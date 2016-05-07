@@ -1,3 +1,17 @@
+# scholar_articles
+
+[Google Schloar](http://scholar.google.com)
+
+* title
+* year
+* citations_count
+* link
+* bibtex
+* resource_type
+* resource_link
+* summary(abstract)
+* google_id
+
 # 准备工作
 
 ## virtualenv
@@ -8,3 +22,4 @@
 * 安装依赖: `pip install -r requirements.txt`
 
 注意: 在pip install 安装依赖之前，确保启动了虚拟环境，这样才不会把全局依赖和虚拟环境的依赖混淆
+
