@@ -19,7 +19,7 @@ class ParseHTML:
     def year(self, sec):
         year = sec.select('.gs_a')[0].text.split('-')[-2].split(',')[-1][1:-1]
         return year
-    
+
     def citations_count(self, sec):
         citations_count = sec.select('.gs_fl > a')[0].text[9:]
         citations_count = int(citations_count)
@@ -29,6 +29,7 @@ class ParseHTML:
         link = sec.select('.gs_rt > a')[0]['href']
         return link
 
+    # need to config proxy in terminal
     def bibtex(self, sec):
         bibtex = ''
         import requests
@@ -39,11 +40,11 @@ class ParseHTML:
                     }
         '''
         proxies = None
-        
+        # get ajax_url
         ajax_url = 'https://scholar.google.co.jp/scholar?q=info:' + self.google_id(sec) +':scholar.google.com/&output=cite&scirp='+ self.index(sec) +'&hl=en'
         ajax_url = 'http' + ajax_url[5:]
         #print('ajax_url:' + ajax_url)
-        try:        
+        try:
             ajax_res = requests.get(url=ajax_url,proxies=proxies)
             ajax_res_cnt = ajax_res.content
             #print('ajax_res_cnt:',ajax_res_cnt)
@@ -79,12 +80,13 @@ class ParseHTML:
     def google_id(self, sec):
         google_id = sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[0][1:-1]
         return google_id
-    
+
+    # number in pages
     def index(self, sec):
         index = sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
         return index
-    
 
+# instance object
 p = ParseHTML()
 for sec in p.sections():
     print('title',p.title(sec))
