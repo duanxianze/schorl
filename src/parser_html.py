@@ -45,7 +45,7 @@ class ParseHTML:
         ajax_url = 'http' + ajax_url[5:]
         #print('ajax_url:' + ajax_url)
         try:
-            ajax_res = requests.get(url=ajax_url,proxies=proxies)
+            ajax_res = requests.get(url=ajax_url,proxies=proxies,timeout=2)
             ajax_res_cnt = ajax_res.content
             #print('ajax_res_cnt:',ajax_res_cnt)
             ajax_soup = BeautifulSoup(ajax_res_cnt,'lxml')
