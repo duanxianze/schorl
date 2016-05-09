@@ -8,38 +8,39 @@ class ParseHTML:
         self.soup = BeautifulSoup(self.html, 'lxml')
         self.html_text = self.soup.text
 
-    @property
-    def title(self):
+    def sections(self):
+        sections = self.soup.select('.gs_r')
+        return sections
+
+    def title(self, sec):
+        title = sec.select('.gs_rt > a')
+        return title
+
+    def year(self, sec):
         pass
 
-    @property
-    def year(self):
+    def citations_count(self, sec):
         pass
 
-    @property
-    def citations_count(self):
+    def link(self, sec):
         pass
 
-    @property
-    def link(self):
+    def bibtex(self, sec):
         pass
 
-    @property
-    def bibtex(self):
+    def resource_type(self, sec):
         pass
 
-    @property
-    def resource_type(self):
+    def resource_link(self, sec):
         pass
 
-    @property
-    def resource_link(self):
+    def summary(self, sec):
         pass
 
-    @property
-    def summary(self):
+    def google_id(self, sec):
         pass
 
-    @property
-    def google_id(self):
-        pass
+p = ParseHTML()
+for sec in p.sections():
+    print(p.title(sec))
+    print("===")
