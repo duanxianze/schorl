@@ -1,13 +1,18 @@
 from bs4 import BeautifulSoup
+import requests
+requests.packages.urllib3.disable_warnings()
+from random import randint
 
 class ParseHTML:
-    def __init__(self):
+    def __init__(self, use_proxy=False):
         with open('scholar_articles.htm', 'rb') as f:
             self.html = f.read()
 
         self.soup = BeautifulSoup(self.html, 'lxml')
         self.html_text = self.soup.text
-
+        self.rand_port = lambda x, y: randint(x, y)
+        self.use_proxy = use_proxy
+        
     def sections(self):
         sections = self.soup.select('.gs_r')
         return sections
@@ -31,19 +36,19 @@ class ParseHTML:
 
     # need to config proxy in terminal
     def bibtex(self, sec):
-        bibtex = ''
-        import requests
+        bibtex = None
+        if self.use_proxy:
+            import socket
+            import socks
+            proxy_port = self.rand_port(9053, 9113)
+            print(proxy_port)
+            socks.set_default_proxy(socks.SOCKS5, "localhost", proxy_port)
+            socket.socket = socks.socksocket
+            print(requests.get('https://api.ipify.org', verify=False).text)
+
         '''
-        proxies = {
-                      "http": "http://tonylu:kidlin@127.0.0.1:7777",
-                      "https": "http://tonylu:kidlin@127.0.0.1:7777",
-                    }
-        '''
-        proxies = None
-        # get ajax_url
         ajax_url = 'https://scholar.google.co.jp/scholar?q=info:' + self.google_id(sec) +':scholar.google.com/&output=cite&scirp='+ self.index(sec) +'&hl=en'
         ajax_url = 'http' + ajax_url[5:]
-        #print('ajax_url:' + ajax_url)
         try:
             ajax_res = requests.get(url=ajax_url,proxies=proxies,timeout=2)
             ajax_res_cnt = ajax_res.content
@@ -55,6 +60,7 @@ class ParseHTML:
             bibtex = res.content
         except:
             print('google 404')
+        '''
         return bibtex
 
     def resource_type(self, sec):
@@ -87,16 +93,16 @@ class ParseHTML:
         return index
 
 # instance object
-p = ParseHTML()
+p = ParseHTML(use_proxy=True)
 for sec in p.sections():
-    print('title',p.title(sec))
-    print('year',p.year(sec))
-    print('citations_count',p.citations_count(sec))
-    print('link',p.link(sec))
-    print('resource_type',p.resource_type(sec))
-    print('resource_link',p.resource_link(sec))
-    print('summary',p.summary(sec))
-    print('google_id',p.google_id(sec))
-    print('index',p.index(sec))
+    #print('title',p.title(sec))
+    #print('year',p.year(sec))
+    #print('citations_count',p.citations_count(sec))
+    #print('link',p.link(sec))
+    #print('resource_type',p.resource_type(sec))
+    #print('resource_link',p.resource_link(sec))
+    #print('summary',p.summary(sec))
+    #print('google_id',p.google_id(sec))
+    #print('index',p.index(sec))
     print('bibtex',p.bibtex(sec))
     print("===")
