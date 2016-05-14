@@ -1,8 +1,10 @@
 import psycopg2
+from bs4 import BeautifulSoup
+from request_with_proxy import request_with_proxy
 
 DB_NAME = "sf_development"
-USER = "Ru"
-PASSWORD = ""
+USER = "gao"
+PASSWORD = "gaotongfei13"
 conn = psycopg2.connect("dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD))
 cur = conn.cursor()
 
@@ -21,7 +23,13 @@ class QueryDB:
         return self.start_url
 
     def page(self):
-        pass
+        r = request_with_proxy(self.start_url)
+        if r:
+            soup = BeautifulSoup(r.text, "lxml")
+            about = soup.select("#gs_ab_md")
+            print(about)
+        else:
+            print(r.status_code)
 
 cur.execute("select first_name, middle_name, last_name from scholars where id >=1000")
 names =  [n for n in cur.fetchall()]
