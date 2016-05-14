@@ -9,10 +9,10 @@ cur = conn.cursor()
 class QueryDB:
     def __init__(self):
         cur.execute("select (first_name, middle_name, last_name) from scholars where id >= 1000")
-        self.names = [n for n in cur.fetchall()]
+        self.names = [n[0] for n in cur.fetchall()]
 
     def run(self):
-        print(self._names_list)
+        print(self.names)
 
 query = QueryDB()
 query.run()
