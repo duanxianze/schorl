@@ -54,19 +54,8 @@ class ParseHTML:
 
     # need to config proxy in terminal
     def bibtex(self, sec):
-<<<<<<< HEAD
-        bibtex = ''
-        '''
-        proxies = {
-                      "http": "http://tonylu:kidlin@127.0.0.1:7777",
-                      "https": "http://tonylu:kidlin@127.0.0.1:7777",
-                    }
-        '''
         proxies = None
-        # get ajax_url
-=======
         bibtex = None
->>>>>>> c037401b13412748444020e77ff928f1e9c764c1
         ajax_url = 'https://scholar.google.co.jp/scholar?q=info:' + self.google_id(sec) +':scholar.google.com/&output=cite&scirp='+ self.index(sec) +'&hl=en'
         ajax_url = 'http' + ajax_url[5:]
         try:
