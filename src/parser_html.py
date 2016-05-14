@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+import requests
 
 class ParseHTML:
     def __init__(self):
@@ -32,7 +33,6 @@ class ParseHTML:
     # need to config proxy in terminal
     def bibtex(self, sec):
         bibtex = ''
-        import requests
         '''
         proxies = {
                       "http": "http://tonylu:kidlin@127.0.0.1:7777",
