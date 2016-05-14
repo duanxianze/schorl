@@ -1,14 +1,24 @@
 from bs4 import BeautifulSoup
 import requests
+from fake_useragent import UserAgent
+import time
+import requests
+requests.packages.urllib3.disable_warnings()
+from random import randint
+import socks
+import socket
 
 class ParseHTML:
-    def __init__(self):
+    def __init__(self, use_proxy=False):
         with open('scholar_articles.htm', 'rb') as f:
             self.html = f.read()
 
         self.soup = BeautifulSoup(self.html, 'lxml')
         self.html_text = self.soup.text
-
+        self.rand_port = lambda x, y: randint(x, y)
+        self.use_proxy = use_proxy
+        self.ua = UserAgent()
+        
     def sections(self):
         sections = self.soup.select('.gs_r')
         return sections
@@ -30,8 +40,21 @@ class ParseHTML:
         link = sec.select('.gs_rt > a')[0]['href']
         return link
 
+    def request_with_proxy(self, url, timeout=10):
+        headers = {'User-Agent': self.ua.random}
+        print(headers)
+        print(requests.get('https://api.ipify.org').text)
+        r = None
+        proxy_port = self.rand_port(9053, 9113)
+        socks.set_default_proxy(socks.SOCKS5, "localhost", proxy_port)
+        socket.socket = socks.socksocket
+        r = requests.get(url, headers=headers)
+        return r
+
+
     # need to config proxy in terminal
     def bibtex(self, sec):
+<<<<<<< HEAD
         bibtex = ''
         '''
         proxies = {
@@ -41,20 +64,24 @@ class ParseHTML:
         '''
         proxies = None
         # get ajax_url
+=======
+        bibtex = None
+>>>>>>> c037401b13412748444020e77ff928f1e9c764c1
         ajax_url = 'https://scholar.google.co.jp/scholar?q=info:' + self.google_id(sec) +':scholar.google.com/&output=cite&scirp='+ self.index(sec) +'&hl=en'
         ajax_url = 'http' + ajax_url[5:]
-        #print('ajax_url:' + ajax_url)
         try:
-            ajax_res = requests.get(url=ajax_url,proxies=proxies,timeout=2)
+            ajax_res = self.request_with_proxy(ajax_url)
+            print(ajax_res)
             ajax_res_cnt = ajax_res.content
             #print('ajax_res_cnt:',ajax_res_cnt)
-            ajax_soup = BeautifulSoup(ajax_res_cnt,'lxml')
+            ajax_soup = BeautifulSoup(ajax_res_cnt, 'lxml')
             bibtex_url = ajax_soup.select('.gs_citi')[0]['href']
-            bibtex_url = 'http://scholar.google.co.jp' + bibtex_url
-            res = requests.get(url=bibtex_url,proxies=proxies)
+            bibtex_url = 'http://scholar.google.com' + bibtex_url
+            res = self.request_with_proxy(bibtex_url)
             bibtex = res.content
-        except:
-            print('google 404')
+        except Exception as e:
+            print(e)
+
         return bibtex
 
     def resource_type(self, sec):
@@ -87,16 +114,17 @@ class ParseHTML:
         return index
 
 # instance object
-p = ParseHTML()
+p = ParseHTML(use_proxy=True)
 for sec in p.sections():
-    print('title',p.title(sec))
-    print('year',p.year(sec))
-    print('citations_count',p.citations_count(sec))
-    print('link',p.link(sec))
-    print('resource_type',p.resource_type(sec))
-    print('resource_link',p.resource_link(sec))
-    print('summary',p.summary(sec))
-    print('google_id',p.google_id(sec))
-    print('index',p.index(sec))
+    time.sleep(5)
+    #print('title',p.title(sec))
+    #print('year',p.year(sec))
+    #print('citations_count',p.citations_count(sec))
+    #print('link',p.link(sec))
+    #print('resource_type',p.resource_type(sec))
+    #print('resource_link',p.resource_link(sec))
+    #print('summary',p.summary(sec))
+    #print('google_id',p.google_id(sec))
+    #print('index',p.index(sec))
     print('bibtex',p.bibtex(sec))
     print("===")
