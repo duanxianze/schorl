@@ -1,5 +1,5 @@
 import psycopg2
-# from parser_html import ParseHTML
+
 DB_NAME = "sf_development"
 USER = "Ru"
 PASSWORD = ""
