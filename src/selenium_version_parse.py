@@ -7,7 +7,6 @@ class CrawlGoogleScholar:
 
     def __init__(self,keyword):
         self.driver = webdriver.Firefox()
-        self.driver.get('https://scholar.google.com/scholar?hl=zh-CN&q=wenhuayu&btnG=&lr=')
         self.driver.get("https://scholar.google.com/")
         elem = self.driver.find_element_by_id("gs_hp_tsi")
         elem.send_keys(keyword)
@@ -17,7 +16,7 @@ class CrawlGoogleScholar:
         sections = self.driver.find_elements_by_class_name('gs_r')
         return sections
        
-    def get_bibtex_url(self,sec):
+    def bibtex_url(self,sec):
         cite_button = sec.find_elements_by_class_name('gs_nph')[1]
         cite_button.click()
         time.sleep(2) #点击后需要等待加载元素完全display再去搜索
@@ -75,8 +74,8 @@ if __name__ == "__main__":
     spider = CrawlGoogleScholar(keyword= 'wenhuayu')
     sections = spider.get_sections()
     for sec in sections:
-        time.sleep(2)
-        print('bibtex_url',spider.get_bibtex_url(sec))
+    	time.sleep(2)#防止被封的时间间隔
+        print('bibtex_url',spider.bibtex_url(sec))
         print('title',spider.title(sec))
         print('year',spider.year(sec))
         print('citations_count',spider.citations_count(sec))
