@@ -2,11 +2,11 @@ from bs4 import BeautifulSoup
 import requests
 from fake_useragent import UserAgent
 import time
-import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint
 import socks
 import socket
+from request_with_proxy import request_with_proxy
 
 class ParseHTML:
     def __init__(self, use_proxy=False):
@@ -40,18 +40,6 @@ class ParseHTML:
         link = sec.select('.gs_rt > a')[0]['href']
         return link
 
-    def request_with_proxy(self, url, timeout=10):
-        headers = {'User-Agent': self.ua.random}
-        print(headers)
-        print(requests.get('https://api.ipify.org').text)
-        r = None
-        proxy_port = self.rand_port(9053, 9113)
-        socks.set_default_proxy(socks.SOCKS5, "localhost", proxy_port)
-        socket.socket = socks.socksocket
-        r = requests.get(url, headers=headers)
-        return r
-
-
     # need to config proxy in terminal
     def bibtex(self, sec):
         proxies = None
@@ -59,14 +47,14 @@ class ParseHTML:
         ajax_url = 'https://scholar.google.co.jp/scholar?q=info:' + self.google_id(sec) +':scholar.google.com/&output=cite&scirp='+ self.index(sec) +'&hl=en'
         ajax_url = 'http' + ajax_url[5:]
         try:
-            ajax_res = self.request_with_proxy(ajax_url)
+            ajax_res = request_with_proxy(ajax_url)
             print(ajax_res)
             ajax_res_cnt = ajax_res.content
             #print('ajax_res_cnt:',ajax_res_cnt)
             ajax_soup = BeautifulSoup(ajax_res_cnt, 'lxml')
             bibtex_url = ajax_soup.select('.gs_citi')[0]['href']
             bibtex_url = 'http://scholar.google.com' + bibtex_url
-            res = self.request_with_proxy(bibtex_url)
+            res = request_with_proxy(bibtex_url)
             bibtex = res.content
         except Exception as e:
             print(e)
