@@ -9,14 +9,13 @@ import socket
 from request_with_proxy import request_with_proxy
 
 class ParseHTML:
-    def __init__(self, use_proxy=False):
+    def __init__(self):
         with open('scholar_articles.htm', 'rb') as f:
             self.html = f.read()
 
         self.soup = BeautifulSoup(self.html, 'lxml')
         self.html_text = self.soup.text
         self.rand_port = lambda x, y: randint(x, y)
-        self.use_proxy = use_proxy
         self.ua = UserAgent()
         
     def sections(self):
@@ -91,7 +90,7 @@ class ParseHTML:
         return index
 
 # instance object
-p = ParseHTML(use_proxy=True)
+p = ParseHTML()
 for sec in p.sections():
     time.sleep(5)
     #print('title',p.title(sec))
