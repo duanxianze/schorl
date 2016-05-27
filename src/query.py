@@ -1,6 +1,8 @@
 import psycopg2
+import re
 from bs4 import BeautifulSoup
 from request_with_proxy import request_with_proxy
+from math import ceil
 
 DB_NAME = "sf_development"
 USER = "gao"
@@ -11,32 +13,52 @@ cur = conn.cursor()
 class QueryDB:
     def __init__(self,name):
         self.name = name
-        self.start_url = None
         self.url = []
-
-    def run(self):
         if self.name[1].strip()=='':
-            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.name[0].strip()+'+'+self.name[2].strip()+'&hl=en&as_sdt=0,5'
+            self.full_name = self.name[0].strip() + ' ' + self.name[2].strip()
+            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&as_sdt=0,5'
         else:
-            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.name[0].strip()+'+'+self.name[1].strip()+'+'+self.name[2].strip()+'&hl=en&as_sdt=0,5'
+            self.full_name = self.name[0].strip() + ' ' + self.name[1].strip() + ' ' + self.name[2].strip()
+            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&as_sdt=0,5'
 
-        return self.start_url
 
     def page(self):
+        p = 10
         r = request_with_proxy(self.start_url)
         if r:
             soup = BeautifulSoup(r.text, "lxml")
             about = soup.select("#gs_ab_md")
-            print(about)
+            if about:
+                result = about[0].text
+                result_num = re.findall("About\s+([\w\,]+)\s+results", result)
+                if result_num:
+                    result_num = result_num[0].replace(",", "")
+                    p = int(ceil(int(result_num)/float(10)))
         else:
             print(r.status_code)
+        return p 
+
+
+    def page_url(self):
+        """
+        page 大于100，按照100处理，因为google scholar最多只能查询到100页
+        """
+        pages = self.page()
+        if pages > 100:
+            pages = 100
+        
+        urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
+
+        return urls 
+
 
 cur.execute("select first_name, middle_name, last_name from scholars where id >=1000")
 names =  [n for n in cur.fetchall()]
 
 for name in names:
     query = QueryDB(name)
-    query.run()
     print(name)
     print(query.start_url)
-    query.page()
+    print(query.page_url())
+    #print(query.page)
+
