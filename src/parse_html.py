@@ -11,18 +11,29 @@ from request_with_proxy import request_with_proxy
 class ParseHTML:
     def __init__(self, from_web=True, url=None):
         if from_web and url:
+            print("from web")
             self.html = request_with_proxy(url).text
         else:
+            print("from local file")
             with open('scholar_articles.htm', 'rb') as f:
                 self.html = f.read()
-
+        '''
+        # write html
+        with open("test.html", "w+") as test:
+            test.write(self.html)
+        '''
         self.soup = BeautifulSoup(self.html, 'lxml')
         self.html_text = self.soup.text
         self.rand_port = lambda x, y: randint(x, y)
         self.ua = UserAgent()
         
     def sections(self):
-        sections = self.soup.select('.gs_r')
+        sections = None
+        try:
+            sections = self.soup.select('.gs_r')
+        except Exception as e:
+            print("ERROR:ParseHTML:sections")
+
         return sections
 
     def title(self, sec):
@@ -130,8 +141,8 @@ class ParseHTML:
             print(e)
         return index
 
-# instance object
 '''
+# instance object
 p = ParseHTML(url='https://scholar.google.com/scholar?hl=en&q=wenhua+yu&btnG=&as_sdt=1%2C5&as_sdtp=')
 for sec in p.sections():
     time.sleep(5)
@@ -144,6 +155,6 @@ for sec in p.sections():
     print('summary',p.summary(sec))
     print('google_id',p.google_id(sec))
     print('index',p.index(sec))
-    print('bibtex',p.bibtex(sec))
+    #print('bibtex',p.bibtex(sec))
     print("===")
 '''

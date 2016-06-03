@@ -17,7 +17,7 @@ def rand_port(x, y, exclude):
 
 
 def request_with_proxy(url, timeout=10, use_ss=True):
-    time.sleep(20)
+    time.sleep(30)
     headers = {'User-Agent': ua.random}
     r = None
     if not use_ss:
@@ -39,5 +39,6 @@ def request_with_proxy(url, timeout=10, use_ss=True):
             "https": "socks5://127.0.0.1:{}".format(port)
         }
         r = requests.get(url, proxies=proxies, timeout=10, headers=headers)
+        print(r.status_code)
 
     return r
