@@ -3,11 +3,13 @@ import re
 from bs4 import BeautifulSoup
 from request_with_proxy import request_with_proxy
 from math import ceil
+from parse_html import ParseHTML
 
 DB_NAME = "sf_development"
 USER = "gao"
 PASSWORD = "gaotongfei13"
 conn = psycopg2.connect("dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD))
+conn.autocommit = True
 cur = conn.cursor()
 
 class QueryDB:
@@ -35,30 +37,57 @@ class QueryDB:
                     result_num = result_num[0].replace(",", "")
                     p = int(ceil(int(result_num)/float(10)))
         else:
-            print(r.status_code)
+            pass
         return p 
 
 
-    def page_url(self):
-        """
-        page 大于100，按照100处理，因为google scholar最多只能查询到100页
-        """
-        pages = self.page()
-        if pages > 100:
-            pages = 100
+    def page_urls(self):
+        #pages = self.page()
+        pages = 10
         
         urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
 
         return urls 
 
 
-cur.execute("select first_name, middle_name, last_name from scholars where id >=1000")
+#cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
+cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
 names =  [n for n in cur.fetchall()]
 
 for name in names:
-    query = QueryDB(name)
+    id = name[0]
+    query = QueryDB(name[1:])
+    print(id)
     print(name)
-    print(query.start_url)
-    print(query.page_url())
-    #print(query.page)
+    page_urls = query.page_urls()
+    for p in page_urls:
+        print("for p in page")
+        print(p)
+        parse_html = ParseHTML(url=p)
+        print(parse_html)
+        print(parse_html.sections())
+        for sec in parse_html.sections():
+            print("for sec in parse_html.secions()")
+            print(sec)
+            try:
+                print("try...")
+                title = parse_html.title(sec)
+                year = parse_html.year(sec)
+                citations_count = parse_html.citations_count(sec)
+                link = parse_html.link(sec)
+                resource_type = parse_html.resource_type(sec)
+                resource_link = parse_html.resource_link(sec)
+                summary = parse_html.summary(sec)
+                google_id = parse_html.google_id(sec)
+                #bibtex = parse_html.bibtex(sec)
+                #print("({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})".format(title, year, citations_count, link, resource_type, resource_link, summary, google_id))
+                #print("google_id: {0}".format(google_id))
+                cur.execute("insert into articles (title, year, citations_count, link, resource_type, resource_link, summary, google_id) "
+                        "values (%s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, link, resource_type, resource_link, summary, google_id))
+            except Exception as e:
+                print(e)
 
+    cur.execute("update scholars set is_added = 1 where id = (%s)", (id,))
+
+cur.close()
+conn.close()

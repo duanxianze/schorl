@@ -12,20 +12,19 @@ ua = UserAgent()
 def rand_port(x, y, exclude):
     r = None
     while r in exclude or not r:
-        print(r)
         r = randint(x, y)
     return r
 
 
 def request_with_proxy(url, timeout=10, use_ss=True):
-    time.sleep(10)
+    time.sleep(30)
     headers = {'User-Agent': ua.random}
     r = None
     if not use_ss:
         proxy_port = rand_port(9053, 9113)
         socks.set_default_proxy(socks.SOCKS5, "localhost", proxy_port)
         socket.socket = socks.socksocket
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=10)
         while str(r.status_code).startswith('5') or str(r.status_code).startswith('4'):
             print(r.status_code)
             print('retrying...')
@@ -39,7 +38,7 @@ def request_with_proxy(url, timeout=10, use_ss=True):
             "http": "socks5://127.0.0.1:{}".format(port),
             "https": "socks5://127.0.0.1:{}".format(port)
         }
-        time.sleep(10)
         r = requests.get(url, proxies=proxies, timeout=10, headers=headers)
+        print(r.status_code)
 
     return r
