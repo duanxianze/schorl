@@ -64,6 +64,15 @@ class ParseHTML:
             print(e)
         return citations_count
 
+    def citations_link(self, sec):
+        citations_link = None
+        try:
+            citations_link = sec.select('.gs_fl > a')[0]['href']
+        except Exception as e:
+            print("ERROR:ParseHTML:citations_link")
+            print(e)
+        return citations_link
+
     def link(self, sec):
         link = None
         try:
@@ -141,9 +150,10 @@ class ParseHTML:
             print(e)
         return index
 
-'''
 # instance object
-p = ParseHTML(url='https://scholar.google.com/scholar?hl=en&q=wenhua+yu&btnG=&as_sdt=1%2C5&as_sdtp=')
+#p = ParseHTML(url='https://scholar.google.com/scholar?hl=en&q=wenhua+yu&btnG=&as_sdt=1%2C5&as_sdtp=')
+'''
+p = ParseHTML(from_web=False)
 for sec in p.sections():
     time.sleep(5)
     print('title',p.title(sec))
@@ -157,4 +167,5 @@ for sec in p.sections():
     print('index',p.index(sec))
     #print('bibtex',p.bibtex(sec))
     print("===")
+    print(p.citations_link(sec))
 '''

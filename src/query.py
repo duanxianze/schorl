@@ -74,6 +74,7 @@ for name in names:
                 title = parse_html.title(sec)
                 year = parse_html.year(sec)
                 citations_count = parse_html.citations_count(sec)
+                citations_link = parse_html.citations_link(sec)
                 link = parse_html.link(sec)
                 resource_type = parse_html.resource_type(sec)
                 resource_link = parse_html.resource_link(sec)
@@ -82,8 +83,8 @@ for name in names:
                 #bibtex = parse_html.bibtex(sec)
                 #print("({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})".format(title, year, citations_count, link, resource_type, resource_link, summary, google_id))
                 #print("google_id: {0}".format(google_id))
-                cur.execute("insert into articles (title, year, citations_count, link, resource_type, resource_link, summary, google_id) "
-                        "values (%s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, link, resource_type, resource_link, summary, google_id))
+                cur.execute("insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
+                        "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id))
             except Exception as e:
                 print(e)
 
