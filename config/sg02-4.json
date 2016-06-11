@@ -1,0 +1,9 @@
+{
+    "server":"sg02-4.ssv7.net",
+    "server_port":13053,
+    "local_address": "127.0.0.1",
+    "local_port":1082,
+    "password":"Qh5NAbSvJypF",
+    "timeout":300,
+    "method":"aes-256-cfb"
+}
