@@ -21,11 +21,12 @@ def download(url_googleid):
             with open(os.path.join(DOWNLOAD_FOLDER, google_id), 'wb') as pdf_file:
                 print('writing pdf file')
                 pdf_file.write(r.content)
+        cur.execute("update articles set is_downloaded = 1 where google_id = %s", (google_id,))
     except Exception as e:
         print(e)
 
 pool = ThreadPool(8)
-cur.execute("select resource_link, google_id from articles where id>=314060 and resource_link is not null and resource_type='PDF'")
+cur.execute("select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF'")
 url_googleids = cur.fetchall()
 print(len(url_googleids))
 
