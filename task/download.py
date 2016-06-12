@@ -7,7 +7,9 @@ import psycopg2
 conn = psycopg2.connect(dbname="sf_development", user="gao", password="gaotongfei13")
 cur = conn.cursor()
 
-DOWNLOAD_FOLDER = "/home/gao/scholar_articles/download"
+DOWNLOAD_FOLDER = "./download"
+if not os.path.exists(DOWNLOAD_FOLDER):
+    os.makedirs(DOWNLOAD_FOLDER)
 
 def download(url_googleid):
     try:
