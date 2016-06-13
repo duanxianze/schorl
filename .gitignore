@@ -1,7 +1,9 @@
 venv
+torrc
 .DS_Store
 __pycache__
 *.pyc
 *.log
 download/
 logs
+*.html

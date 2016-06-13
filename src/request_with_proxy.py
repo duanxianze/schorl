@@ -21,14 +21,12 @@ def request_with_proxy(url, timeout=10, use_ss=True):
     headers = {'User-Agent': ua.random}
     r = None
     if not use_ss:
-        proxy_port = rand_port(9053, 9113)
-        socks.set_default_proxy(socks.SOCKS5, "localhost", proxy_port)
-        socket.socket = socks.socksocket
-        r = requests.get(url, headers=headers, timeout=10)
-        while str(r.status_code).startswith('5') or str(r.status_code).startswith('4'):
-            print(r.status_code)
-            print('retrying...')
-            request_with_proxy(url)
+        proxy_port = rand_port(9054, 9155)
+        proxies = {
+                "http": "socks5://127.0.0.1:{}".format(proxy_port),
+                "https": "socks5://127.0.0.1:{}".foramt(proxy_port)
+        }
+        r = requests.get(url, proxies=proxies, headers=headers, timeout=20)
     else:
         port_range = (1080, 1097)
         error_ports = [1083, 1085, 1089, 1094]
@@ -38,7 +36,8 @@ def request_with_proxy(url, timeout=10, use_ss=True):
             "http": "socks5://127.0.0.1:{}".format(port),
             "https": "socks5://127.0.0.1:{}".format(port)
         }
-        r = requests.get(url, proxies=proxies, timeout=10, headers=headers)
-        print(r.status_code)
+        r = requests.get(url, proxies=proxies, timeout=20, headers=headers)
+
+    print(r.status_code)
 
     return r
