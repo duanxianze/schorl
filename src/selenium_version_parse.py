@@ -1,4 +1,7 @@
 #coding:utf-8
+'''
+    selenium_version_parse.py 用于测试selenium版本的爬取方式
+'''
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
