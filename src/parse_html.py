@@ -1,3 +1,7 @@
+#coding:utf-8
+'''
+    parse_html.py 用于解析学者搜索结果页
+'''
 from bs4 import BeautifulSoup
 import requests
 from fake_useragent import UserAgent
@@ -9,6 +13,10 @@ import socket
 from request_with_proxy import request_with_proxy
 
 class ParseHTML:
+    '''
+        对于google_scholar的搜索结果页进行解析，包含文章列表，逐一解析
+        from_web和url参数是需要一边爬取一边解析的情况，
+    '''
     def __init__(self, from_web=True, url=None):
         if from_web and url:
             print("from web")
@@ -26,7 +34,8 @@ class ParseHTML:
         self.html_text = self.soup.text
         self.rand_port = lambda x, y: randint(x, y)
         self.ua = UserAgent()
-        
+
+    '''得到文章列表'''
     def sections(self):
         sections = None
         try:
@@ -36,6 +45,8 @@ class ParseHTML:
 
         return sections
 
+    '''传入参数：sec————每一个文章的片段（由sections裁剪得到）'''
+    '''以下属性函数均类似'''
     def title(self, sec):
         title = ''
         try:
