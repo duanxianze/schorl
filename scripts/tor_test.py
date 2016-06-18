@@ -38,7 +38,7 @@ def test_port(port_num):
 duplicate = 0
 error = 0
 ip_list = []
-for i in range(9054, 9254):
+for i in range(9054, 9154):
     try:
         ip = test_port(i)
         print(ip)
