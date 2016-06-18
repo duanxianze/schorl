@@ -1,5 +1,5 @@
 start = 9054
-end = 9254
+end = 9154
 
 def generate_tor_config(start, end):
     with open('torrc', 'w+') as f:
