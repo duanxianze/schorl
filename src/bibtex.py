@@ -20,24 +20,24 @@ while True:
     print("{} tasks running".format(len(result_sets)))
     for id, google_id in result_sets:
         bibtex = None
-        time.sleep(1)
-        rand_port = random_port(9054, 9155)
-        print(rand_port)
-        proxies = {
-                'http': 'socks5://127.0.0.1:{0}'.format(rand_port),
-                'https': 'socks5://127.0.0.1:{0}'.format(rand_port)
-        }
-
         url = 'https://scholar.google.com/scholar?q=info:{}:scholar.google.com/&output=cite&scirp=0&hl=en'.format(google_id)
-        headers = {'User-Agent': ua.random}
-        print(requests.get('https://api.ipify.org', proxies=proxies, headers=headers).content)
-        response = requests.get(url, proxies=proxies, timeout=20, headers=headers)
+        #print(request_with_proxy('https://api.ipify.org', use_ss=False).content)
+        response = request_with_proxy(url, timeout=20, use_ss=False, sleep=1)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "lxml")
-            url = soup.select("#gs_citi > a")[0]['href']
-            full_url = "https://scholar.google.com" + url
-            bibtex_response = requests.get(full_url, proxies=proxies, timeout=20, headers=headers)
-            if bibtex_response:
-                bibtex = bibtex_response.text
+            citi = soup.select("#gs_citi > a")
+            if citi:
+                url = citi[0]['href'] 
+                full_url = "https://scholar.google.com" + url
+                bibtex_response = request_with_proxy(full_url, timeout=20, use_ss=False, sleep=1)
+                if bibtex_response:
+                    bibtex = bibtex_response.text
+                    print(bibtex)
+                else:
+                    print('no bibtex scraped')
 
+        else:
+            print(response.status_code)
         cur.execute("update articles set bibtex = %s where id = %s", (bibtex, id))
+
+    time.sleep(3600)
