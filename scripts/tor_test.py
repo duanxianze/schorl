@@ -37,8 +37,10 @@ def test_port(port_num):
 
 duplicate = 0
 error = 0
+error_ports = []
 ip_list = []
-for i in range(9054, 9254):
+#for i in range(9054, 9154):
+for i in [9058, 9102, 9119]:
     try:
         ip = test_port(i)
         print(ip)
@@ -48,9 +50,11 @@ for i in range(9054, 9254):
             duplicate += 1
     except Exception as e:
         error += 1
+        error_ports.append(i)
         print(i)
         print(e)
 
 print("duplicate " + str(duplicate))
 print("how many ips can be used " + str(len(ip_list)))
 print("how many ips can not be used " + str(error))
+print(error_ports)
