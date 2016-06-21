@@ -16,7 +16,10 @@ ua = UserAgent()
 
 '''
 功能：随机分配端口
-传入参数：随机域的两个边界x,y，以及一个包含所有不可能值的集合对象exclude
+传入参数：
+    x,y：    随机域的两个边界，
+    exclude：以及一个包含所有不可能值的集合对象
+返回随机端口
 '''
 def rand_port(x, y, exclude):
     r = None
@@ -26,8 +29,11 @@ def rand_port(x, y, exclude):
 
 '''
 功能：发送代理请求
-传入参数：请求地址url，爬取时间间隔timeout，
-        是否使用shadowsocks代理use_ss
+传入参数：
+    url：    请求地址url，
+    timeout：爬取时间间隔，
+    use_ss： 是否使用shadowsocks代理
+    sleep:   运行前等待时间
 返回请求结果
 '''
 def request_with_proxy(url, timeout=10, use_ss=True, sleep=30):
@@ -52,5 +58,4 @@ def request_with_proxy(url, timeout=10, use_ss=True, sleep=30):
         r = requests.get(url, proxies=proxies, timeout=20, headers=headers)
 
     print(r.status_code)
-
     return r
