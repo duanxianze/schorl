@@ -15,9 +15,18 @@ from request_with_proxy import request_with_proxy
 class ParseHTML:
     '''
         对于google_scholar的搜索结果页进行解析，包含文章列表，逐一解析
-        from_web和url参数是需要一边爬取一边解析的情况，
     '''
     def __init__(self, from_web=True, url=None):
+        '''
+            from_web和url参数是需要一边爬取一边解析的情况，
+            若本地解析html则实例化时不需要传入
+
+            类属性包括:
+                self.soup:  BeautifulSoup解析模型生成的文档结构
+                self.html_text：soup中包含的text
+                self.rand_port：代理端口
+                self.ua：       代理实例对象
+        '''
         if from_web and url:
             print("from web")
             self.html = request_with_proxy(url).text
