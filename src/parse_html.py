@@ -45,9 +45,12 @@ class ParseHTML:
 
         return sections
 
-    '''传入参数：sec————每一个文章的片段（由sections裁剪得到）'''
-    '''以下属性函数均类似'''
     def title(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段（由sections裁剪得到）
+            返回文章题目
+        '''
         title = ''
         try:
             title = sec.select('.gs_rt > a')[0].text
@@ -57,6 +60,11 @@ class ParseHTML:
         return title
 
     def year(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章发表年份
+        '''
         year = None
         try:
             year = sec.select('.gs_a')[0].text.split('-')[-2].split(',')[-1][1:-1]
@@ -66,6 +74,11 @@ class ParseHTML:
         return year
 
     def citations_count(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章引用次数
+        '''
         citations_count = None
         try:
             citations_count = sec.select('.gs_fl > a')[0].text[9:]
@@ -76,6 +89,11 @@ class ParseHTML:
         return citations_count
 
     def citations_link(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章的引用链接，指向引用该文章的搜索结果url
+        '''
         citations_link = None
         try:
             citations_link = sec.select('.gs_fl > a')[0]['href']
@@ -85,6 +103,11 @@ class ParseHTML:
         return citations_link
 
     def link(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章链接
+        '''
         link = None
         try:
             link = sec.select('.gs_rt > a')[0]['href']
@@ -95,6 +118,11 @@ class ParseHTML:
 
     # need to config proxy in terminal
     def bibtex(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章bibtex信息
+        '''
         bibtex = None
         ajax_url = 'https://scholar.google.co.jp/scholar?q=info:' + self.google_id(sec) +':scholar.google.com/&output=cite&scirp='+ self.index(sec) +'&hl=en'
         ajax_url = 'http' + ajax_url[5:]
@@ -118,6 +146,11 @@ class ParseHTML:
         return bibtex
 
     def resource_type(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章资源类型，多是html或pdf
+        '''
         resource_type = None
         try:
             resource_type = sec.select('.gs_ggsS')[0].text.split(' ')[1][1:-1]
@@ -126,6 +159,11 @@ class ParseHTML:
         return resource_type
 
     def resource_link(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章资源链接，便于pdf的下载
+        '''
         resource_link = None
         try:
             resource_link = sec.select('.gs_md_wp > a')[0]['href']
@@ -134,6 +172,11 @@ class ParseHTML:
         return resource_link
 
     def summary(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章内容介绍总结性文字
+        '''
         summary = None
         try:
             summary = sec.select('.gs_rs')[0].text
@@ -143,6 +186,11 @@ class ParseHTML:
         return summary
 
     def google_id(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章在google_scholar中google为其编码的ID
+        '''
         google_id = None
         try:
             google_id = sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[0][1:-1]
@@ -153,6 +201,11 @@ class ParseHTML:
 
     # number in pages
     def index(self, sec):
+        '''
+            传入参数：
+                sec:每一个文章的片段
+            返回文章在该页面是第几个文章
+        '''
         index = None
         try:
             index = sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
