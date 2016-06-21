@@ -57,8 +57,8 @@ class QueryDB:
 
 
 '''从scholar表中检索出学者名列表'''
-#cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
-cur.execute("select id, first_name, middle_name, last_name from scholars where id = (select max(id)-1 from scholars)")
+cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
+#cur.execute("select id, first_name, middle_name, last_name from scholars where id = (select max(id)-1 from scholars)")
 names =  [n for n in cur.fetchall()]
 
 '''对于每一个学者'''
@@ -95,11 +95,8 @@ for name in names:
                 print("({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})".format(title, year, citations_count, link, resource_type, resource_link, summary, google_id))
                 #print("google_id: {0}".format(google_id))
                 '''各项写入文章表'''
-                #cur.execute("insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
-                        #"values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id))
-
                 cur.execute("insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
-                        "values (%s, %s, %s, %s, %s, %s, %s, %s, %s)", (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id))
+                        "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id))
             except Exception as e:
                 print(e)
     '''更新数据库中学者的记录is_added = 1，表示已经爬取过他的文章集合'''
