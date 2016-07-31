@@ -30,7 +30,7 @@ def rand_port(x, y, exclude):
         是否使用shadowsocks代理use_ss
 返回请求结果
 '''
-def request_with_proxy(url, timeout=10, use_ss=True, sleep=30):
+def request_with_proxy(url, timeout=10, use_ss=False, sleep=30):
     time.sleep(sleep)
     headers = {'User-Agent': ua.random}
     r = None
@@ -42,9 +42,9 @@ def request_with_proxy(url, timeout=10, use_ss=True, sleep=30):
         }
         r = requests.get(url, proxies=proxies, headers=headers, timeout=20)
     else:
-        port_range = (1080, 1097)
-        error_ports = [1083, 1085, 1089, 1094]
-        port = rand_port(1080, 1097, error_ports)
+        port_range = (1080, 1108)
+        error_ports = [1094, 1098]
+        port = rand_port(1080, 1108, error_ports)
         proxies = {
             "http": "socks5://127.0.0.1:{}".format(port),
             "https": "socks5://127.0.0.1:{}".format(port)

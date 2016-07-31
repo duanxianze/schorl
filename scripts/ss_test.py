@@ -33,7 +33,7 @@ def test_port(port_num):
     r = requests.get("https://api.ipify.org/", proxies=proxies, timeout=5, headers=headers)
     print(r.text)
 
-for i in range(1080, 1098):
+for i in range(1080, 1108):
     try:
         test_port(i)
     except Exception as e:
