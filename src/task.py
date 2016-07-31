@@ -83,7 +83,7 @@ names =  [n for n in cur.fetchall()]
 for name in names:
     try:
         id = name[0]
-        query = QueryDB(name[1:])
+        query = ScholarSearch(name[1:])
         print(id)
         print(name)
         '''从实例化类中得到关于该学者的搜索结果的所有页面url'''
