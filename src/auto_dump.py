@@ -2,7 +2,7 @@ import os,time
 
 def auto_dump(date_str):
 	dump_file_name = date_str + '.sql'
-	os.system('pg_dump -U postgres -f '+ dump_file_name + ' sf_development')
+	os.system('pg_dump -U postgres -f ~/backups/'+ dump_file_name + ' sf_development')
 
 
 if __name__ == '__main__':
