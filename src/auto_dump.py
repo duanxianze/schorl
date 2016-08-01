@@ -6,9 +6,7 @@ def auto_dump(date_str):
 
 
 if __name__ == '__main__':
-    '''
-	auto_dump('2015_5_23')
-	'''
+	#auto_dump('2015_5_23')
 	while True:
 		date_str = time.strftime("%Y_%m_%d",time.localtime(time.time()))
 		auto_dump(date_str)
