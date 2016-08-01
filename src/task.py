@@ -12,7 +12,7 @@ from parse_html import ParseHTML
 '''连接数据库'''
 DB_NAME = "sf_development"
 USER = "gao"
-PASSWORD = "gaotongfei13"
+PASSWORD = "123123"
 conn = psycopg2.connect("dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD))
 conn.autocommit = True
 cur = conn.cursor()
