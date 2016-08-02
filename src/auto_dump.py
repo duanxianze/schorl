@@ -1,3 +1,8 @@
+#coding:utf-8
+'''
+auto_dump.py：
+    用于自动导出备份数据库，并云同步至dropbox
+'''
 import os,time
 
 def auto_dump(date_str):

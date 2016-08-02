@@ -1,4 +1,9 @@
 #coding:utf-8
+'''
+amount_status.py：
+    用于统计数据库articles表数据量，了解爬取速率
+'''
+
 import psycopg2,time
 
 def articles_amount(cur):
