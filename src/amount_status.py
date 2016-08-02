@@ -9,15 +9,13 @@ def articles_amount(cur):
 
 
 if __name__=='__main__':
-    '''设置数据库'''
     DB_NAME = "sf_development"
     USER = "gao"
-    PASSWORD = "123123"
-    '''连接数据库'''
+    PASSWORD = "gaotongfei13"
     conn = psycopg2.connect(
         "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
     )
-    conn.autocommit = True  #设置数据库自动提交
+    conn.autocommit = True
     cur = conn.cursor()
 
     f = open('amount_log.txt','a')
