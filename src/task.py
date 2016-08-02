@@ -75,7 +75,8 @@ class ScholarSearch:
 
 
 '''从scholar表中检索出学者名列表'''
-cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
+#cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
+cur.execute("select id, first_name, middle_name, last_name from scholars where id > 2000")
 #cur.execute("select id, first_name, middle_name, last_name from scholars where id = (select max(id)-1 from scholars)")
 names =  [n for n in cur.fetchall()]
 

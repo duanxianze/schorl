@@ -36,7 +36,7 @@ def rand_port(x, y, exclude):
     sleep:   运行前等待时间
 返回请求结果
 '''
-def request_with_proxy(url, timeout=10, use_ss=False, sleep=30):
+def request_with_proxy(url, timeout=30, use_ss=False, sleep=10):
     time.sleep(sleep)
     headers = {'User-Agent': ua.random}
     r = None
@@ -46,7 +46,7 @@ def request_with_proxy(url, timeout=10, use_ss=False, sleep=30):
                 "http": "socks5://127.0.0.1:{}".format(proxy_port),
                 "https": "socks5://127.0.0.1:{}".format(proxy_port)
         }
-        r = requests.get(url, proxies=proxies, headers=headers, timeout=20)
+        r = requests.get(url, proxies=proxies, headers=headers, timeout=timeout)
     else:
         port_range = (1080, 1108)
         error_ports = [1094, 1098]
@@ -55,7 +55,6 @@ def request_with_proxy(url, timeout=10, use_ss=False, sleep=30):
             "http": "socks5://127.0.0.1:{}".format(port),
             "https": "socks5://127.0.0.1:{}".format(port)
         }
-        r = requests.get(url, proxies=proxies, timeout=20, headers=headers)
+        r = requests.get(url, proxies=proxies, timeout=timeout, headers=headers)
 
-    print(r.status_code)
     return r
