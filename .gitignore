@@ -9,3 +9,5 @@ download/
 logs
 *.html
 config
+*.swp
+nohup.out
