@@ -21,6 +21,7 @@ def articles_amount(cur):
     )
     return cur.fetchall()[0][0]
 
+
 def update_csv():
     fr = open('amount_log.txt','r')
     cf = open('amount_log.csv','wb')
