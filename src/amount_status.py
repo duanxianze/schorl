@@ -4,7 +4,7 @@ amount_status.py：
     用于统计数据库articles表数据量，了解爬取速率
 '''
 
-import psycopg2,time
+import psycopg2,time,csv
 
 def articles_amount(cur):
     cur.execute(
@@ -13,22 +13,27 @@ def articles_amount(cur):
     return cur.fetchall()[0][0]
 
 
+DB_NAME = "sf_development"
+USER = "gao"
+PASSWORD = "gaotongfei13"
+conn = psycopg2.connect(
+    "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
+)
+conn.autocommit = True
+cur = conn.cursor()
+
+
 if __name__=='__main__':
-    DB_NAME = "sf_development"
-    USER = "gao"
-    PASSWORD = "gaotongfei13"
-    conn = psycopg2.connect(
-        "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
-    )
-    conn.autocommit = True
-    cur = conn.cursor()
-
-    f = open('amount_log.txt','a')
-
+    csv_file = file('amount_log.csv','wb')
+    cw = csv.writer(fileobj=csv_file)
+    prev_amount = 0
     while(1):
-        aa = articles_amount(cur)
+        amount = articles_amount(cur)
         local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
-        f.write(str(aa)+'  '+local_time+'\n')
-        f.close()
-        f = open('amount_log.txt','a')
+        delta = amount - prev_amount
+        cw.write([amount,local_time,delta])
+        csv_file.close()
+        csv_file = file('amount_log.csv','wb')
+        cw = csv.writer(fileobj=csv_file)
+        prev_amount = amount
         time.sleep(60*10)#每十分钟统计一次
