@@ -28,16 +28,17 @@ def update_csv():
     cw = csv.writer(cf)
     line = 'hello'
     while line:
-        line = fr.readline()
-        print(line)
+        line = fr.readline()[:-1]
         line_data = line.split(',')
-        num = int(line_data[0])
+        print(line_data)
+        if len(line_data)==1:
+            break
+        num = line_data[0]
         time = line_data[1]
-        delta = int(line_data[2])
+        delta = line_data[2]
         print(num,time,delta)
         cw.writerow([num,time,delta])
     cf.close()
-
 
 
 if __name__=='__main__':
@@ -53,6 +54,7 @@ if __name__=='__main__':
             initial = False
         tf.write(str(amount)+','+local_time+','+str(delta)+'\n')
         tf.close()
+        update_csv()
         tf = open('amount_log.txt','a+')
         prev_amount = amount
-        time.sleep(10*60)#每十分钟统计一次
+        time.sleep(1)#每十分钟统计一次
