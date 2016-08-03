@@ -8,9 +8,13 @@ import os,time
 def auto_dump(date_str):
     #dump_file_name = date_str + '.sql'
     dump_file_name = 'latest_dump.sql'
-    os.system('pg_dump -U gao -f ~/Dropbox/backups/'+ dump_file_name + ' sf_development')
+    os.system(
+        'pg_dump -U gao -f ~/Dropbox/backups/'+ dump_file_name + ' sf_development'
+    )
     print('dump ok!upload to dropbox...')
-    os.system('./dropbox_uploader.sh upload ~/Dropbox/backups/'+dump_file_name+' backups ')
+    os.system(
+        './dropbox_uploader.sh upload ~/Dropbox/backups/'+dump_file_name+' backups '
+    )
     print('upload ok!')
 
 

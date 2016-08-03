@@ -5,17 +5,9 @@ amount_status.py：
 '''
 
 import psycopg2,time,csv
-
-def articles_amount(cur):
-    cur.execute(
-        'select count(*) from articles'
-    )
-    return cur.fetchall()[0][0]
-
-
 DB_NAME = "sf_development"
 USER = "gao"
-PASSWORD = "gaotongfei13"
+PASSWORD = "123123"
 conn = psycopg2.connect(
     "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
 )
@@ -23,17 +15,43 @@ conn.autocommit = True
 cur = conn.cursor()
 
 
+def articles_amount(cur):
+    cur.execute(
+        'select count(*) from articles'
+    )
+    return cur.fetchall()[0][0]
+
+def update_csv():
+    fr = open('amount_log.txt','r')
+    cf = open('amount_log.csv','wb')
+    cw = csv.writer(cf)
+    line = 'hello'
+    while line:
+        line = fr.readline()
+        print(line)
+        line_data = line.split(',')
+        num = int(line_data[0])
+        time = line_data[1]
+        delta = int(line_data[2])
+        print(num,time,delta)
+        cw.writerow([num,time,delta])
+    cf.close()
+
+
+
 if __name__=='__main__':
-    csv_file = file('amount_log.csv','wb')
-    cw = csv.writer(fileobj=csv_file)
+    tf = open('amount_log.txt','a+')
     prev_amount = 0
+    initial = True
     while(1):
         amount = articles_amount(cur)
         local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
         delta = amount - prev_amount
-        cw.write([amount,local_time,delta])
-        csv_file.close()
-        csv_file = file('amount_log.csv','wb')
-        cw = csv.writer(fileobj=csv_file)
+        if initial:
+            delta = 0
+            initial = False
+        tf.write(str(amount)+','+local_time+','+str(delta)+'\n')
+        tf.close()
+        tf = open('amount_log.txt','a+')
         prev_amount = amount
-        time.sleep(60*10)#每十分钟统计一次
+        time.sleep(10*60)#每十分钟统计一次
