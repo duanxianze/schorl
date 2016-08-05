@@ -20,7 +20,7 @@ cur = conn.cursor()
 
 while True:
     '''查询数据库，得到bibtex为空的项目元组'''
-    cur.execute("select id, google_id from articles where id > 314073 and bibtex is null")
+    cur.execute("select id, google_id from articles where id > 314083 and bibtex is null")
     result_sets = cur.fetchall()
     print("{} tasks running".format(len(result_sets)))
     for id, google_id in result_sets:
@@ -40,16 +40,15 @@ while True:
                 '''若访问正常，对访问的返回结果注入BeautifulSoup模型'''
                 soup = BeautifulSoup(response.text, "lxml")
                 citi = soup.select("#gs_citi > a")
-                with open(google_id+'.html', 'w') as f:
-                    f.write(response.text)
+                #with open(google_id+'.html', 'w') as f:
+                #f.write(response.text)
                 print(citi)
                 if citi:
                     '''搜索节点，找到bibtex的url路径'''
                     url = citi[0]['href']
-                    full_url = "https://scholar.google.com" + url
+                    print("get bibtex from {}".format(url))
                     '''访问该路径，得到bibtex'''
-                    bibtex_response = request_with_proxy(full_url)
-                    print('bibtex url: {0}'.format(full_url))
+                    bibtex_response = request_with_proxy(url)
                     print('bibtex site status code: {}'.format(bibtex_response.status_code))
                     if bibtex_response:
                         bibtex = bibtex_response.text
