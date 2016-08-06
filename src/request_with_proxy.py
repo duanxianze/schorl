@@ -3,7 +3,6 @@
     request_with_proxy.py 用于设置爬虫代理
 '''
 
-import requests
 import time
 from fake_useragent import UserAgent
 from ua_pool import agents

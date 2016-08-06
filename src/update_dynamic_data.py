@@ -24,6 +24,13 @@ conn.autocommit = True  #设置数据库自动提交
 cur = conn.cursor()
 
 
+def show_article_status():
+    cur.execute(
+        "select citations_count,citations_link,resource_type,resource_type from articles where google_id="+self.google_id
+    )
+    print(cur.fetchall())
+
+
 class ArticleUpdate(object):
     def __init__(self,title,google_id):
         self.title = title
@@ -46,7 +53,7 @@ class ArticleUpdate(object):
         return False
 
 
-    def update(self,cur):
+    def update(self):
         p = self.parse_model
         sec = self.get_sec()
         if sec:
@@ -58,20 +65,14 @@ class ArticleUpdate(object):
                 resource_type = p.resource_type(sec)
                 resource_link = p.resource_link(sec)
                 print(local_time,citations_count,citations_link,resource_type,resource_link,self.google_id)
-                cur.execute(
-                    "select citations_count,citations_link,resource_type,resource_type from articles where google_id="+self.google_id
-                )
-                print(cur.fetchall())
+                show_article_status()
                 cur.execute(
                     "UPDATE articles SET "
                     "citations_count = %s , citations_link = %s , resource_type = %s , resource_link = %s "
                     "WHERE google_id = %s ",
                     (citations_count,citations_link,resource_type,resource_link,self.google_id)
                 )
-                cur.execute(
-                    "select citations_count,citations_link,resource_type,resource_type from articles where google_id="+self.google_id
-                )
-                print(cur.fetchall())
+                show_article_status()
             except Exception as e:
                 print ('update():'+str(e))
         else:
@@ -95,6 +96,6 @@ if __name__=='__main__':
         print(data)
         AU = ArticleUpdate(title=data[0],google_id=data[1])
         AU.update(cur)
-    '''与数据库连接断开'''
+
     cur.close()
     conn.close()
