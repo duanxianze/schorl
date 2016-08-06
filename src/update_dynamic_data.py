@@ -25,6 +25,7 @@ cur = conn.cursor()
 
 
 class ArticleUpdate(object):
+    '''本类用于文章更新'''
     def __init__(self,title,google_id):
         self.title = title
         self.google_id = google_id
@@ -47,11 +48,12 @@ class ArticleUpdate(object):
 
 
     def show_article_status(self):
+        '''展示文章条目的各项状态'''
         try:
             cur.execute(
                 'select citations_count,citations_link,resource_type,resource_type from articles where google_id="%s"',
                 (self.google_id)
-            )   
+            )
             print(cur.fetchall())
         except Exception as e:
             print('show():'+str(e))
@@ -71,11 +73,13 @@ class ArticleUpdate(object):
                 print(local_time,citations_count,citations_link,resource_type,resource_link,self.google_id)
                 print('update before:')
                 self.show_article_status()
+                '''
                 cur.execute(
                     'UPDATE articles SET citations_count = %s , citations_link = "%s" , resource_type = "%s" , resource_link = "%s" WHERE google_id = "%s"',
                     (citations_count,citations_link,resource_type,resource_link,self.google_id)
                 )
                 print('update ok:')
+                '''
                 self.show_article_status()
             except Exception as e:
                 print ('update():'+str(e))

@@ -11,11 +11,11 @@ def auto_dump_sql(date_str):
     os.system(
         'pg_dump -U gao -f ~/Dropbox/backups/'+ dump_file_name + ' sf_development'
     )
-    print('dump ok!upload to dropbox...')
+    print('dump sql ok!upload to dropbox...')
     os.system(
         './dropbox_uploader.sh upload ~/Dropbox/backups/'+dump_file_name+' backups '
     )
-    print('upload ok!')
+    print('upload sql ok!')
 
 
 def auto_dump_log():
