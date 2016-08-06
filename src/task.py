@@ -97,7 +97,7 @@ for name in names:
             print(parse_html)
             print(parse_html.sections())
             for sec in parse_html.sections():
-                '''对于每一篇文章，分布提取元素'''
+                '''对于每一篇文章，分别提取元素'''
                 print("for sec in parse_html.secions()")
                 print(sec)
                 try:

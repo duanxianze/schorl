@@ -5,6 +5,8 @@ amount_status.py：
 '''
 
 import psycopg2,time,csv
+
+COUNT_FROM_ARTICLES = 'select count(*) from articles'
 DB_NAME = "sf_development"
 USER = "gao"
 PASSWORD = "123123"
