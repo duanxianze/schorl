@@ -5,7 +5,7 @@ auto_dump.py：
 '''
 import os,time
 
-def auto_dump(date_str):
+def auto_dump_sql(date_str):
     #dump_file_name = date_str + '.sql'
     dump_file_name = 'latest_dump.sql'
     os.system(
@@ -18,10 +18,19 @@ def auto_dump(date_str):
     print('upload ok!')
 
 
+def auto_dump_log():
+    os.system(
+        './dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
+    )
+    print('upload log ok!')
+
+
 if __name__ == '__main__':
-    #auto_dump('2015_5_23')
+    auto_dump_log()
     while True:
         date_str = time.strftime("%Y_%m_%d",time.localtime(time.time()))
-        auto_dump(date_str)
-        time.sleep(60*60*24)
+        auto_dump_sql(date_str)#一天一次
+        for i in range(0,24):
+            auto_dump_log()#一小时一次
+            time.sleep(60*60)
 
