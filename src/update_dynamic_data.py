@@ -47,12 +47,16 @@ class ArticleUpdate(object):
 
 
     def show_article_status(self):
-        cur.execute(
-            "select citations_count,citations_link,resource_type,resource_type from articles where google_id="+self.google_id
-        )
-        print(cur.fetchall())
+        try:
+            cur.execute(
+                'select citations_count,citations_link,resource_type,resource_type from articles where google_id="%s"',
+                (self.google_id)
+            )   
+            print(cur.fetchall())
+        except Exception as e:
+            print('show():'+str(e))
 
-
+        
     def update(self):
         p = self.parse_model
         sec = self.get_sec()
@@ -65,13 +69,13 @@ class ArticleUpdate(object):
                 resource_type = p.resource_type(sec)
                 resource_link = p.resource_link(sec)
                 print(local_time,citations_count,citations_link,resource_type,resource_link,self.google_id)
+                print('update before:')
                 self.show_article_status()
                 cur.execute(
-                    "UPDATE articles SET "
-                    "citations_count = %s , citations_link = %s , resource_type = %s , resource_link = %s "
-                    "WHERE google_id = %s ",
+                    'UPDATE articles SET citations_count = %s , citations_link = "%s" , resource_type = "%s" , resource_link = "%s" WHERE google_id = "%s"',
                     (citations_count,citations_link,resource_type,resource_link,self.google_id)
                 )
+                print('update ok:')
                 self.show_article_status()
             except Exception as e:
                 print ('update():'+str(e))
@@ -95,7 +99,9 @@ if __name__=='__main__':
     for data in titles:
         print(data)
         AU = ArticleUpdate(title=data[0],google_id=data[1])
-        AU.update()
-
+        try:
+            AU.update()
+        except:
+            print('search failed..')
     cur.close()
     conn.close()
