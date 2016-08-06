@@ -16,7 +16,7 @@ class ParseHTML:
     '''
         对于google_scholar的搜索结果页进行解析，包含文章列表，逐一解析
     '''
-    def __init__(self, from_web=True, url=None):
+    def __init__(self, from_web=True, url=None, no_proxy_test=False):
         '''
             from_web和url参数是需要一边爬取一边解析的情况，
             若本地解析html则实例化时不需要传入
@@ -29,7 +29,7 @@ class ParseHTML:
         '''
         if from_web and url:
             print("from web")
-            self.html = request_with_proxy(url).text
+            self.html = request_with_proxy(url,no_proxy_test=no_proxy_test).text
         else:
             print("from local file")
             with open('scholar_articles.htm', 'rb') as f:

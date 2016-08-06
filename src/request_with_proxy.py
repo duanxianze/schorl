@@ -6,13 +6,17 @@
 import requests
 import time
 from fake_useragent import UserAgent
+from ua_pool import agents
 import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint
-import socks
-import socket
+import random
 
-ua = UserAgent()
+try:
+    ua = random.choice(agents)
+except:
+    ua = UserAgent().random
+
 
 '''
 功能：随机分配端口
@@ -36,9 +40,11 @@ def rand_port(x, y, exclude):
     sleep:   运行前等待时间
 返回请求结果
 '''
-def request_with_proxy(url, timeout=30, use_ss=False, sleep=10):
+def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=False):
+    headers = {'User-Agent': ua}
+    if no_proxy_test:
+        return requests.get(url, headers=headers, timeout=timeout)
     time.sleep(sleep)
-    headers = {'User-Agent': ua.random}
     r = None
     if not use_ss:
         proxy_port = rand_port(9054, 9155, [])

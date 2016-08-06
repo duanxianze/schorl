@@ -12,7 +12,7 @@
 from request_with_proxy import request_with_proxy
 from parse_html import ParseHTML
 import time,psycopg2
-
+import platform
 
 '''设置数据库'''
 DB_NAME = "sf_development"
@@ -30,7 +30,11 @@ class ArticleUpdate(object):
         self.google_id = google_id
         self.url = 'https://scholar.google.com/scholar?start=0&q='+title+'&hl=en&as_sdt=0,5'
         #只需要第一页结果即可
-        self.parse_model = ParseHTML(url=self.url)
+        if platform.system()=='Windows':
+            no_proxy_test = True
+        else:
+            no_proxy_test = False
+        self.parse_model = ParseHTML(url=self.url,no_proxy_test=no_proxy_test)
 
 
     def get_sec(self):
