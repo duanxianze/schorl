@@ -11,7 +11,7 @@
 """
 from request_with_proxy import request_with_proxy
 from parse_html import ParseHTML
-import time
+import time,psycopg2
 
 
 '''设置数据库'''
@@ -28,7 +28,7 @@ class ArticleUpdate(object):
     def __init__(self,title,google_id):
         self.title = title
         self.google_id = google_id
-        self.url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&as_sdt=0,5'
+        self.url = 'https://scholar.google.com/scholar?start=0&q='+title+'&hl=en&as_sdt=0,5'
         #只需要第一页结果即可
         self.parse_model = ParseHTML(url=self.url)
 
@@ -53,13 +53,21 @@ class ArticleUpdate(object):
                 citations_link = p.citations_link(sec)
                 resource_type = p.resource_type(sec)
                 resource_link = p.resource_link(sec)
-                #print(local_time,citations_count,citations_link,resource_type,resource_link,self.google_id)
+                print(local_time,citations_count,citations_link,resource_type,resource_link,self.google_id)
                 cur.execute(
-                    "UPDATE articles SET"
+                    "select citations_count,citations_link,resource_type,resource_type from articles where google_id="+self.google_id
+                )
+                print(cur.fetchall())
+                cur.execute(
+                    "UPDATE articles SET "
                     "citations_count = %s , citations_link = %s , resource_type = %s , resource_link = %s "
                     "WHERE google_id = %s ",
                     (citations_count,citations_link,resource_type,resource_link,self.google_id)
                 )
+                cur.execute(
+                    "select citations_count,citations_link,resource_type,resource_type from articles where google_id="+self.google_id
+                )
+                print(cur.fetchall())
             except Exception as e:
                 print ('update():'+str(e))
         else:
@@ -80,8 +88,9 @@ if __name__=='__main__':
     titles = cur.fetchall()
     '''得到数据库已有文章的title集，传入更新模型'''
     for data in titles:
+        print(data)
         AU = ArticleUpdate(title=data[0],google_id=data[1])
-        AU.update()
+        AU.update(cur)
     '''与数据库连接断开'''
     cur.close()
     conn.close()
