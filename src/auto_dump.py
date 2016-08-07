@@ -13,14 +13,14 @@ def auto_dump_sql(date_str):
     )
     print('dump ok!upload to dropbox...')
     os.system(
-        './dropbox_uploader.sh upload ~/Dropbox/backups/'+dump_file_name+' backups '
+        '~/dropbox_uploader.sh upload ~/Dropbox/backups/'+dump_file_name+' backups '
     )
     print('upload ok!')
 
 
 def auto_dump_log():
     os.system(
-        './dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
+        '~/dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
     )
     print('upload log ok!')
 
