@@ -19,9 +19,11 @@ def auto_dump_sql(date_str):
 
 
 def auto_dump_log():
+    print('dropbox:')
     os.system(
         '~/dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
     )
+    print('swift bucket:')
     os.system(
         'swift upload visualspider amount_log.txt'
     )#only use in 'src'
