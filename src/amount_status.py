@@ -53,7 +53,7 @@ if __name__=='__main__':
     initial = True
     while(1):
         amount = articles_amount(cur)
-        local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+        local_time = time.strftime("%Y-%m-%d-%H-%M-%S",time.localtime(time.time()))
         delta = amount - prev_amount
         if initial:
             delta = 0

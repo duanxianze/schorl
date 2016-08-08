@@ -22,6 +22,9 @@ def auto_dump_log():
     os.system(
         '~/dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
     )
+    os.system(
+        'swift upload visualspider amount_log.txt'
+    )#only use in 'src'
     print('upload log ok!')
 
 
