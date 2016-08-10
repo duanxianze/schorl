@@ -11,17 +11,22 @@ def auto_dump_sql(date_str):
     os.system(
         'pg_dump -U gao -f ~/Dropbox/backups/'+ dump_file_name + ' sf_development'
     )
-    print('dump ok!upload to dropbox...')
+    print('dump sql ok!upload to dropbox...')
     os.system(
         '~/dropbox_uploader.sh upload ~/Dropbox/backups/'+dump_file_name+' backups '
     )
-    print('upload ok!')
+    print('upload sql ok!')
 
 
 def auto_dump_log():
+    print('dropbox:')
     os.system(
         '~/dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
     )
+    print('swift bucket:')
+    os.system(
+        'swift upload visualspider amount_log.txt -A https://auth.sinas3.com/v1.0 -U 1mzlkylny3 -K jx13044wz5khz555mj3ky2jjimjjlzii41whzziz'
+    )#only use in 'src'
     print('upload log ok!')
 
 

@@ -34,7 +34,7 @@ while True:
             #print(request_with_proxy('https://api.ipify.org', use_ss=False).content)
             '''爬虫访问文章url'''
             #response = request_with_proxy(url, timeout=20, use_ss=False, sleep=1)
-            response = request_with_proxy(url, use_ss=True)
+            response = request_with_proxy(url)
             if response.status_code == 200:
                 print("response 200")
                 '''若访问正常，对访问的返回结果注入BeautifulSoup模型'''
