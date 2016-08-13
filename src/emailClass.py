@@ -43,7 +43,7 @@ class Email:
         #连接服务器,并启动tls服务
         try:
             self.smtp.connect(host,port)
-            self.smtp.starttls() 
+            self.smtp.starttls()
         except Exception as e:
             print('conn_server():',e)
 
@@ -73,11 +73,12 @@ class Email:
 
 if __name__=='__main__':
     '''使用方法如下'''
+    admin_address = '965606089@qq.com'
     emailAI = Email(
-        receiver='965606089@qq.com',
-        sender='luyangaini@vip.qq.com',
-        subject='this is test email',
-        content='fuck',
+        receiver = admin_address,
+        sender   = 'luyangaini@vip.qq.com',
+        subject  = '爬虫停止工作了，上线看看吧',
+        content  = 'rt',
     )
     emailAI.conn_server(
         host='smtp.qq.com',
@@ -85,7 +86,7 @@ if __name__=='__main__':
     )
     emailAI.login(
         username='luyangaini@vip.qq.com',
-        password='xx'
+        password='ptuevbbulatcbcfh'
     )
     emailAI.send()
     emailAI.close()

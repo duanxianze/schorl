@@ -31,25 +31,12 @@ def articles_amount(cur):
     )
     return cur.fetchall()[0][0]
 
-
-def send_mail(admin_address):
-    emailAI = Email(
-        receiver = admin_address,
-        sender   = 'luyangaini@vip.qq.com',
-        subject  = '爬虫停止工作了，上线看看吧',
-        content  = 'rt',
+import os
+def send_mail():
+    #py33 以上smtp.starttls()会报错，移到其他脚本上用py27执行
+    os.system(
+        '/usr/bin/python2.7 ~/scholar_articles/src/emailClass.py'
     )
-    emailAI.conn_server(
-        host='smtp.qq.com',
-        port = 587
-    )
-    emailAI.login(
-        username='luyangaini@vip.qq.com',
-        password='ptuevbbulatcbcfh'
-    )
-    emailAI.send()
-    emailAI.close()
-
 
 
 if __name__=='__main__':
@@ -65,7 +52,7 @@ if __name__=='__main__':
         if delta==0:
             delta_zero_cot += 1
         if delta_zero_cot==3:
-            send_mail('965606089@qq.com')
+            send_mail()
             delta_zero_cot = 0
         if initial:
             delta = 0
