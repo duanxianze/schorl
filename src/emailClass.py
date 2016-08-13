@@ -3,11 +3,12 @@
 @file:      emailClass.py
 @author:    lyn
 @contact:   tonylu716@gmail.com
-@python:    3.3
+@python:    2.7
 @editor:    PyCharm
 @create:    2016-8-12 14:30
 @description:
-            smtp发送邮件，对email类做一个简单的封装
+            smtp发送邮件，对email类做一个简单的封装,
+            注意python3.3以上smtp.starttls()会报错
 """
 
 import smtplib
@@ -15,7 +16,6 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
-
 
 class Email:
     def __init__(
@@ -71,13 +71,11 @@ class Email:
 
 
 
-if __name__=='__main__':
-    '''使用方法如下'''
-    admin_address = '965606089@qq.com'
+def remind_me(admin_address):
     emailAI = Email(
         receiver = admin_address,
         sender   = 'luyangaini@vip.qq.com',
-        subject  = '爬虫停止工作了，上线看看吧',
+        subject  = '爬虫停止工作半小时了，上线看看吧',
         content  = 'rt',
     )
     emailAI.conn_server(
@@ -90,3 +88,9 @@ if __name__=='__main__':
     )
     emailAI.send()
     emailAI.close()
+
+
+if __name__=='__main__':
+    admin_addresses = ['965606089@qq.com','gaotongfei1995@gmail.com']
+    for admin_address in admin_addresses:
+        remind_me(admin_address)
