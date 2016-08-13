@@ -40,14 +40,14 @@ def send_mail():
 
 
 if __name__=='__main__':
-    send_mail('965606089@qq.com')
+    #send_mail()
     tf = open('amount_log.txt','a+')
     prev_amount = 0
     initial = True
     delta_zero_cot = 0
     while(1):
         amount = articles_amount(cur)
-        local_time = time.strftime("%Y-%m-%d-%H-%M-%S",time.localtime(time.time()))
+        local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
         delta = amount - prev_amount
         if delta==0:
             delta_zero_cot += 1
