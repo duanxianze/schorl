@@ -75,7 +75,7 @@ def remind_me(admin_address):
     emailAI = Email(
         receiver = admin_address,
         sender   = 'luyangaini@vip.qq.com',
-        subject  = '爬虫停止工作半小时了，上线看看吧',
+        subject  = '爬虫一小时没采到信息了，上线看看吧',
         content  = 'rt',
     )
     emailAI.conn_server(
@@ -91,6 +91,4 @@ def remind_me(admin_address):
 
 
 if __name__=='__main__':
-    admin_addresses = ['965606089@qq.com','gaotongfei1995@gmail.com']
-    for admin_address in admin_addresses:
-        remind_me(admin_address)
+    map(remind_me,['965606089@qq.com','gaotongfei1995@gmail.com'])

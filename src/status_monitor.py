@@ -51,7 +51,9 @@ if __name__=='__main__':
         delta = amount - prev_amount
         if delta==0:
             delta_zero_cot += 1
-        if delta_zero_cot==3:
+        else:
+            delta_zero_cot = 0
+        if delta_zero_cot==6:
             send_mail()
             delta_zero_cot = 0
         if initial:
