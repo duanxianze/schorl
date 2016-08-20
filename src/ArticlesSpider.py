@@ -14,6 +14,16 @@ from parse_html import *
 from multiprocessing.dummy import Pool as ThreadPool
 import re,random
 
+DB_NAME = "sf_development"
+USER = "gao"
+PASSWORD = "gaotongfei13"
+
+conn = psycopg2.connect(
+    "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
+)
+conn.autocommit = True
+cur = conn.cursor()
+
 class ArticleSpider:
     '''
         文章爬虫类，爬取Google Scholar
@@ -36,7 +46,7 @@ class ArticleSpider:
             full_name = unfinished_item[1:]
             for page_url in  ScholarSearch(full_name).page_urls():
                 for sec in ParseHTML(page_url).sections():
-                    Article(sec).save_to_db()
+                    Article(sec).save_to_db(cur)
             cur.execute("update scholars set is_added = 1 where id = (%s)", (scholar_db_id,))
         except Exception as e:
             print('ArticleSpider:\n\tERROR:{}'.format(str(e)))
@@ -45,7 +55,7 @@ class ArticleSpider:
         full_name = unfinished_item[1:]
         for page_url in  ScholarSearch(full_name).page_urls():
             for sec in ParseHTML(page_url).sections():
-                Article(sec).save_to_db()
+                Article(sec).save_to_db(cur)
         cur.execute("update scholars set is_added = 1 where id = (%s)", (scholar_db_id,))
         '''
 
