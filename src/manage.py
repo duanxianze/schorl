@@ -12,9 +12,8 @@
 import subprocess
 
 cmd_list = [
-    'nohup python task.py &',
     'nohup python auto_dump.py &',
-    'nohup python status_monitor.py &'
+    'nohup python artcles_watchdog.py &'
 ]
 
 for command in cmd_list:
