@@ -77,56 +77,57 @@ class ScholarSearch:
 
 
 
-'''从scholar表中检索出学者名列表'''
-#cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
-cur.execute("select id, first_name, middle_name, last_name from scholars where id > 4000")
-#cur.execute("select id, first_name, middle_name, last_name from scholars where id = (select max(id)-1 from scholars)")
-names =  [n for n in cur.fetchall()]
+if __name__=='__main__':
+    '''从scholar表中检索出学者名列表'''
+    #cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
+    cur.execute("select id, first_name, middle_name, last_name from scholars where is_added = 0")
+    #cur.execute("select id, first_name, middle_name, last_name from scholars where id = (select max(id)-1 from scholars)")
+    names =  [n for n in cur.fetchall()]
 
-'''对于每一个学者'''
-for name in names:
-    try:
-        id = name[0]
-        query = ScholarSearch(name[1:])
-        print(id)
-        print(name)
-        '''从实例化类中得到关于该学者的搜索结果的所有页面url'''
-        page_urls = query.page_urls()
-        for p in page_urls:
-            '''对于每一页，都交给ParseHTML模型解析'''
-            print("for p in page")
-            print(p)
-            parse_html = ParseHTML(url=p)
-            print(parse_html)
-            print(parse_html.sections())
-            for sec in parse_html.sections():
-                '''对于每一篇文章，分别提取元素'''
-                print("for sec in parse_html.secions()")
-                print(sec)
-                try:
-                    print("try...")
-                    title = parse_html.title(sec)
-                    year = parse_html.year(sec)
-                    citations_count = parse_html.citations_count(sec)
-                    citations_link = parse_html.citations_link(sec)
-                    link = parse_html.link(sec)
-                    resource_type = parse_html.resource_type(sec)
-                    resource_link = parse_html.resource_link(sec)
-                    summary = parse_html.summary(sec)
-                    google_id = parse_html.google_id(sec)
-                    #bibtex = parse_html.bibtex(sec)
-                    print("({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})".format(title, year, citations_count, link, resource_type, resource_link, summary, google_id))
-                    #print("google_id: {0}".format(google_id))
-                    '''各项写入文章表'''
-                    cur.execute("insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
-                            "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id))
-                except Exception as e:
-                    print(e)
-        '''更新数据库中学者的记录is_added = 1，表示已经爬取过他的文章集合'''
-        cur.execute("update scholars set is_added = 1 where id = (%s)", (id,))
-    except Exception as e:
-        print(e)
+    '''对于每一个学者'''
+    for name in names:
+        try:
+            id = name[0]
+            query = ScholarSearch(name[1:])
+            print(id)
+            print(name)
+            '''从实例化类中得到关于该学者的搜索结果的所有页面url'''
+            page_urls = query.page_urls()
+            for p in page_urls:
+                '''对于每一页，都交给ParseHTML模型解析'''
+                print("for p in page")
+                print(p)
+                parse_html = ParseHTML(url=p)
+                print(parse_html)
+                print(parse_html.sections())
+                for sec in parse_html.sections():
+                    '''对于每一篇文章，分别提取元素'''
+                    print("for sec in parse_html.secions()")
+                    print(sec)
+                    try:
+                        print("try...")
+                        title = parse_html.title(sec)
+                        year = parse_html.year(sec)
+                        citations_count = parse_html.citations_count(sec)
+                        citations_link = parse_html.citations_link(sec)
+                        link = parse_html.link(sec)
+                        resource_type = parse_html.resource_type(sec)
+                        resource_link = parse_html.resource_link(sec)
+                        summary = parse_html.summary(sec)
+                        google_id = parse_html.google_id(sec)
+                        #bibtex = parse_html.bibtex(sec)
+                        print("({0}, {1}, {2}, {3}, {4}, {5}, {6}, {7})".format(title, year, citations_count, link, resource_type, resource_link, summary, google_id))
+                        #print("google_id: {0}".format(google_id))
+                        '''各项写入文章表'''
+                        cur.execute("insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
+                                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing", (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id))
+                    except Exception as e:
+                        print(e)
+            '''更新数据库中学者的记录is_added = 1，表示已经爬取过他的文章集合'''
+            cur.execute("update scholars set is_added = 1 where id = (%s)", (id,))
+        except Exception as e:
+            print(e)
 
-'''与数据库连接断开'''
-cur.close()
-conn.close()
+    '''与数据库连接断开'''
+    cur.close()
+    conn.close()
