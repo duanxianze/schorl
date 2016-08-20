@@ -1,18 +1,15 @@
 #coding:utf-8
 """
 @file:      download.py
-@python:    3.3
+@python:    2.7
 @editor:    PyCharm
 @description:
             从db中检索出resource_link集,下载pdf
 """
-import os,time,random
-import requests
+import random,requests,psycopg2,os
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
-import psycopg2
 
-'''设置数据库连接'''
 conn = psycopg2.connect(
     dbname="sf_development",
     user="postgres",
@@ -20,7 +17,6 @@ conn = psycopg2.connect(
 )
 cur = conn.cursor()
 
-'''设置pdf下载保存路径'''
 DOWNLOAD_FOLDER = "./download"
 
 
@@ -33,7 +29,19 @@ class PdfDownloader:
         if not os.path.exists(save_folder):
             os.makedirs(save_folder)
         self.save_folder = save_folder
-        self.statusMonitor = StatusMonitor()
+
+    @property
+    def unfinished_items(self,extend_cursor=None):
+        #db中未下载的条目集
+        if extend_cursor:
+            cursor = extend_cursor
+        else:
+            cursor = cur
+        #从db中检索出未下载pdf的表项
+        cursor.execute(
+            "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF'"
+        )
+        return cur.fetchall()
 
     def download(self,unfinished_item):
         #对于单条item的下载处理
@@ -51,7 +59,7 @@ class PdfDownloader:
                     os.path.join(self.save_folder, save_name), 'wb'
                 ) as pdf_file:
                     pdf_file.write(resp.content)
-                    print(save_name + ' wrote ok...')
+                    print('Downloader:\n\t'+ save_name + ' wrote ok...')
             #下载完成后，在数据库中做记录：已下载
             cur.execute(
                 "update articles set is_downloaded = 1 where google_id = %s",
@@ -59,85 +67,19 @@ class PdfDownloader:
             )
             conn.commit()
         except Exception as e:
-            print('download( google_id = "{}" ) ERROR:\n\t{}'.format(google_id,str(e)))
-
-    def run_monitor(self):
-        while True:
-            print(
-                'pdf_files:',
-                self.statusMonitor.counts_of_pdf_files
-            )
-            print(
-                'unfinished_item:',
-                self.statusMonitor.counts_of_unfinished_db_item
-            )
-            time.sleep(10)
+            print('Downloader:\n\tdownload( google_id = "{}" ) ERROR:\n\t{}'.format(google_id,str(e)))
 
     def run(self,thread_counts=8):
-        print('unfinshed_item length: ',self.statusMonitor.counts_of_unfinished_db_item)
         pool = ThreadPool(thread_counts)
-        unfinished_items = self.statusMonitor.unfinished_items
-        random.shuffle(unfinished_items)
+        unfinished_items = self.unfinished_items
+        random.shuffle(unfinished_items)#打乱顺序
         pool.map(self.download, unfinished_items)
         #主循环，对于检索的结果列表中每个item都交给download函数执行
         pool.close()
         pool.join()
 
 
-class StatusMonitor:
-    '''
-        关于pdf下载的数据监视器类
-    '''
-    def __init__(self):
-        pass
-
-    @property
-    def unfinished_items(self,extend_cursor=None):
-        #db中未下载的条目集
-        if extend_cursor:
-            cursor = extend_cursor
-        else:
-            cursor = cur
-        #从db中检索出未下载pdf的表项
-        cursor.execute(
-            "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF'"
-        )
-        return cur.fetchall()
-
-    @property
-    def counts_of_finished_db_item(self,extend_cursor=None):
-        #db显示已下载项的数量
-        if extend_cursor:
-            cursor = extend_cursor
-        else:
-            cursor = cur
-        cursor.execute(
-            "select count(id) from articles where is_downloaded = 1"
-        )
-        return int(cur.fetchall()[0][0])
-
-    @property
-    def counts_of_unfinished_db_item(self,extend_cursor=None):
-        #db显示未下载项的数量
-        if extend_cursor:
-            cursor = extend_cursor
-        else:
-            cursor = cur
-        cursor.execute(
-            "select count(*) from articles where is_downloaded = 0"
-        )
-        return int(cursor.fetchall()[0][0])
-
-    @property
-    def counts_of_pdf_files(self,extend_folder=None):
-        #下载文件夹中pdf文件的数量
-        if extend_folder:
-            folder = extend_folder
-        else:
-            folder = DOWNLOAD_FOLDER
-        return len(os.listdir(folder))
-
-
 if __name__=='__main__':
-    while(1):
-        PdfDownloader(DOWNLOAD_FOLDER).run(thread_counts=10)
+    PdfDownloader(
+        save_folder = DOWNLOAD_FOLDER,
+    ).run(thread_counts=10)
