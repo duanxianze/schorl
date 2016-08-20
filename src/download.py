@@ -65,11 +65,15 @@ class PdfDownloader:
         while True:
             print(
                 'pdf_files:',
-                self.statusMonitor.counts_of_pdf_files,
+                self.statusMonitor.counts_of_pdf_files
+            )
+            print(
+                'unfinished_item:',
+                self.statusMonitor.counts_of_unfinished_db_item
             )
             time.sleep(10)
 
-    def run(self,thread_counts=6):
+    def run(self,thread_counts=8):
         print('unfinshed_item length: ',self.statusMonitor.counts_of_unfinished_db_item)
         pool = ThreadPool(thread_counts)
         unfinished_items = self.statusMonitor.unfinished_items
@@ -135,4 +139,5 @@ class StatusMonitor:
 
 
 if __name__=='__main__':
-    PdfDownloader(DOWNLOAD_FOLDER).run(thread_counts=8)
+    while(1):
+        PdfDownloader(DOWNLOAD_FOLDER).run(thread_counts=10)

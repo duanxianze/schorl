@@ -3,7 +3,7 @@
 @file:      WatchDog.py
 @author:    lyn
 @contact:   tonylu716@gmail.com
-@python:    3.3
+@python:    2.7
 @editor:    PyCharm
 @create:    2016-08-19 14:33
 @description:
@@ -13,12 +13,14 @@ from emailClass import Email
 import psutil,os
 
 
-def get_existed_proc(cmd_line):
+def get_existed_proc(cmd_line=None,pname=None):
     #cmd_line is like:  ['python','amount_status.py']
     for proc in psutil.process_iter():
         try:
-            if proc.cmdline is cmd_line:
+            if proc.cmdline() == cmd_line:
                 return proc  # return if found one
+            if pname is not None and proc.name().lower() == pname.lower():
+                return proc
         except psutil.AccessDenied:
             pass
         except psutil.NoSuchProcess:
@@ -66,6 +68,7 @@ class WatchDog:
     def create_proc(self):
         common_cmd = ' '.join(self.proc_cmd_line)
         nohup_cmd = 'nohup ' + common_cmd + ' & '
+        if os.
         os.system(nohup_cmd)
         print('execute cmd: " %s " ...'.format(nohup_cmd))
 

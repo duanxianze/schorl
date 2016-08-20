@@ -14,7 +14,9 @@ DB_NAME = "sf_development"
 USER = "gao"
 PASSWORD = "gaotongfei13"
 '''连接数据库'''
-conn = psycopg2.connect("dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD))
+conn = psycopg2.connect(
+    "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
+)
 conn.autocommit = True  #设置数据库自动提交
 cur = conn.cursor()
 
@@ -72,6 +74,7 @@ class ScholarSearch:
         '''10页以后意义不大，故大于10页取10页爬取'''
         urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
         return urls
+
 
 
 '''从scholar表中检索出学者名列表'''

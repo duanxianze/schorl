@@ -16,12 +16,15 @@ from email.mime.text import MIMEText
 from email.header import Header
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+import platform
 
 class Email:
     def __init__(
             self,sender,receiver,subject,content,
             subtype='plain',img_src=None
     ):
+        if float(platform.python_version()[:3])>3.4:
+            raise ImportError('Please use python version under 3.4')
         self.msg = MIMEMultipart('mixed')
         msgText = MIMEText(content,_subtype=subtype,_charset='utf-8')
         self.msg.attach(msgText)

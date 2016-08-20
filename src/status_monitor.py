@@ -1,6 +1,6 @@
 #coding:utf-8
 """
-@file:      status_monitor.py
+@file:      artciles_watchdog.py
 @author:    lyn
 @contact:   tonylu716@gmail.com
 @python:    3.3
