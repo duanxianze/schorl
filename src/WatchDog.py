@@ -40,12 +40,13 @@ class WatchDog:
             self.proc = psutil.Process(pid)
         if self.proc:
             print('WatchDog:\n\tThe previous existed pid = ' + str(self.proc.pid))
-        else:
-            #假如不存在该cmdline创建的进程，看门狗自动为其创建
-            print('WatchDog:\n\tNO previous pid existed, Creating new process...')
-            self.proc = psutil.Process(
-                pid = self.create_proc().pid
-            )
+            self.close_proc()
+        
+        #假如不存在该cmdline创建的进程，看门狗自动为其创建
+        print('WatchDog:\n\tCreating new process...')
+        self.proc = psutil.Process(
+            pid = self.create_proc().pid
+        )
 
     def send_mail(self,admin_address,subject):
         emailAI = Email(
