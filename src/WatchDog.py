@@ -39,10 +39,10 @@ class WatchDog:
         if pid:
             self.proc = psutil.Process(pid)
         if self.proc:
-            print('Dog:\n\tThe previous existed pid = ' + str(self.proc.pid))
+            print('WatchDog:\n\tThe previous existed pid = ' + str(self.proc.pid))
         else:
             #假如不存在该cmdline创建的进程，看门狗自动为其创建
-            print('Dog:\n\tNO previous pid existed, Creating new process...')
+            print('WatchDog:\n\tNO previous pid existed, Creating new process...')
             self.proc = psutil.Process(
                 pid = self.create_proc().pid
             )
@@ -66,7 +66,7 @@ class WatchDog:
         emailAI.close()
 
     def close_proc(self):
-        print('Dog:\n\tKilling process:  {}  ...'.format(self.proc.pid))
+        print('WatchDog:\n\tKilling process:  {}  ...'.format(self.proc.pid))
         os.system(
             'kill -9 {}'.format(self.proc.pid)
         )
@@ -81,7 +81,7 @@ class WatchDog:
         self.close_proc()
         self.create_proc()
         self.proc = get_existed_proc(self.proc_cmd_line)
-        print('Dog:\n\tRestart ok! The new pid is: ' + str(self.proc.pid))
+        print('WatchDog:\n\tRestart ok! The new pid is: ' + str(self.proc.pid))
 
     @property
     def proc_status(self):
@@ -92,7 +92,7 @@ class WatchDog:
         '''
         maybe like that:
             while(1):
-                if self.proc_status is 'sleeping':
+                if self.proc_status() is 'sleeping':
                     self.send_mail('fuck')
                 time.sleep(timeout)
         '''
