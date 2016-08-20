@@ -48,7 +48,7 @@ class Artciles_Spider_WatchDog(WatchDog):
                 delta_zero_cot = 0
             if delta_zero_cot==6:
                 self.restart()
-                self.send_mail()
+                #self.send_mail()
                 delta_zero_cot = 0
             if initial:
                 delta = 0
@@ -58,15 +58,22 @@ class Artciles_Spider_WatchDog(WatchDog):
             #update_csv()# operation not in server
             tf = open('amount_log.txt','a+')
             prev_amount = amount
-            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{}'.format(
-                    amount,
-                    delta,
-                    delta_zero_cot,
-                    current_status,
-                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+            for i in range(1,60):
+                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{}'.format(
+                        amount,
+                        delta,
+                        delta_zero_cot,
+                        current_status,
+                        time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                    )
                 )
-            )
-            time.sleep(10*60)#每十分钟统计一次
+                print(self.proc.status())
+                #if self.proc.status() is not 'running':
+                #    self.restart()
+                if self.proc.status() is 'sleeping':
+                    self.proc.resume()
+                time.sleep(10)
+            #time.sleep(60)#每十分钟统计一次
 
 
 if __name__=='__main__':

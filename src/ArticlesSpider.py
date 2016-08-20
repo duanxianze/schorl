@@ -40,12 +40,13 @@ class ArticleSpider:
         return cur.fetchall()
 
     def crawl(self,unfinished_item):
+        print(unfinished_item)
         #对于单条学者item的爬取处理
         try:
             scholar_db_id = unfinished_item[0]
             full_name = unfinished_item[1:]
             for page_url in  ScholarSearch(full_name).page_urls():
-                for sec in ParseHTML(page_url).sections():
+                for sec in ParseHTML(url=page_url).sections():
                     Article(sec).save_to_db(cur)
             cur.execute("update scholars set is_added = 1 where id = (%s)", (scholar_db_id,))
         except Exception as e:
