@@ -47,7 +47,7 @@ class Artciles_Spider_WatchDog(WatchDog):
             else:
                 delta_zero_cot = 0
             if delta_zero_cot==6:
-                #self.restart()
+                self.restart()
                 self.send_mail()
                 delta_zero_cot = 0
             if initial:
@@ -71,9 +71,9 @@ class Artciles_Spider_WatchDog(WatchDog):
 
 if __name__=='__main__':
     if os.name is 'nt':
-        proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/task.py']
+        proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/ArticlesSpider.py']
     else:
-        proc_cmd_line = ['python', '-u', '~/scholar_articles/src/task.py']
+        proc_cmd_line = ['python', '-u', 'ArticlesSpider.py']
 
     Artciles_Spider_WatchDog(proc_cmd_line).run()
 
