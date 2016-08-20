@@ -7,10 +7,10 @@
 @editor:    PyCharm
 @create:    2016-08-19 14:33
 @description:
-            --
+            The basic class of process monitor of one specific task.
 """
 from emailClass import Email
-import psutil,os
+import psutil,os,subprocess
 
 
 def get_existed_proc(cmd_line=None,pname=None):
@@ -38,9 +38,14 @@ class WatchDog:
         self.proc = get_existed_proc(proc_cmd_line)
         if pid:
             self.proc = psutil.Process(pid)
-        if not self.proc:
-            self.create_proc()
-            self.proc = get_existed_proc(proc_cmd_line)
+        if self.proc:
+            print('Dog:\n\tThe previous existed pid = ' + str(self.proc.pid))
+        else:
+            #假如不存在该cmdline创建的进程，看门狗自动为其创建
+            print('Dog:\n\tNO previous pid existed, Creating new process...')
+            self.proc = psutil.Process(
+                pid = self.create_proc().pid
+            )
 
     def send_mail(self,admin_address,subject):
         emailAI = Email(
@@ -61,22 +66,22 @@ class WatchDog:
         emailAI.close()
 
     def close_proc(self):
-        cmd = 'kill -9 ' + str(self.proc.pid)
-        os.system(cmd)
-        print('execute cmd: " %s " ...'.format(cmd))
+        print('Dog:\n\tKilling process:  {}  ...'.format(self.proc.pid))
+        os.system(
+            'kill -9 {}'.format(self.proc.pid)
+        )
 
     def create_proc(self):
-        common_cmd = ' '.join(self.proc_cmd_line)
-        nohup_cmd = 'nohup ' + common_cmd + ' & '
-        if os.
-        os.system(nohup_cmd)
-        print('execute cmd: " %s " ...'.format(nohup_cmd))
+        return subprocess.Popen(
+            args = self.proc_cmd_line,
+            bufsize = 0
+        )
 
     def restart(self):
         self.close_proc()
         self.create_proc()
         self.proc = get_existed_proc(self.proc_cmd_line)
-        print('Restart ok! The new pid is: ' + self.proc.pid)
+        print('Dog:\n\tRestart ok! The new pid is: ' + str(self.proc.pid))
 
     @property
     def proc_status(self):
