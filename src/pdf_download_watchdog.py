@@ -5,7 +5,7 @@
 @contact:   tonylu716@gmail.com
 @python:    2.7
 @editor:    PyCharm
-@create:    2016-08-19 13:36
+@create:    2016-08-20 13:36
 @description:
             关于pdf下载的数据监视器类，继承于基本的看门狗类
 """
@@ -57,23 +57,25 @@ class Pdf_Download_Watchdog(WatchDog):
         prev_cot = 0
         delta_zero_cot = 0
         while(1):
-            print('Dog:\n\t{},\t{},\t{},\t{},\t{}'.format(
-                    self.counts_of_unfinished_db_item,
-                    self.counts_of_pdf_files,
-                    delta,
-                    delta_zero_cot,
-                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
-                )
-            )
             current_cot = self.counts_of_unfinished_db_item
             delta = prev_cot - current_cot
             prev_cot = current_cot
+            current_status = self.proc.status()
             if delta==0:
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
-            if delta_zero_cot==6:
+            if delta_zero_cot==3 or current_status is not 'running':
                 self.restart()
+            print('Dog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
+                    current_cot,
+                    self.counts_of_pdf_files,
+                    delta,
+                    delta_zero_cot,
+                    current_status,
+                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                )
+            )
             time.sleep(10)
 
 
