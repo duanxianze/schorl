@@ -18,28 +18,30 @@ class WatchDog:
         对于每个process(对应于每个任务)的监视管理器
         如果需要定制，可做父类继承
     '''
-    def __init__(self,cmd_line,sub_proc_cmd_line,pid=None):
+    def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
         self.cmd_line = cmd_line
-        self.sub_proc_cmd_line = sub_proc_cmd_line
+        self.task_proc_cmd_line = task_proc_cmd_line
         self.kill_prev_watchdog_procs()#清理之前的类似看门狗进程
         if pid:
-            #直接以pid初始化sub_proc
-            self.sub_proc = psutil.Process(pid)
-            return
+            #直接以pid初始化task_proc
+            self.task_proc = psutil.Process(pid)
         else:
             #未指定已存在的子进程id，看门狗自动为其创建
-            self.create_new_sub_proc()
-            print('WatchDog:\n\tThe new pid is : {}'.format(self.sub_proc.pid))
+            self.kill_prev_task_procs()
+            self.create_new_task_proc()
+            print('WatchDog:\n\tThe new pid is : {}'.format(self.task_proc.pid))
 
     def kill_prev_watchdog_procs(self):
         prev_pids = get_prev_pids(self.cmd_line)
-        print('WatchDog:\n\tPrevious pids: {}'.format(prev_pids))
+        print('WatchDog:\n\tPrevious watchdog pids: {}'.format(prev_pids))
         #清理之前的看门狗进程
-        for prev_pid in prev_pids:
-            try:
-                self.close_proc(prev_pid)
-            except:
-                pass
+        close_procs(prev_pids)
+
+    def kill_prev_task_procs(self):
+        prev_pids = get_prev_pids(self.task_proc_cmd_line)
+        print('WatchDog:\n\tPrevious task pids: {}'.format(prev_pids))
+        #清理之前的看门狗进程
+        close_procs(prev_pids)
 
     def send_mail(self,admin_address,subject):
         emailAI = Email(
@@ -59,28 +61,28 @@ class WatchDog:
         emailAI.send()
         emailAI.close()
 
-    def close_sub_proc(self):
-        print('WatchDog:\n\tKilling process:  {}  ...'.format(self.sub_proc.pid))
-        close_proc(self.sub_proc.pid)
+    def close_task_proc(self):
+        print('WatchDog:\n\tKilling process:  {}  ...'.format(self.task_proc.pid))
+        close_proc(self.task_proc.pid)
 
-    def create_new_sub_proc(self):
-        print('WatchDog:\n\tCreating new sub_process...')
-        self.sub_proc = psutil.Process(
+    def create_new_task_proc(self):
+        print('WatchDog:\n\tCreating new task_process...')
+        self.task_proc = psutil.Process(
             pid = subprocess.Popen(
-                args = self.sub_proc_cmd_line,
+                args = self.task_proc_cmd_line,
                 bufsize = 0
             ).pid
         )
 
-    def restart_sub_proc(self):
-        self.close_sub_proc()
-        self.create_new_sub_proc()
-        print('WatchDog:\n\tRestart ok! The new pid is: ' + str(self.sub_proc.pid))
+    def restart_task_proc(self):
+        self.close_task_proc()
+        self.create_new_task_proc()
+        print('WatchDog:\n\tRestart ok! The new pid is: ' + str(self.task_proc.pid))
 
     @property
-    def sub_proc_status(self):
+    def task_proc_status(self):
         try:
-            return self.sub_proc.status()
+            return self.task_proc.status()
         except:
             return 'dead'
     '''
@@ -136,3 +138,10 @@ def close_proc(pid=None):
     os.system(
         'kill -9 {}'.format(pid)
     )
+
+def close_procs(pids):
+    for pid in pids:
+        try:
+            close_proc(pid)
+        except:
+            pass
