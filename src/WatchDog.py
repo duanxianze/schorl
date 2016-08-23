@@ -82,7 +82,6 @@ class WatchDog:
         try:
             return self.sub_proc.status()
         except:
-            print('WatchDog:\n\tThe sub_process has dead')
             return 'dead'
     '''
     def run(self):
