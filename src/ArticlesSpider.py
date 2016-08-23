@@ -38,6 +38,13 @@ class ArticleSpider:
             "select id, first_name, middle_name, last_name from scholars where is_added = 0"
         )
         return cur.fetchall()
+    
+    @property
+    def counts_of_unfinished_item(self):
+        cur.execute(
+            "select count(*) from scholars where is_added = 0"
+                )
+        return int(cur.fetchall[0][0])
 
     def crawl(self,unfinished_item):
         print(unfinished_item)

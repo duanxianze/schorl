@@ -28,19 +28,39 @@ def get_existed_proc(cmd_line=None,pname=None):
     return None
 
 
+def get_prev_pids(cmd_line=None,pname=None):
+    #cmd_line is like:  ['python','amount_status.py']
+    print('cmd_line',cmd_line)
+    prev_pids = []
+    for proc in psutil.process_iter():
+        try:
+            if proc.cmdline() == cmd_line:
+                prev_pids.append(proc.pid)
+            if pname is not None and proc.name().lower() == pname.lower():
+                prev_pids.append(proc.pid)
+        except psutil.AccessDenied:
+            pass
+        except psutil.NoSuchProcess:
+            pass
+    return prev_pids[:-1]
+
+
 class WatchDog:
     '''
         对于每个process(对应于每个任务)的监视管理器
         如果需要定制，可做父类继承
     '''
-    def __init__(self,proc_cmd_line,pid=None):
+    def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
         self.proc_cmd_line = proc_cmd_line
-        self.proc = get_existed_proc(proc_cmd_line)
+        prev_pids = get_prev_pids(self_cmd_line)
+        print(prev_pids)
+        for prev_pid in prev_pids:
+            try:
+                self.close_proc(prev_pid)
+            except:
+                pass
         if pid:
             self.proc = psutil.Process(pid)
-        if self.proc:
-            print('WatchDog:\n\tThe previous existed pid = ' + str(self.proc.pid))
-            self.close_proc()
         
         #假如不存在该cmdline创建的进程，看门狗自动为其创建
         print('WatchDog:\n\tCreating new process...')
@@ -66,17 +86,23 @@ class WatchDog:
         emailAI.send()
         emailAI.close()
 
-    def close_proc(self):
-        print('WatchDog:\n\tKilling process:  {}  ...'.format(self.proc.pid))
+    def close_proc(self,ex_pid=None):
+        if ex_pid:
+            pid = ex_pid
+        else:
+            pid = self.proc.pid
+        print('WatchDog:\n\tKilling process:  {}  ...'.format(pid))
         os.system(
-            'kill -9 {}'.format(self.proc.pid)
+            'kill -9 {}'.format(pid)
         )
 
     def create_proc(self):
-        return subprocess.Popen(
+        sp = subprocess.Popen(
             args = self.proc_cmd_line,
             bufsize = 0
         )
+        print('WatchDog\n\tThe new pid is {}'.format(sp.pid))
+        return sp
 
     def restart(self):
         self.close_proc()

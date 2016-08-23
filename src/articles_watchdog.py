@@ -16,8 +16,8 @@ from WatchDog import WatchDog
 from task import *
 
 class Artciles_Spider_WatchDog(WatchDog):
-    def __init__(self,proc_cmd_line,pid=None):
-        WatchDog.__init__(self,proc_cmd_line,pid)
+    def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
+        WatchDog.__init__(self,self_cmd_line,proc_cmd_line,pid)
 
     @property
     def articles_amount(self):
@@ -67,11 +67,11 @@ class Artciles_Spider_WatchDog(WatchDog):
                         time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                     )
                 )
-                print(self.proc.status())
+                #print(self.proc.status())
                 #if self.proc.status() is not 'running':
                 #    self.restart()
-                if self.proc.status() is 'sleeping':
-                    self.proc.resume()
+                #if self.proc.status() is 'sleeping':
+                #    self.proc.resume()
                 time.sleep(10)
             #time.sleep(60)#每十分钟统计一次
 
@@ -82,6 +82,8 @@ if __name__=='__main__':
     else:
         proc_cmd_line = ['python', '-u', 'ArticlesSpider.py']
 
-    Artciles_Spider_WatchDog(proc_cmd_line).run()
+    self_cmd_line = ['python','articles_watchdog.py']
+
+    Artciles_Spider_WatchDog(self_cmd_line,proc_cmd_line).run()
 
 
