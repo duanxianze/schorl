@@ -24,7 +24,7 @@ class Email:
             subtype='plain',img_src=None
     ):
         if float(platform.python_version()[:3])>3.4:
-            raise ImportError('Please use python version under 3.4')
+            raise ImportError('Email Class():Please use python version under 3.4')
         self.msg = MIMEMultipart('mixed')
         msgText = MIMEText(content,_subtype=subtype,_charset='utf-8')
         self.msg.attach(msgText)

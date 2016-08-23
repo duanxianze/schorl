@@ -26,7 +26,7 @@ class ParseHTML:
                 self.ua：       代理实例对象
         '''
         if from_web and url:
-            print("from web")
+            #print("from web")
             self.html = request_with_proxy(url,no_proxy_test=no_proxy_test).text
         else:
             print("from local file")
@@ -110,7 +110,7 @@ class Article:
                 (self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id)
             )
         except Exception as e:
-            print('Article save error:',str(e))
+            print('Article save error:{}'.format(str(e)))
 
 
 
