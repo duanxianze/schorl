@@ -75,7 +75,7 @@ if __name__=='__main__':
     if os.name is 'nt':
         proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/ArticlesSpider.py']
     else:
-        proc_cmd_line = ['python', '-u', 'ArticlesSpider.py']
+        proc_cmd_line = ['python', 'ArticlesSpider.py']
 
     self_cmd_line = ['python','articles_watchdog.py']
 
