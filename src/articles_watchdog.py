@@ -13,7 +13,8 @@
 
 import time,os
 from WatchDog import WatchDog
-from task import *
+from ArticlesSpider import *
+
 
 class Artciles_Spider_WatchDog(WatchDog):
     def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
