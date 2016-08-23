@@ -46,7 +46,7 @@ class Artciles_Spider_WatchDog(WatchDog):
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
-            if delta_zero_cot==6:
+            if delta_zero_cot>=6:
                 self.restart()
                 #self.send_mail()
                 delta_zero_cot = 0
@@ -67,11 +67,6 @@ class Artciles_Spider_WatchDog(WatchDog):
                         time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                     )
                 )
-                #print(self.proc.status())
-                #if self.proc.status() is not 'running':
-                #    self.restart()
-                #if self.proc.status() is 'sleeping':
-                #    self.proc.resume()
                 time.sleep(10)
             #time.sleep(60)#每十分钟统计一次
 

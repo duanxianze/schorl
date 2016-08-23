@@ -16,8 +16,8 @@ import time,os
 
 
 class Pdf_Download_Watchdog(WatchDog):
-    def __init__(self,proc_cmd_line,pid=None):
-        WatchDog.__init__(self,proc_cmd_line,pid)
+    def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
+        WatchDog.__init__(self,self_cmd_line,proc_cmd_line,pid)
 
     @property
     def counts_of_finished_db_item(self,extend_cursor=None):
@@ -53,21 +53,21 @@ class Pdf_Download_Watchdog(WatchDog):
         return len(os.listdir(folder))
 
     def run(self):
-        delta = 0
         prev_cot = 0
         delta_zero_cot = 0
         while(1):
             current_cot = self.counts_of_unfinished_db_item
             delta = prev_cot - current_cot
             prev_cot = current_cot
-            current_status = self.proc.status()
+            current_status = self.sub_proc_status
             if delta==0:
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
-            if delta_zero_cot==3 or current_status is not 'running':
+            if delta_zero_cot>=3 or current_status is not 'running':
                 self.restart()
-            print('Dog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
+                delta_zero_cot = 0
+            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
                     current_cot,
                     self.counts_of_pdf_files,
                     delta,
@@ -80,7 +80,7 @@ class Pdf_Download_Watchdog(WatchDog):
 
 
 if __name__=='__main__':
-    pdf_watchdog = Pdf_Download_Watchdog(
+    Pdf_Download_Watchdog(
+        self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download_watchdog.py'],
         proc_cmd_line = ['C:\\Python27\\python.exe', 'F:/scholar_articles/src/download.py']
-    )
-    pdf_watchdog.run()
+    ).run()

@@ -67,6 +67,11 @@ class PdfDownloader:
             )
             conn.commit()
         except Exception as e:
+            cur.execute(
+                "update articles set is_downloaded = -1 where google_id = %s",
+                (google_id,)
+            )
+            conn.commit()
             print('Downloader:\n\tdownload( google_id = "{}" ) ERROR:\n\t{}'.format(google_id,str(e)))
 
     def run(self,thread_counts=8):
@@ -83,3 +88,6 @@ if __name__=='__main__':
     PdfDownloader(
         save_folder = DOWNLOAD_FOLDER,
     ).run(thread_counts=10)
+    #直接运行本文件，没有看门狗功能，请运行pdf_download_wacthdog.py,
+    #进程运行一段时间，增量长时间为零，不能自动控制重启
+    #由看门狗parent process调用本文件，作为sub process，控制并监测运行情况

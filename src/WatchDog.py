@@ -30,7 +30,7 @@ def get_existed_proc(cmd_line=None,pname=None):
 
 def get_prev_pids(cmd_line=None,pname=None):
     #cmd_line is like:  ['python','amount_status.py']
-    print('cmd_line',cmd_line)
+    #print('cmd_line',cmd_line)
     prev_pids = []
     for proc in psutil.process_iter():
         try:
@@ -50,23 +50,28 @@ class WatchDog:
         对于每个process(对应于每个任务)的监视管理器
         如果需要定制，可做父类继承
     '''
-    def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
-        self.proc_cmd_line = proc_cmd_line
-        prev_pids = get_prev_pids(self_cmd_line)
-        print(prev_pids)
+    def __init__(self,cmd_line,sub_proc_cmd_line,pid=None):
+        self.sub_proc_cmd_line = sub_proc_cmd_line
+        self.cmd_line = cmd_line
+        self.kill_prev_watchdog_procs()#清理之前的类似看门狗进程
+        if pid:
+            #直接以pid初始化sub_proc
+            self.sub_proc = psutil.Process(pid)
+            return
+        else:
+            #未指定已存在的子进程id，看门狗自动为其创建
+            self.create_new_sub_proc()
+            print('WatchDog:\n\tThe new pid is : {}'.format(self.sub_proc.pid))
+
+    def kill_prev_watchdog_procs(self):
+        prev_pids = get_prev_pids(self.cmd_line)
+        print('prev_pids:',prev_pids)
+        #清理之前的看门狗进程
         for prev_pid in prev_pids:
             try:
                 self.close_proc(prev_pid)
             except:
                 pass
-        if pid:
-            self.proc = psutil.Process(pid)
-        
-        #假如不存在该cmdline创建的进程，看门狗自动为其创建
-        print('WatchDog:\n\tCreating new process...')
-        self.proc = psutil.Process(
-            pid = self.create_proc().pid
-        )
 
     def send_mail(self,admin_address,subject):
         emailAI = Email(
@@ -90,29 +95,29 @@ class WatchDog:
         if ex_pid:
             pid = ex_pid
         else:
-            pid = self.proc.pid
+            pid = self.sub_proc.pid
         print('WatchDog:\n\tKilling process:  {}  ...'.format(pid))
         os.system(
             'kill -9 {}'.format(pid)
         )
 
-    def create_proc(self):
-        sp = subprocess.Popen(
-            args = self.proc_cmd_line,
-            bufsize = 0
+    def create_new_sub_proc(self):
+        print('WatchDog:\n\tCreating new sub_process...')
+        self.sub_proc = psutil.Process(
+            pid = subprocess.Popen(
+                args = self.sub_proc_cmd_line,
+                bufsize = 1
+            ).pid
         )
-        print('WatchDog\n\tThe new pid is {}'.format(sp.pid))
-        return sp
 
     def restart(self):
         self.close_proc()
-        self.create_proc()
-        self.proc = get_existed_proc(self.proc_cmd_line)
-        print('WatchDog:\n\tRestart ok! The new pid is: ' + str(self.proc.pid))
+        self.create_new_sub_proc()
+        print('WatchDog:\n\tRestart ok! The new pid is: ' + str(self.sub_proc.pid))
 
     @property
-    def proc_status(self):
-        return self.proc.status()
+    def sub_proc_status(self):
+        return self.sub_proc.status()
 
     def run(self):
         pass
