@@ -32,7 +32,7 @@ class WatchDog:
             print('WatchDog:\n\tThe new pid is : {}'.format(self.task_proc.pid))
 
     def kill_prev_watchdog_procs(self):
-        prev_pids = get_prev_pids(self.cmd_line)
+        prev_pids = get_prev_pids(self.cmd_line)[:-1]
         print('WatchDog:\n\tPrevious watchdog pids: {}'.format(prev_pids))
         #清理之前的看门狗进程
         close_procs(prev_pids)
@@ -63,7 +63,7 @@ class WatchDog:
 
     def close_task_proc(self):
         print('WatchDog:\n\tKilling process:  {}  ...'.format(self.task_proc.pid))
-        close_proc(self.task_proc.pid)
+        os.kill(self.task_proc.pid,9)
 
     def create_new_task_proc(self):
         print('WatchDog:\n\tCreating new task_process...')
@@ -131,17 +131,15 @@ def get_prev_pids(cmd_line=None,pname=None):
             pass
         except psutil.NoSuchProcess:
             pass
-    return prev_pids[:-1]
+    return prev_pids
 
-
-def close_proc(pid=None):
-    os.system(
-        'kill -9 {}'.format(pid)
-    )
 
 def close_procs(pids):
     for pid in pids:
         try:
-            close_proc(pid)
+            os.kill(pid,9)
+            print (
+                '\tKill pid:{} ok!'.format(pid)
+            )
         except:
             pass

@@ -59,13 +59,13 @@ class Pdf_Download_Watchdog(WatchDog):
             current_cot = self.counts_of_unfinished_db_item
             delta = prev_cot - current_cot
             prev_cot = current_cot
-            current_status = self.sub_proc_status
+            current_status = self.task_proc_status
             if delta==0:
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
             if delta_zero_cot>=3 or current_status is 'dead':
-                self.restart_sub_proc()
+                self.restart_task_proc()
                 delta_zero_cot = 0
             print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
                     current_cot,
