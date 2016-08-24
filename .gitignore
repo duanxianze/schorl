@@ -8,3 +8,7 @@ __pycache__
 download/
 logs
 *.html
+config
+*.swp
+nohup.out
+src/amount_log.txt
