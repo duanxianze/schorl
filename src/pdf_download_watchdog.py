@@ -39,7 +39,19 @@ class Pdf_Download_Watchdog(WatchDog):
         else:
             cursor = cur
         cursor.execute(
-            "select count(*) from articles where is_downloaded = 0 or is_downloaded = -1"
+            "select count(*) from articles where is_downloaded = 0"
+        )
+        return int(cursor.fetchall()[0][0])
+
+    @property
+    def counts_of_exception_db_item(self,extend_cursor=None):
+        #db显示未下载项的数量
+        if extend_cursor:
+            cursor = extend_cursor
+        else:
+            cursor = cur
+        cursor.execute(
+            "select count(*) from articles where is_downloaded = -1"
         )
         return int(cursor.fetchall()[0][0])
 
@@ -64,11 +76,12 @@ class Pdf_Download_Watchdog(WatchDog):
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
-            if delta_zero_cot>=3 or current_status is 'dead':
+            if delta_zero_cot>=10 or current_status is 'dead':
                 self.restart_task_proc()
                 delta_zero_cot = 0
             print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
                     current_cot,
+                    self.counts_of_exception_db_item,
                     self.counts_of_pdf_files,
                     delta,
                     delta_zero_cot,
