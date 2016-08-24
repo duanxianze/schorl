@@ -42,7 +42,7 @@ class Artciles_Spider_WatchDog(WatchDog):
             amount = self.articles_amount
             local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
             delta = amount - prev_amount
-            current_status = self.proc.status()
+            current_status = self.task_proc_status
             if delta==0:
                 delta_zero_cot += 1
             else:

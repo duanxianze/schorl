@@ -37,7 +37,7 @@ class ParseHTML:
         with open("test.html", "w+") as test:
             test.write(self.html)
         '''
-        self.soup = BeautifulSoup(self.html, 'lxml')
+        self.soup = BeautifulSoup(self.html)
         self.html_text = self.soup.text
         self.rand_port = lambda x, y: randint(x, y)
         self.ua = UserAgent()
