@@ -12,7 +12,7 @@
 from math import ceil
 from parse_html import *
 from multiprocessing.dummy import Pool as ThreadPool
-import re,random,os
+import re,random,os,psycopg2
 
 if os.name is 'nt':
     conn = psycopg2.connect(
