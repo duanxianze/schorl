@@ -10,13 +10,14 @@ from random import randint
 from request_with_proxy import request_with_proxy
 
 def except_or_none(func):
-    def decorator( *args, **kwargs):
+    def wrapper(*args, **kwargs):
         try:
             return func(*args,**kwargs)
         except Exception as e:
-            print('Error:{}():{}'.format(func.__name__,str(e)))
+            print('Error in {}(): {}'.format(func.__name__,str(e)))
             return None
-    return decorator
+    return wrapper
+
 
 class ParseHTML:
     '''
@@ -118,8 +119,10 @@ class Article:
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
 
     def save_to_db(self,cur):
+        self.show_in_cmd()
+        '''
         try:
-            print(self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id) 
+            self.show_in_cmd()
             cur.execute(
                 "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
                 "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
@@ -127,6 +130,18 @@ class Article:
             )
         except Exception as e:
             print('Article save error:{}'.format(str(e)))
+        '''
 
-
+    def show_in_cmd(self):
+        print('**************Article Info******************')
+        print('title:\t{}'.format(self.title))
+        print('google_id:\t{}'.format(self.google_id))
+        print('year:\t{}'.format(self.year))
+        print('resource_type:\t{}'.format(self.resource_type))
+        print('resource_link:\t{}'.format(self.resource_link))
+        print('citations_count:\t{}'.format(self.citations_count))
+        print('citations_link:\t{}'.format(self.citations_link))
+        print('link:\t{}'.format(self.link))
+        print('summary:\t{}'.format(self.summary))
+        print('**************Article Info******************')
 
