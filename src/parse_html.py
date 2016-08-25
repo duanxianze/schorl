@@ -3,11 +3,12 @@
     parse_html.py 用于解析学者搜索结果页
 '''
 from bs4 import BeautifulSoup
-import requests,psycopg2,random
+import requests,random
 requests.packages.urllib3.disable_warnings()
 from random import randint
 from request_with_proxy import request_with_proxy
 from ua_pool import agents
+
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
@@ -107,13 +108,11 @@ class Article:
     @except_or_none
     def summary(self):
         return self.sec.select('.gs_rs')[0].text
-    
 
     @property
     @except_or_none
     def google_id(self):
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[0][1:-1]
-    
 
     @property
     @except_or_none
