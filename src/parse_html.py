@@ -121,21 +121,18 @@ class Article:
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
 
     def save_to_db(self,cur):
-        self.show_in_cmd()
-        '''
         try:
-            self.show_in_cmd()
             cur.execute(
                 "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
                 "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
                 (self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id)
             )
+            self.show_in_cmd()
         except Exception as e:
             print('Article save error:{}'.format(str(e)))
-        '''
 
     def show_in_cmd(self):
-        print('**************Article Info******************')
+        print('**************New Article Info******************')
         print('title:\t\t{}'.format(self.title))
         print('google_id:\t{}'.format(self.google_id))
         print('year:\t\t{}'.format(self.year))
@@ -145,7 +142,7 @@ class Article:
         print('citations_link:\t{}'.format(self.citations_link))
         print('link:\t\t\t{}'.format(self.link))
         print('summary:\t\t{}'.format(self.summary))
-        print('**************Article Info******************')
+        print('**************New Article Info******************')
 
 
 
