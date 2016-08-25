@@ -114,6 +114,11 @@ class PdfDownloader:
 
 
 if __name__=='__main__':
+    '''
+    PdfDownloader(
+        save_folder = DOWNLOAD_FOLDER,
+    ).run(thread_counts=8)
+    '''
 
     PdfDownloader(
         save_folder = DOWNLOAD_FOLDER,
