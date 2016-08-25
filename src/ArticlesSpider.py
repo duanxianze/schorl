@@ -12,17 +12,24 @@
 from math import ceil
 from parse_html import *
 from multiprocessing.dummy import Pool as ThreadPool
-import re,random
+import re,random,os,psycopg2
 
-DB_NAME = "sf_development"
-USER = "gao"
-PASSWORD = "gaotongfei13"
-
-conn = psycopg2.connect(
-    "dbname={0} user={1} password={2}".format(DB_NAME, USER, PASSWORD)
-)
-conn.autocommit = True
+if os.name is 'nt':
+    conn = psycopg2.connect(
+        host = '45.32.131.53',
+        port = 5432,
+        dbname = "sf_development",
+        user = "gao",
+        password = "gaotongfei13"
+    )
+else:
+    conn = psycopg2.connect(
+        dbname = "sf_development",
+        user = "gao",
+        password = "gaotongfei13"
+    )
 cur = conn.cursor()
+conn.autocommit = True
 
 class ArticleSpider:
     '''
@@ -35,7 +42,7 @@ class ArticleSpider:
     def unfinished_items(self):
         #从scholar表中检索出未爬取过的学者集
         cur.execute(
-            "select id, first_name, middle_name, last_name from scholars where is_added = 1"
+            "select id, first_name, middle_name, last_name from scholars where is_added = 0"
         )
         return cur.fetchall()
     
@@ -52,7 +59,7 @@ class ArticleSpider:
         try:
             scholar_db_id = unfinished_item[0]
             full_name = unfinished_item[1:]
-            for page_url in  ScholarSearch(full_name).page_urls():
+            for page_url in ScholarSearch(full_name).page_urls():
                 for sec in ParseHTML(url=page_url).sections():
                     Article(sec).save_to_db(cur)
             cur.execute("update scholars set is_added = 1 where id = (%s)", (scholar_db_id,))

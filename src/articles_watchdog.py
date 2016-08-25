@@ -42,14 +42,14 @@ class Artciles_Spider_WatchDog(WatchDog):
             amount = self.articles_amount
             local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
             delta = amount - prev_amount
-            current_status = self.proc.status()
+            current_status = self.task_proc_status
             if delta==0:
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
             if delta_zero_cot>=6:
-                self.restart()
-                #self.send_mail()
+                self.restart_task_proc()
+                self.send_mail()
                 delta_zero_cot = 0
             if initial:
                 delta = 0
@@ -60,16 +60,13 @@ class Artciles_Spider_WatchDog(WatchDog):
             tf = open('amount_log.txt','a+')
             prev_amount = amount
             for i in range(1,60):
-                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{}'.format(
-                        amount,
-                        delta,
-                        delta_zero_cot,
+                print('WatchDog:\n\t{},\t{},\t{}'.format(
+                        self.articles_amount,
                         current_status,
                         time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                     )
                 )
                 time.sleep(10)
-            #time.sleep(60)#每十分钟统计一次
 
 
 if __name__=='__main__':
