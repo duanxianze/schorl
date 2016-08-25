@@ -9,6 +9,14 @@ requests.packages.urllib3.disable_warnings()
 from random import randint
 from request_with_proxy import request_with_proxy
 
+def except_or_none(func):
+    def decorator( *args, **kwargs):
+        try:
+            return func(*args,**kwargs)
+        except Exception as e:
+            print('Error:{}():{}'.format(func.__name__,str(e)))
+            return None
+    return decorator
 
 class ParseHTML:
     '''
@@ -37,7 +45,7 @@ class ParseHTML:
         with open("test.html", "w+") as test:
             test.write(self.html)
         '''
-        self.soup = BeautifulSoup(self.html)
+        self.soup = BeautifulSoup(self.html,'lxml')
         self.html_text = self.soup.text
         self.rand_port = lambda x, y: randint(x, y)
         self.ua = UserAgent()
@@ -55,55 +63,63 @@ class ParseHTML:
 class Article:
     def __init__(self,sec):
         self.sec = sec
-
+    
+    @except_or_none
     @property
     def title(self):
         return self.sec.select('.gs_rt > a')[0].text
-
+    
+    @except_or_none
     @property
     def year(self):
         return self.sec.select('.gs_a')[0].text.split('-')[-2].split(',')[-1][1:-1]
-
+    
+    @except_or_none
     @property
     def citations_count(self):
         return int(self.sec.select('.gs_fl > a')[0].text[9:])
-
+    
+    @except_or_none
     @property
     def citations_link(self):
         return self.sec.select('.gs_fl > a')[0]['href']
 
+    @except_or_none
     @property
     def link(self):
         return self.sec.select('.gs_rt > a')[0]['href']
 
+    @except_or_none
     @property
     def resource_type(self):
-        try:
-            return self.sec.select('.gs_ggsS')[0].text.split(' ')[1][1:-1]
-        except:
-            return None
+        return self.sec.select('.gs_ggsS')[0].text.split(' ')[1][1:-1]
 
+    @except_or_none
     @property
     def resource_link(self):
         if self.resource_type:
             return self.sec.select('.gs_md_wp > a')[0]['href']
         else:
             return None
-
+    
+    @except_or_none
     @property
     def summary(self):
         return self.sec.select('.gs_rs')[0].text
-
+    
+    @except_or_none
     @property
     def google_id(self):
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[0][1:-1]
-
+    
+    @except_or_none
     @property
     def index(self):
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
 
     def save_to_db(self,cur):
         try:
+            print(self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id) 
             cur.execute(
                 "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
                 "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
