@@ -27,7 +27,7 @@ class Pdf_Download_Watchdog(WatchDog):
         else:
             cursor = cur
         cursor.execute(
-            "select count(id) from articles where is_downloaded = 1"
+            "select count(id) from articles where is_downloaded = 1 and resource_type='PDF'"
         )
         return int(cur.fetchall()[0][0])
 
@@ -39,7 +39,7 @@ class Pdf_Download_Watchdog(WatchDog):
         else:
             cursor = cur
         cursor.execute(
-            "select count(*) from articles where is_downloaded = 0"
+            "select count(*) from articles where is_downloaded = 0 and resource_type='PDF'"
         )
         return int(cursor.fetchall()[0][0])
 
