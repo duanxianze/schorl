@@ -11,7 +11,7 @@
             若delta数据长时为零，则邮件通知管理员
 """
 
-import time,os
+import time
 from WatchDog import WatchDog
 from ArticlesSpider import *
 
