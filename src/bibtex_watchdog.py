@@ -16,12 +16,12 @@ from bibtex import *
 
 class Bibtex_Spider_WatchDog(WatchDog):
     def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
-        WatchDog.__init__(cmd_line,task_proc_cmd_line,pid)
+        WatchDog.__init__(self,cmd_line,task_proc_cmd_line,pid)
 
     @property
     def bibtex_not_null_article_amount(self):
         cur.execute(
-            'select count(*) from articles where where id > 314083 and bibtex is not null'
+            'select count(*) from articles where id > 314083 and bibtex is not null'
         )
         return int(cur.fetchall()[0][0])
 
