@@ -17,7 +17,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 import psycopg2
 import time,random,os
 
-random_port = lambda x, y: randint(x, y)#随机分配端口
+
 
 if os.name is 'nt':
     conn = psycopg2.connect(
@@ -60,7 +60,7 @@ class Bibtex:
     @except_or_none
     def url(self):
         if self.citi:
-            return 'https://scholar.google.com'+self.citi[0]['href']
+            return self.citi[0]['href']
 
     @property
     @except_or_none
