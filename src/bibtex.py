@@ -62,7 +62,7 @@ class Bibtex:
             print('Bibtex:\n\tbibtex site status code: {}'.format(bibtex_response.status_code))
             if bibtex_response:
                 bibtex = bibtex_response.text
-                print('Bibtex:\n\t[SUCCESS] to get new bibtex of the article:{}\n\t{}'.format(self.article_id,bibtex))
+                print('Bibtex:\n\t[SUCCESS] to get new bibtex of the article: {}\n\t{}'.format(self.article_id,bibtex))
                 return bibtex
             time.sleep(3)
         return None
@@ -74,6 +74,7 @@ class Bibtex:
                     "update articles set bibtex = %s where id = %s",
                     (self.text, self.article_id)
                 )
+                print('Bibtex:\n\tSave article: {} OK!',format(self.article_id))
             except Exception as e:
                 print('Bibtex:Error:save_to_db():\n\t{}'.format(str(e)))
 
@@ -103,7 +104,7 @@ class BibtexSpider:
                     soup = BeautifulSoup(response.text, "lxml"),
                     article_id = id
                 ).save_to_db()
-                break
+                return
             else:
                 print('BibtexSpider:\n\tFirst page visit error:Responese {}'.format(response.status_code))
             time.sleep(3)
