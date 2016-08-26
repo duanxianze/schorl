@@ -4,18 +4,11 @@
 '''
 
 import time
-from fake_useragent import UserAgent
 from ua_pool import agents
 import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint
 import random
-
-
-try:
-    ua = random.choice(agents)
-except:
-    ua = UserAgent().random
 
 
 '''
@@ -41,7 +34,7 @@ def rand_port(x, y, exclude):
 返回请求结果
 '''
 def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=False):
-    headers = {'User-Agent': ua}
+    headers = {'User-Agent': random.choice(agents)}
     if no_proxy_test:
         return requests.get(url, headers=headers, timeout=timeout)
     time.sleep(sleep)
