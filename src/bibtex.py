@@ -13,6 +13,7 @@
 from bs4 import BeautifulSoup
 from random import randint
 from request_with_proxy import request_with_proxy
+from multiprocessing.dummy import Pool as ThreadPool
 import psycopg2
 import time,random
 
@@ -56,12 +57,12 @@ class Bibtex:
     @except_or_none
     def text(self):
         for i in range(1,10):
-            print('Bibtex:\n\t{} times trying to get bibtex from {}...'.format(i,self.url))
+            print('Bibtex:\n\t{} times trying to get bibtex of id={}'.format(i,self.article_id))
             bibtex_response = request_with_proxy(self.url)
-            print('bibtex site status code: {}'.format(bibtex_response.status_code))
+            print('Bibtex:\n\tbibtex site status code: {}'.format(bibtex_response.status_code))
             if bibtex_response:
                 bibtex = bibtex_response.text
-                print('Bibtex:\n\tGet new bibtex of the article:{}\n\t{}'.format(self.article_id,bibtex))
+                print('Bibtex:\n\t[SUCCESS] to get new bibtex of the article:{}\n\t{}'.format(self.article_id,bibtex))
                 return bibtex
             time.sleep(3)
         return None
@@ -88,26 +89,35 @@ class BibtexSpider:
         )
         return cur.fetchall()
 
-    def run(self,shuffle=True):
-        while(1):
-            unfinished_items = self.unfinished_items
+    def crawl(self,unfinished_item):
+        id = unfinished_item[0]
+        google_id = unfinished_item[1]
+        url = 'https://scholar.google.com/scholar?q=info:{}:scholar.google.com/&output=cite&scirp=0&hl=en'.format(google_id)
+        print("BibtexSpider:\n\tid: {0} google_id: {1} url:{2}".format(id, google_id,url))
+        for i in range(1,10):
+            print('BibtexSpider:\n\t{} times to enter first page...'.format(i))
+            response = request_with_proxy(url)
+            if response.status_code == 200:
+                print("response 200")
+                Bibtex(
+                    soup = BeautifulSoup(response.text, "lxml"),
+                    article_id = id
+                ).save_to_db()
+                break
+            else:
+                print(response.status_code)
+            time.sleep(3)
+
+    def run(self,thread_counts=4,shuffle=True):
+        pool = ThreadPool(thread_counts)
+        unfinished_items = self.unfinished_items
+        if shuffle:
             random.shuffle(unfinished_items)
-            for id, google_id in unfinished_items:
-                url = 'https://scholar.google.com/scholar?q=info:{}:scholar.google.com/&output=cite&scirp=0&hl=en'.format(google_id)
-                print("BibtexSpider:\n\tid: {0} google_id: {1} url:{2}".format(id, google_id,url))
-                for i in range(1,10):
-                    print('BibtexSpider:\n\t{} times to enter first page...')
-                    response = request_with_proxy(url)
-                    if response.status_code == 200:
-                        print("response 200")
-                        Bibtex(
-                            soup = BeautifulSoup(response.text, "lxml"),
-                            article_id = id
-                        ).save_to_db()
-                    else:
-                        print(response.status_code)
-                    time.sleep(3)
+        pool.map(self.crawl, unfinished_items)
+        pool.close()
+        pool.join()
+
 
 
 if __name__=='__main__':
-    BibtexSpider().run()
+    BibtexSpider().run(thread_counts=4)
