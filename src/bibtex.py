@@ -60,7 +60,7 @@ class Bibtex:
     @except_or_none
     def url(self):
         if self.citi:
-            return self.citi[0]['href']
+            return 'https://scholar.google.com'+self.citi[0]['href']
 
     @property
     @except_or_none
