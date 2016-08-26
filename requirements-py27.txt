@@ -1,11 +1,9 @@
-PySocks==1.5.7
+PySocks==1.5.6
 argparse==1.2.1
 beautifulsoup4==4.4.1
-fake-useragent==0.0.8
-lxml==3.6.0
-psycopg2==2.6.1
-pyOpenSSL==16.0.0
-requests==2.10.0
-six==1.10.0
-wheel==0.29.0
+cffi==1.6.0
+fake-useragent==0.1.2
+psutil==4.3.0
+psycopg2==2.6.2
+requests==2.11.1
 wsgiref==0.1.2
