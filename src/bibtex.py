@@ -66,8 +66,9 @@ class Bibtex:
     @except_or_none
     def text(self):
         for i in range(1,10):
-            print('Bibtex:\n\t{} times trying to get bibtex of article_id = {}'.format(i,self.article_id))
-            bibtex_response = request_with_proxy(self.url)
+            url = self.url
+            print('Bibtex:\n\t{} times trying to get bibtex of article_id = {}\n\turl:{}'.format(i,self.article_id,url))
+            bibtex_response = request_with_proxy(url)
             print('Bibtex:\n\tbibtex site status code: {}'.format(bibtex_response.status_code))
             if bibtex_response:
                 bibtex = bibtex_response.text
