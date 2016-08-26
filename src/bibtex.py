@@ -15,15 +15,24 @@ from random import randint
 from request_with_proxy import request_with_proxy
 from multiprocessing.dummy import Pool as ThreadPool
 import psycopg2
-import time,random
+import time,random,os
 
 random_port = lambda x, y: randint(x, y)#随机分配端口
 
-conn = psycopg2.connect(
-    dbname = "sf_development",
-    user = "gao",
-    password = "gaotongfei13"
-)
+if os.name is 'nt':
+    conn = psycopg2.connect(
+        host = '45.32.131.53',
+        port = 5432,
+        dbname = "sf_development",
+        user = "gao",
+        password = "gaotongfei13"
+    )
+else:
+    conn = psycopg2.connect(
+        dbname = "sf_development",
+        user = "gao",
+        password = "gaotongfei13"
+    )
 cur = conn.cursor()
 conn.autocommit = True
 
@@ -57,14 +66,14 @@ class Bibtex:
     @except_or_none
     def text(self):
         for i in range(1,10):
-            print('Bibtex:\n\t{} times trying to get bibtex of article_id={}'.format(i,self.article_id))
+            print('Bibtex:\n\t{} times trying to get bibtex of article_id = {}'.format(i,self.article_id))
             bibtex_response = request_with_proxy(self.url)
             print('Bibtex:\n\tbibtex site status code: {}'.format(bibtex_response.status_code))
             if bibtex_response:
                 bibtex = bibtex_response.text
-                print('Bibtex:\n\t[SUCCESS] to get new bibtex of the article: {}\n\t{}'.format(self.article_id,bibtex))
+                print('Bibtex:\n\t[SUCCESS] to get new bibtex of the article: {}\n{}'.format(self.article_id,bibtex))
                 return bibtex
-            time.sleep(3)
+            time.sleep(random.randint(1,4))
         return None
 
     def save_to_db(self):
@@ -74,7 +83,7 @@ class Bibtex:
                     "update articles set bibtex = %s where id = %s",
                     (self.text, self.article_id)
                 )
-                print('Bibtex:\n\tSave article: {} OK!',format(self.article_id))
+                print('Bibtex:\n\tSave article: {} OK!'.format(self.article_id))
             except Exception as e:
                 print('Bibtex:Error:save_to_db():\n\t{}'.format(str(e)))
 
@@ -96,7 +105,7 @@ class BibtexSpider:
         url = 'https://scholar.google.com/scholar?q=info:{}:scholar.google.com/&output=cite&scirp=0&hl=en'.format(google_id)
         print("BibtexSpider:\n\tid: {0} google_id: {1} \n\turl:{2}".format(id, google_id,url))
         for i in range(1,10):
-            print('BibtexSpider:\n\t{} times to enter article_id={} first page...'.format(i,id))
+            print('BibtexSpider:\n\t{} times to enter article_id = {} first page...'.format(i,id))
             response = request_with_proxy(url)
             if response.status_code == 200:
                 print("BibtexSpider:\n\tFirst page ok!Response 200...")
@@ -107,7 +116,7 @@ class BibtexSpider:
                 return
             else:
                 print('BibtexSpider:\n\tFirst page visit error:Responese {}'.format(response.status_code))
-            time.sleep(3)
+            time.sleep(random.randint(1,4))
 
     def run(self,thread_counts=4,shuffle=True):
         pool = ThreadPool(thread_counts)
