@@ -57,7 +57,7 @@ class Bibtex:
     @except_or_none
     def text(self):
         for i in range(1,10):
-            print('Bibtex:\n\t{} times trying to get bibtex of id={}'.format(i,self.article_id))
+            print('Bibtex:\n\t{} times trying to get bibtex of article_id={}'.format(i,self.article_id))
             bibtex_response = request_with_proxy(self.url)
             print('Bibtex:\n\tbibtex site status code: {}'.format(bibtex_response.status_code))
             if bibtex_response:
@@ -93,19 +93,19 @@ class BibtexSpider:
         id = unfinished_item[0]
         google_id = unfinished_item[1]
         url = 'https://scholar.google.com/scholar?q=info:{}:scholar.google.com/&output=cite&scirp=0&hl=en'.format(google_id)
-        print("BibtexSpider:\n\tid: {0} google_id: {1} url:{2}".format(id, google_id,url))
+        print("BibtexSpider:\n\tid: {0} google_id: {1} \n\turl:{2}".format(id, google_id,url))
         for i in range(1,10):
-            print('BibtexSpider:\n\t{} times to enter first page...'.format(i))
+            print('BibtexSpider:\n\t{} times to enter article_id={} first page...'.format(i,id))
             response = request_with_proxy(url)
             if response.status_code == 200:
-                print("response 200")
+                print("BibtexSpider:\n\tFirst page ok!Response 200...")
                 Bibtex(
                     soup = BeautifulSoup(response.text, "lxml"),
                     article_id = id
                 ).save_to_db()
                 break
             else:
-                print(response.status_code)
+                print('BibtexSpider:\n\tFirst page visit error:Responese {}'.format(response.status_code))
             time.sleep(3)
 
     def run(self,thread_counts=4,shuffle=True):
