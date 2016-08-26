@@ -8,8 +8,12 @@ from ua_pool import agents
 import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint
-import random
+import random,os
 
+if os.name is 'nt':
+    No_Prox = True
+else:
+    No_Prox = False
 
 '''
 功能：随机分配端口
@@ -33,7 +37,7 @@ def rand_port(x, y, exclude):
     sleep:   运行前等待时间
 返回请求结果
 '''
-def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=False):
+def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=No_Prox):
     headers = {'User-Agent': random.choice(agents)}
     if no_proxy_test:
         return requests.get(url, headers=headers, timeout=timeout)
