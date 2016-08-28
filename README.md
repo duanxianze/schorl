@@ -56,7 +56,15 @@
 - 可脱离于主程序，在宿机器上运行
 
 ### bibtex.py
-NULL
+包含:
+- 爬虫控制器`BibtexSpider`类
+- 逻辑上的`Bibtex`类，包括属性的获取，数据库保存
+
+工作原理：
+- 从db中检索出未填充好bibtex的article条目
+- 根据google_id,规则匹配url，进入中间页，寻找bibtex页面的url
+- 进入bibtex页面，获取完毕
+
 ##任务进程监控
 ### WacthDog.py&为各项任务定制的**watchdog.py
 - 用到`psutil`，`subprocess`包，获取某项进程的各种状态属性
