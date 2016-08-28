@@ -42,7 +42,7 @@ class ArticleSpider:
     def unfinished_items(self):
         #从scholar表中检索出未爬取过的学者集
         cur.execute(
-            "select id, first_name, middle_name, last_name from scholars where is_added = 0"
+            "select id, first_name, middle_name, last_name from scholars"
         )
         return cur.fetchall()
     
