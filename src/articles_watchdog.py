@@ -48,9 +48,12 @@ class Artciles_Spider_WatchDog(WatchDog):
             else:
                 delta_zero_cot = 0
             if delta_zero_cot>=6:
-                self.restart_task_proc()
+                #self.restart_task_proc()
                 self.send_mail()
                 delta_zero_cot = 0
+            if delta_zero_cot>=3:
+                self.restart_task_proc()
+                tf.write('restart,'+local_time+'\n')
             if initial:
                 delta = 0
                 initial = False
@@ -73,6 +76,7 @@ if __name__=='__main__':
     if os.name is 'nt':
         proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/ArticlesSpider.py']
     else:
+        #os.system('source ~/scholar_articles/py3env/bin/activate')
         proc_cmd_line = ['python', 'ArticlesSpider.py']
 
     self_cmd_line = ['python','articles_watchdog.py']
