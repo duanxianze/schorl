@@ -119,7 +119,17 @@ class Article:
     def index(self):
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
 
+    def is_saved(self,cur):
+        cur.execute(
+            "select id from articles where google_id = '{}'".format(self.google_id)
+        )
+        return cur.fetchall()
+
     def save_to_db(self,cur):
+        print('is_saved:\t\t{}'.format(self.is_saved(cur)))
+        if self.is_saved(cur):
+            print('Article save error: Already saved before.')
+            return
         try:
             cur.execute(
                 "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
@@ -146,5 +156,14 @@ class Article:
 
 
 if __name__=='__main__':
+    import psycopg2
+    conn = psycopg2.connect(
+        host = '45.32.131.53',
+        port = 5432,
+        dbname = "sf_development",
+        user = "gao",
+        password = "gaotongfei13"
+    )
+    cur = conn.cursor()
     for sec in ParseHTML(from_web=False).sections():
-        Article(sec).show_in_cmd()
+        Article(sec).save_to_db(cur)
