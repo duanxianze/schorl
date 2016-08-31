@@ -6,7 +6,7 @@
 @description:
             从db中检索出resource_link集,下载pdf
 """
-import random,requests,psycopg2,os
+import requests,psycopg2,os
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
 
