@@ -133,10 +133,10 @@ class ScholarSearch:
             并生成每页url的集合，作为返回值
         '''
         pages = self.page()
-        if pages>10:
-            pages = 10
-        '''10页以后意义不大，故大于10页取10页爬取'''
+        '''10页以后意义不大，故大于10页取10页爬取''' 
         urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
+        if pages>10:
+            urls = urls[9:]
         return urls
 
 
