@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-08-20 23:44
 @description:
-            --
+            主爬虫，创建初始的articles表条目
 """
 from math import ceil
 from parse_html import *
@@ -141,7 +141,7 @@ class ScholarSearch:
 
 
 if __name__=='__main__':
-    ArticleSpider().run(thread_counts=4)
+    ArticleSpider().run(thread_counts=8)
     #直接运行本文件，没有看门狗功能，请运行articles_wacthdog.py,
     #进程运行一段时间，增量长时间为零，不能自动控制重启
     #由看门狗parent process调用本文件，作为sub process，控制并监测运行情况
