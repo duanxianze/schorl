@@ -133,15 +133,15 @@ class ScholarSearch:
             并生成每页url的集合，作为返回值
         '''
         pages = self.page()
-        '''10页以后意义不大，故大于10页取10页爬取''' 
-        urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
         if pages>10:
-            urls = urls[9:]
+            pages = 10
+        '''10页以后意义不大，故大于10页取10页爬取'''
+        urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
         return urls
 
 
 if __name__=='__main__':
-    ArticleSpider().run(thread_counts=8)
+    ArticleSpider().run(thread_counts=4)
     #直接运行本文件，没有看门狗功能，请运行articles_wacthdog.py,
     #进程运行一段时间，增量长时间为零，不能自动控制重启
     #由看门狗parent process调用本文件，作为sub process，控制并监测运行情况
