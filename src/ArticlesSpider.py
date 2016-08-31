@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-08-20 23:44
 @description:
-            --
+            主爬虫，创建初始的articles表条目
 """
 from math import ceil
 from parse_html import *

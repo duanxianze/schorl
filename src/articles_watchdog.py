@@ -26,6 +26,13 @@ class Artciles_Spider_WatchDog(WatchDog):
             'select count(*) from articles'
         )
         return int(cur.fetchall()[0][0])
+    
+    @property
+    def get_journal_temp_amount(self):
+        cur.execute(
+            'select count(*) from articles where journal_temp_info is not null'
+                )
+        return int(cur.fetchall()[0][0])
 
     def send_mail(self):
         #py33 以上smtp.starttls()会报错，移到其他脚本上用py27执行
@@ -48,9 +55,12 @@ class Artciles_Spider_WatchDog(WatchDog):
             else:
                 delta_zero_cot = 0
             if delta_zero_cot>=6:
-                self.restart_task_proc()
+                #self.restart_task_proc()
                 self.send_mail()
                 delta_zero_cot = 0
+            if delta_zero_cot>=3:
+                self.restart_task_proc()
+                tf.write('restart,'+local_time+'\n')
             if initial:
                 delta = 0
                 initial = False
@@ -62,6 +72,7 @@ class Artciles_Spider_WatchDog(WatchDog):
             for i in range(1,60):
                 print('WatchDog:\n\t{},\t{},\t{}'.format(
                         self.articles_amount,
+                        self.get_journal_temp_amount,
                         current_status,
                         time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                     )
@@ -73,6 +84,7 @@ if __name__=='__main__':
     if os.name is 'nt':
         proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/ArticlesSpider.py']
     else:
+        #os.system('source ~/scholar_articles/py3env/bin/activate')
         proc_cmd_line = ['python', 'ArticlesSpider.py']
 
     self_cmd_line = ['python','articles_watchdog.py']

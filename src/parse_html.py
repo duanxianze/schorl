@@ -58,7 +58,7 @@ class ParseHTML:
         try:
             sections = self.soup.select('.gs_r')
         except Exception as e:
-            print("ERROR:ParseHTML:sections")
+            print("ERROR:ParseHTML:sections:{}".format(str(e)))
         return sections
 
 
@@ -119,12 +119,45 @@ class Article:
     def index(self):
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
 
+    @property
+    @except_or_none
+    def journal_temp_info(self):
+        # 该属性的创建是由于bibtex获取困难，但目前需要杂志社的信息，识别IEEE直接下载pdf
+        # 之前考虑数据不冗余，所以没把bibtex中重复的信息单独作为一项
+        # 本属性也只属于articles表临时列，成品可删除
+        return self.sec.select('.gs_a')[0].text.split('-')[-1]
+
+
+    def is_saved(self,cur):
+        cur.execute(
+            "select id from articles where google_id = '{}'".format(self.google_id)
+        )
+        return cur.fetchall()
+
+    def has_journal_temp(self,cur):
+        cur.execute(
+            "select journal_temp_info from articles where google_id = '{}'".format(self.google_id)
+        )
+        return cur.fetchall()[0][0]
+
+    def update_journal(self,cur):
+        cur.execute(
+            "update articles set journal_temp_info = '{}' where google_id = '{}'".format(self.journal_temp_info,self.google_id)
+        )
+        print('update_journal ok!')
+
     def save_to_db(self,cur):
+        if self.is_saved(cur):
+            print('Article save error: "{}" already saved before.'.format(self.google_id))
+            if not self.has_journal_temp(cur):
+                print('Get journal temp information: {}'.format(self.journal_temp_info))
+                self.update_journal(cur)
+            return
         try:
             cur.execute(
-                "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id) "
-                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
-                (self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id)
+                "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id,journal_temp_info) "
+                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
+                (self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id,self.journal_temp_info)
             )
             self.show_in_cmd()
         except Exception as e:
@@ -141,10 +174,22 @@ class Article:
         print('citations_link:\t{}'.format(self.citations_link))
         print('link:\t\t\t{}'.format(self.link))
         print('summary:\t\t{}'.format(self.summary))
+        print('journal_temp_info:\t\t{}'.format(self.journal_temp_info))
         print('**************New Article Info******************')
 
 
 
 if __name__=='__main__':
+    import psycopg2
+    conn = psycopg2.connect(
+        host = '45.32.131.53',
+        port = 5432,
+        dbname = "sf_development",
+        user = "gao",
+        password = "gaotongfei13"
+    )
+    cur = conn.cursor()
+    conn.autocommit = True
     for sec in ParseHTML(from_web=False).sections():
-        Article(sec).show_in_cmd()
+        Article(sec).save_to_db(cur)
+        #Article(sec).update_journal(cur)
