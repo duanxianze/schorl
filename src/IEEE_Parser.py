@@ -10,26 +10,10 @@
             --
 """
 
-import os,psycopg2,requests,random
+import requests,random
 from bs4 import BeautifulSoup
 from ua_pool import agents
 
-if os.name is 'nt':
-    conn = psycopg2.connect(
-        host = '45.32.131.53',
-        port = 5432,
-        dbname = "sf_development",
-        user = "gao",
-        password = "gaotongfei13"
-    )
-else:
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "gao",
-        password = "gaotongfei13"
-    )
-cur = conn.cursor()
-conn.autocommit = True
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
