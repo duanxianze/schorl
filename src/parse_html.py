@@ -144,7 +144,7 @@ class Article:
         cur.execute(
             "update articles set journal_temp_info = '{}' where google_id = '{}'".format(self.journal_temp_info,self.google_id)
         )
-        conn.commit()
+        #conn.commit()
         print('update_journal ok!')
 
     def save_to_db(self,cur):
