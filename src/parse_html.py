@@ -134,10 +134,25 @@ class Article:
         )
         return cur.fetchall()
 
+    def has_journal_temp(self,cur):
+        cur.execute(
+            "select journal_temp_info from articles where google_id = '{}'".format(self.google_id)
+        )
+        return cur.fetchall()[0][0]
+
+    def update_journal(self,cur):
+        cur.execute(
+            "update articles set journal_temp_info = '{}' where google_id = '{}'".format(self.journal_temp_info,self.google_id)
+        )
+        conn.commit()
+        print('update_journal ok!')
+
     def save_to_db(self,cur):
-        print('is_saved:\t\t{}'.format(self.is_saved(cur)))
         if self.is_saved(cur):
-            print('Article save error: Already saved before.')
+            print('Article save error: "{}" already saved before.'.format(self.google_id))
+            if not self.has_journal_temp(cur):
+                print('Get journal temp information: {}'.format(self.journal_temp_info))
+                self.update_journal(cur)
             return
         try:
             cur.execute(
@@ -176,5 +191,5 @@ if __name__=='__main__':
     )
     cur = conn.cursor()
     for sec in ParseHTML(from_web=False).sections():
-        #Article(sec).save_to_db(cur)
-        Article(sec).show_in_cmd()
+        Article(sec).save_to_db(cur)
+        #Article(sec).update_journal(cur)
