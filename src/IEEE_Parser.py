@@ -26,8 +26,13 @@ def except_or_none(func):
 
 
 class IEEE_HTML_Parser:
-    def __init__(self,soup):
-        self.soup = soup
+    def __init__(self,soup=None,from_web=True):
+        if soup:
+            self.soup = soup
+        if not from_web:
+            print("from local file")
+            with open('./IEEE Xplore Search Results.html', 'rb') as f:
+                self.soup = BeautifulSoup(f.read(),'lxml')
 
     @property
     def sections(self):
@@ -40,7 +45,7 @@ class Article:
         self.List_items = sec.select('.List-item')
 
     @property
-    @except_or_none
+    #@except_or_none
     def title(self):
         pass
 
@@ -50,32 +55,29 @@ class Article:
         pass
 
     @property
-    @except_or_none
     def pdf_page_url(self):
         for list_item in self.List_items:
-            if list_item.get_attribute('ng-if') is '::record.pdfLink':
-                return list_item.find_element_by_tag_name('a').get_attribute('href')
-            else:
-                print(list_item.get_attribute('ng-if'))
+            if list_item['ng-if'] == '::record.pdfLink':
+                return list_item.select('a')[0]['href']
         return None
 
     @property
     @except_or_none
     def pdf_url(self):
-        session = requests.Session()
-        with session as s:
-            print(self.pdf_page_url)
-            r = s.get(
-                url = self.pdf_page_url,
-                timeout=10,
-                headers = {'User-Agent':random.choice(agents)}
-            )
-            #time.sleep(30)
-            print(r.status_code)
-            if r.status_code==200:
-                soup = BeautifulSoup(r.text, "lxml")
-                return soup.find_all('frame')[1].get('src')
-        return None
+        for i in range(1,10):
+            print('try {} times...'.format(i))
+            with requests.Session() as s:
+                try:
+                    soup = BeautifulSoup(
+                        s.get(
+                            url = self.pdf_page_url,
+                            timeout=30,
+                        ).text,"lxml"
+                    )
+                    return soup.find_all('frame')[1].get('src')
+                except Exception as e:
+                    print('pdf_url() Error:{}'.format(str(e)))
+        raise Exception('Cannot get it in 10 times')
 
     @property
     @except_or_none
@@ -91,6 +93,7 @@ class Article:
         print('**************New Article Info******************')
         print('title:\t\t{}'.format(self.title))
         print('abstract:\t{}'.format(self.abstract))
+        print('pdf_page_url:\t\t{}'.format(self.pdf_page_url))
         print('pdf_url:\t\t{}'.format(self.pdf_url))
         print('html_url:\t{}'.format(self.html_url))
         print('authors:\t{}'.format(self.authors))
@@ -99,7 +102,5 @@ class Article:
 
 
 if __name__=="__main__":
-    for sec in IEEE_HTML_Parser(
-        url='http://ieeexplore.ieee.org/search/searchresult.jsp?queryText=Multilayer&newsearch=true'
-    ).sections:
+    for sec in IEEE_HTML_Parser(from_web=False).sections:
         Article(sec).show_in_cmd()

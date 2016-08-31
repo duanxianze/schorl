@@ -35,14 +35,26 @@ conn.autocommit = True
 
 class IEEE_Search_Model:
     def __init__(self,title):
-        url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?newsearch=true&queryText=' + '%20'.join(title.split(' '))
-        resp = requests.get(
-            url = 'http://ieeexplore.ieee.org/rest/search',
-            headers = {
-                xxx
-            }
-        )
-        print(resp.text)
+        with requests.Session() as s:
+            req = requests.Request('POST',
+                url='http://ieeexplore.ieee.org/rest/search',
+                headers={
+                    'Host': 'ieeexplore.ieee.org',
+                    'Connection': 'keep-alive',
+                    'Content-Length': 38,
+                    'Accept': 'application/json, text/plain, */*',
+                    'Origin': 'http://ieeexplore.ieee.org',
+                    'Content-Type': 'application/json;charset=UTF-8',
+                    'Referer': 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'.format(title),
+                    'Accept-Encoding': 'gzip, deflate',
+                }
+            )
+            prepped = req.prepare()
+            resp = s.send(prepped,
+                verify = False,
+                timeout = 10
+            )
+            print(resp.text)
         ihp = IEEE_HTML_Parser(
             soup = BeautifulSoup(resp.text,'lxml')
         )
