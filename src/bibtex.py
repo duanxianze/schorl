@@ -7,11 +7,10 @@
 @editor:    PyCharm
 @create:    2016-08-26 14:08
 @description:
-            获取articles的bibtex
+            获取articles的bibtex(bs4版本)
 """
 
 from bs4 import BeautifulSoup
-from random import randint
 from request_with_proxy import request_with_proxy
 from multiprocessing.dummy import Pool as ThreadPool
 import psycopg2

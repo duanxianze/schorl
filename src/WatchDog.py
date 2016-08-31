@@ -34,13 +34,13 @@ class WatchDog:
     def kill_prev_watchdog_procs(self):
         prev_pids = get_prev_pids(self.cmd_line)[:-1]
         print('WatchDog:\n\tPrevious watchdog pids: {}'.format(prev_pids))
-        #清理之前的看门狗进程
+        #清理之前的看门狗进程,注意最后一项是当前watchdog自身，不要kill
         close_procs(prev_pids)
 
     def kill_prev_task_procs(self):
         prev_pids = get_prev_pids(self.task_proc_cmd_line)
         print('WatchDog:\n\tPrevious task pids: {}'.format(prev_pids))
-        #清理之前的看门狗进程
+        #清理之前的相同task进程
         close_procs(prev_pids)
 
     def send_mail(self,admin_address,subject):
