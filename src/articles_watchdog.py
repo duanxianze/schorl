@@ -26,6 +26,13 @@ class Artciles_Spider_WatchDog(WatchDog):
             'select count(*) from articles'
         )
         return int(cur.fetchall()[0][0])
+    
+    @property
+    def get_journal_temp_amount(self):
+        cur.execute(
+            'select count(*) from articles where journal_temp_info is not null'
+                )
+        return int(cur.fetchall()[0][0])
 
     def send_mail(self):
         #py33 以上smtp.starttls()会报错，移到其他脚本上用py27执行
@@ -65,6 +72,7 @@ class Artciles_Spider_WatchDog(WatchDog):
             for i in range(1,60):
                 print('WatchDog:\n\t{},\t{},\t{}'.format(
                         self.articles_amount,
+                        self.get_journal_temp_amount,
                         current_status,
                         time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                     )
