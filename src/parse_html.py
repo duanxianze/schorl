@@ -140,18 +140,20 @@ class Article:
         )
         return cur.fetchall()[0][0]
 
-    def update_journal(self,cur):
-        cur.execute(
-            "update articles set journal_temp_info = '{}' where google_id = '{}'".format(self.journal_temp_info,self.google_id)
-        )
-        print('update_journal ok!')
-
     def save_to_db(self,cur):
         if self.is_saved(cur):
             print('Article save error: "{}" already saved before.'.format(self.google_id))
             if not self.has_journal_temp(cur):
+                if 'ieee' in self.journal_temp_info:
+                    #IEEE买了独享资源
+                    cur.execute(
+                        "update articles set resource_type = 'PDF' where google_id = '{}'".format(self.google_id)
+                    )
                 print('Get journal temp information: {}'.format(self.journal_temp_info))
-                self.update_journal(cur)
+                cur.execute(
+                    "update articles set journal_temp_info = '{}' where google_id = '{}'".format(self.journal_temp_info,self.google_id)
+                )
+                print('update_journal ok!')
             return
         try:
             cur.execute(
