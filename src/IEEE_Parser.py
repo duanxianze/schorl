@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 from ua_pool import agents
 
 
+
 def except_or_none(func):
     def wrapper(*args, **kwargs):
         try:
@@ -26,26 +27,21 @@ def except_or_none(func):
 
 
 class IEEE_HTML_Parser:
-    def __init__(self,soup=None,from_web=True):
-        if soup:
-            self.soup = soup
-        if not from_web:
-            print("from local file")
-            with open('./IEEE Xplore Search Results.html', 'rb') as f:
-                self.soup = BeautifulSoup(f.read(),'lxml')
+    def __init__(self,driver):
+        self.driver = driver
 
     @property
     def sections(self):
-        return self.soup.select('.List-results-items')
+        return self.driver.find_elements_by_class_name('List-results-items')
 
 
 class Article:
     def __init__(self,sec):
         self.sec = sec
-        self.List_items = sec.select('.List-item')
+        self.List_items = sec.find_elements_by_class_name('List-item')
 
     @property
-    #@except_or_none
+    @except_or_none
     def title(self):
         pass
 
@@ -57,27 +53,31 @@ class Article:
     @property
     def pdf_page_url(self):
         for list_item in self.List_items:
-            if list_item['ng-if'] == '::record.pdfLink':
-                return list_item.select('a')[0]['href']
+            if list_item.get_attribute('ng-if')=='::record.pdfLink':
+                return list_item.find_element_by_tag_name('a').get_attribute('href')
         return None
 
     @property
-    @except_or_none
     def pdf_url(self):
         for i in range(1,10):
-            print('try {} times...'.format(i))
+            #print('IEEE_Article_Parser:\n\ttry {} times to get pdf_url in frame...'.format(i))
             with requests.Session() as s:
                 try:
                     soup = BeautifulSoup(
                         s.get(
                             url = self.pdf_page_url,
                             timeout=30,
+                            headers = {
+                                'User-Agent':random.choice(agents)
+                            }
                         ).text,"lxml"
                     )
                     return soup.find_all('frame')[1].get('src')
                 except Exception as e:
-                    print('pdf_url() Error:{}'.format(str(e)))
-        raise Exception('Cannot get it in 10 times')
+                    pass
+                    #print('IEEE_Article_Parser:\n\tpdf_url() Error:{}'.format(str(e)))
+        print('IEEE_Article_Parser:\n\tCannot get it in 10 times')
+        return None
 
     @property
     @except_or_none
@@ -102,5 +102,8 @@ class Article:
 
 
 if __name__=="__main__":
-    for sec in IEEE_HTML_Parser(from_web=False).sections:
+    from selenium import webdriver
+    driver = webdriver.Chrome()
+    driver.get(url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText=123&newsearch=true')
+    for sec in IEEE_HTML_Parser(driver).sections:
         Article(sec).show_in_cmd()
