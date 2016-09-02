@@ -15,7 +15,6 @@ from bs4 import BeautifulSoup
 from ua_pool import agents
 
 
-
 def except_or_none(func):
     def wrapper(*args, **kwargs):
         try:
@@ -24,6 +23,21 @@ def except_or_none(func):
             print('IEEE_Article_Parser:\n\tError in {}(): {}'.format(func.__name__,str(e)))
             return None
     return wrapper
+
+
+@except_or_none
+def get_pdf_link(pdf_page_url):
+    with requests.Session() as s:
+        soup = BeautifulSoup(
+            s.get(
+                url = pdf_page_url,
+                timeout=30,
+                headers = {
+                    'User-Agent':random.choice(agents)
+                }
+            ).text,"lxml"
+        )
+        return soup.find_all('frame')[1].get('src')
 
 
 class IEEE_HTML_Parser:
@@ -59,24 +73,7 @@ class Article:
 
     @property
     def pdf_url(self):
-        for i in range(1,10):
-            #print('IEEE_Article_Parser:\n\ttry {} times to get pdf_url in frame...'.format(i))
-            with requests.Session() as s:
-                try:
-                    soup = BeautifulSoup(
-                        s.get(
-                            url = self.pdf_page_url,
-                            timeout=30,
-                            headers = {
-                                'User-Agent':random.choice(agents)
-                            }
-                        ).text,"lxml"
-                    )
-                    return soup.find_all('frame')[1].get('src')
-                except Exception as e:
-                    pass
-                    #print('IEEE_Article_Parser:\n\tpdf_url() Error:{}'.format(str(e)))
-        print('IEEE_Article_Parser:\n\tCannot get it in 10 times')
+        return get_pdf_link(self.pdf_page_url)
         return None
 
     @property
@@ -98,7 +95,6 @@ class Article:
         print('html_url:\t{}'.format(self.html_url))
         print('authors:\t{}'.format(self.authors))
         print('**************New Article Info******************')
-
 
 
 if __name__=="__main__":
