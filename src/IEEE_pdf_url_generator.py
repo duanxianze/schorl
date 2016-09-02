@@ -10,7 +10,6 @@
             专门为IEEE出版社的pdf下载模块
 """
 
-import requests
 import os,psycopg2,random
 from multiprocessing.dummy import Pool as ThreadPool
 from IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
@@ -80,7 +79,7 @@ class IEEE_pdf_url_generator:
     def get_unfinished_items(self,limit=10000):
         #从db中检索出出版社为IEEE的article title集
         cur.execute(
-            "select title,google_id,pdf_temp_url from articles where resource_link is null and journal_temp_info like '%ieee%' and id > 314060  limit {}".format(limit)
+            "select title,google_id,pdf_temp_url from articles where resource_link is null and journal_temp_info like '%ieee%' limit {}".format(limit)
         )
         return cur.fetchall()
 
