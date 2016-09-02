@@ -80,27 +80,14 @@ class IEEE_pdf_url_generator:
     def get_unfinished_items(self,limit=10000):
         #从db中检索出出版社为IEEE的article title集
         cur.execute(
-            "select title,google_id from articles where resource_link is null and journal_temp_info like '%ieee%' limit {}".format(limit)
+            "select title,google_id,pdf_temp_url from articles where resource_link is null and journal_temp_info like '%ieee%' and id > 314060  limit {}".format(limit)
         )
         return cur.fetchall()
 
-    def get_pdf_temp_url_in_db(self,google_id):
-        cur.execute(
-            "select pdf_temp_url from articles where google_id = %s",
-            (google_id,)
-        )
-        data = cur.fetchall()
-        print(data)
-        if data:
-            return data[0][0]
-        else:
-            return None
-
     def generate(self,unfinished_item):
         google_id = unfinished_item[1]
+        pdf_temp_url = unfinished_item[2]
         print('IEEE_PDF_URL_Generator:\n\tGot task of {}\n'.format(google_id))
-        pdf_temp_url = self.get_pdf_temp_url_in_db(google_id)
-        #print('pdf_temp_url:{}'.format(pdf_temp_url))
         if pdf_temp_url:
             pdf_url = get_pdf_link(pdf_temp_url)
         else:
