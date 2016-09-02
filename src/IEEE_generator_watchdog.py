@@ -45,7 +45,11 @@ class IEEE_Generator_Watchdog(WatchDog):
 
 
 if __name__=="__main__":
-    IEEE_Generator_Watchdog(
-        self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_generator_watchdog.py'],
+    import os
+    if os.name=='nt':
+        self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_generator_watchdog.py']
         proc_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_pdf_url_generator.py']
-    ).run()
+    else:
+        self_cmd_line=['python','~/scholar_articles/src/IEEE_generator_watchdog.py']
+        proc_cmd_line=['python','~/scholar_articles/src/IEEE_pdf_url_generator.py']
+    IEEE_Generator_Watchdog(self_cmd_line,proc_cmd_line).run()
