@@ -123,22 +123,38 @@ def get_existed_proc(cmd_line=None,pname=None):
             pass
     return None
 
-
-def get_prev_pids(cmd_line=None,pname=None):
+def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
     #cmd_line is like:  ['python','amount_status.py']
     #print('cmd_line',cmd_line)
-    prev_pids = []
+    procs = []
     for proc in psutil.process_iter():
         try:
-            if proc.cmdline() == cmd_line:
-                prev_pids.append(proc.pid)
-            if pname is not None and proc.name().lower() == pname.lower():
-                prev_pids.append(proc.pid)
+            #print(proc.create_time())
+            if proc.cmdline() == cmd_line\
+                or pname is not None and proc.name().lower() == pname.lower()\
+                or grep in proc.name():\
+                procs.append({'proc':proc,'create_time':proc.create_time()})
         except psutil.AccessDenied:
             pass
         except psutil.NoSuchProcess:
             pass
-    return prev_pids
+    if sort_by_time:
+        procs = sorted(procs,
+                key = lambda x:x['create_time']
+            )#否则默认按id大小排
+    try:
+        return map(lambda x:x['proc'],procs)
+    except:
+        return None
+
+
+def get_prev_pids(cmd_line=None,pname=None,grep=None,sort_by_time=True):
+    procs = get_prev_procs(cmd_line,pname,grep,sort_by_time)
+    #print(procs)
+    try:
+        return map(lambda x:x.pid,procs)
+    except:
+        return None
 
 
 def close_procs(pids):
@@ -153,3 +169,13 @@ def close_procs(pids):
             )
         except:
             pass
+
+
+if __name__=="__main__":
+    #测试代码
+    import time
+    pids = get_prev_pids(grep='python')
+    for pid in pids:
+        time_str = time.localtime(psutil.Process(pid).create_time())#localtime参数为float类型，这里1317091800.0为float类型
+        create_time = time.strftime('%Y-%m-%d %H:%M:%S',time_str)
+        print create_time
