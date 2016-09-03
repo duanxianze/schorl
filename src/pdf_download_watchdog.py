@@ -72,7 +72,7 @@ class Pdf_Download_Watchdog(WatchDog):
             delta = prev_cot - current_cot
             prev_cot = current_cot
             current_status = self.task_proc_status
-            if delta==0:
+            if delta<=0:
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0

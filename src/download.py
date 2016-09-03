@@ -127,7 +127,8 @@ class PdfDownloader:
             if len(unfinished_items)>0:
                 break
         #random.shuffle(unfinished_items)#打乱顺序
-        pool.map(self.download, unfinished_items)
+        result = pool.map(self.download, unfinished_items)
+        print('pool_result:',result)
         #主循环，对于检索的结果列表中每个item都交给download函数执行
         pool.close()
         pool.join()
