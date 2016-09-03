@@ -76,10 +76,10 @@ class Pdf_Download_Watchdog(WatchDog):
                 delta_zero_cot += 1
             else:
                 delta_zero_cot = 0
-            if delta_zero_cot>=10 or current_status is 'dead':
+            if delta_zero_cot>=3 or current_status is 'dead':
                 self.restart_task_proc()
                 delta_zero_cot = 0
-            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
+            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
                     current_cot,
                     self.counts_of_exception_db_item,
                     self.counts_of_pdf_files,

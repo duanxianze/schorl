@@ -174,9 +174,14 @@ def close_procs(pids):
 
 if __name__=="__main__":
     #测试代码
+    '''
     import time
     pids = get_prev_pids(grep='python')
     for pid in pids:
         time_str = time.localtime(psutil.Process(pid).create_time())#localtime参数为float类型，这里1317091800.0为float类型
         create_time = time.strftime('%Y-%m-%d %H:%M:%S',time_str)
         print create_time
+    '''
+    for proc in get_prev_procs(grep='phantom'):
+        print(proc.name)
+        os.kill(proc.pid,9)
