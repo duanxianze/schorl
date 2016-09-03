@@ -128,4 +128,4 @@ class BibtexSpider:
 
 
 if __name__=='__main__':
-    BibtexSpider().run(thread_counts=4)
+    BibtexSpider().run(thread_counts=16)
