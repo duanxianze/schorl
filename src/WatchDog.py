@@ -126,13 +126,14 @@ def get_existed_proc(cmd_line=None,pname=None):
 def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
     #cmd_line is like:  ['python','amount_status.py']
     #print('cmd_line',cmd_line)
+    #后面三个筛选参数有且仅有一个
     procs = []
     for proc in psutil.process_iter():
         try:
             #print(proc.create_time())
-            if proc.cmdline() == cmd_line\
-                or pname is not None and proc.name().lower() == pname.lower()\
-                or grep in proc.name():\
+            if proc.cmdline() is cmd_line \
+                or ( pname is not None and proc.name().lower() is pname.lower() )\
+                    or ( grep is not None and grep in proc.name() ):
                 procs.append({'proc':proc,'create_time':proc.create_time()})
         except psutil.AccessDenied:
             pass
