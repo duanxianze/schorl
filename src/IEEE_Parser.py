@@ -12,8 +12,11 @@
 
 import requests,random
 from bs4 import BeautifulSoup
+from selenium import webdriver
 from ua_pool import agents
 from request_with_proxy import request_with_proxy
+
+
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
@@ -37,17 +40,16 @@ def get_pdf_link(pdf_page_url):
                 }
             ).text,"lxml"
         )
-        return soup.find_all('frame')[1].get('src')
+        try:
+            soup.find_all('frame')[1].get('src')
+        except:
+            print(soup)
 '''
-
-def get_pdf_link(pdf_page_url):
-    soup = BeautifulSoup(
-        request_with_proxy(
-            url = pdf_page_url
-        ).text,"lxml"
-    )
+@except_or_none
+def get_pdf_link(pdf_page_url,driver):
+    driver.get(pdf_page_url)
+    soup = BeautifulSoup(driver.page_source,'lxml')
     return soup.find_all('frame')[1].get('src')
-
 
 
 class IEEE_HTML_Parser:
@@ -60,7 +62,8 @@ class IEEE_HTML_Parser:
 
 
 class Article:
-    def __init__(self,sec):
+    def __init__(self,sec,driver=None):
+        self.driver = driver
         self.sec = sec
         self.List_items = sec.find_elements_by_class_name('List-item')
 
@@ -83,8 +86,7 @@ class Article:
 
     @property
     def pdf_url(self):
-        return get_pdf_link(self.pdf_page_url)
-        return None
+        return get_pdf_link(self.pdf_page_url,self.driver)
 
     @property
     @except_or_none

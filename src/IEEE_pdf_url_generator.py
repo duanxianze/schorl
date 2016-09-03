@@ -36,14 +36,12 @@ else:
 cur = conn.cursor()
 conn.autocommit = True
 
+drivers_pool = []
 
 class IEEE_Search_Model:
-    def __init__(self,title,viusal=False):
+    def __init__(self,title):
         self.title = title
-        if viusal:
-            driver = webdriver.Chrome()
-        else:
-            driver = webdriver.PhantomJS()
+        driver = random.choice(drivers_pool)
         while(1):
             driver.get(
                 url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'\
@@ -69,7 +67,7 @@ class IEEE_Search_Model:
             cur.execute(
                 "update articles set pdf_temp_url = '{}' where title = '{}'".format(pdf_page_url,self.title)
             )
-            return get_pdf_link(pdf_page_url)
+            return get_pdf_link(pdf_page_url,random.choice(drivers_pool))
 
 
 class IEEE_pdf_url_generator:
@@ -120,4 +118,9 @@ if __name__=='__main__':
         unfinished_item = ['Multilayer suspended stripline and coplanar line filters','123123']
     )
     '''
-    ipd.run(thread_counts=4)
+    thread_counts=2
+
+    for i in range(1,thread_counts):
+        drivers_pool.append(webdriver.Chrome())
+
+    ipd.run(thread_counts)
