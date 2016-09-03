@@ -17,7 +17,6 @@ from ua_pool import agents
 from request_with_proxy import request_with_proxy
 
 
-
 def except_or_none(func):
     def wrapper(*args, **kwargs):
         try:

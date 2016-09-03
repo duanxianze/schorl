@@ -13,6 +13,7 @@
 import os,psycopg2,random
 from multiprocessing.dummy import Pool as ThreadPool
 from IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
+from DriversPool import DriversPool
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -36,12 +37,9 @@ else:
 cur = conn.cursor()
 conn.autocommit = True
 
-drivers_pool = []
-
 class IEEE_Search_Model:
-    def __init__(self,title):
+    def __init__(self,title,driver):
         self.title = title
-        driver = random.choice(drivers_pool)
         while(1):
             driver.get(
                 url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'\
@@ -60,6 +58,7 @@ class IEEE_Search_Model:
             except Exception as e:
                 print('IEEE_Search_Model:\n\tError in search page:{}, reload again...'.format(str(e)))
         self.sec = IEEE_HTML_Parser(driver).sections[0]
+        self.driver = driver
 
     def get_pdf_url(self):
         pdf_page_url = Article(self.sec).pdf_page_url
@@ -67,12 +66,12 @@ class IEEE_Search_Model:
             cur.execute(
                 "update articles set pdf_temp_url = '{}' where title = '{}'".format(pdf_page_url,self.title)
             )
-            return get_pdf_link(pdf_page_url,random.choice(drivers_pool))
+            return get_pdf_link(pdf_page_url,self.driver)
 
 
 class IEEE_pdf_url_generator:
     def __init__(self):
-        pass
+        self.drivers_pool = []
 
     def get_unfinished_items(self,limit=10000):
         #从db中检索出出版社为IEEE的article title集
@@ -85,12 +84,16 @@ class IEEE_pdf_url_generator:
         google_id = unfinished_item[1]
         pdf_temp_url = unfinished_item[2]
         print('IEEE_PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
+        driverObj = self.drivers_pool.get_one_free_driver(wait=True)
+        driverObj.status = 'busy'
         if pdf_temp_url:
-            pdf_url = get_pdf_link(pdf_temp_url)
+            pdf_url = get_pdf_link(pdf_temp_url,driverObj.engine)
         else:
             pdf_url = IEEE_Search_Model(
-                title = unfinished_item[0]
+                title = unfinished_item[0],
+                driver = driverObj.engine
             ).get_pdf_url()
+        driverObj.status = 'free'
         if not pdf_url:
             print('IEEE_PDF_URL_Generator:\n\tFail to get pdf_url of {}'.format(google_id))
             return
@@ -105,10 +108,11 @@ class IEEE_pdf_url_generator:
         print('Database:\n\tupdate pdf_url of {} ok '.format(google_id))
 
     def run(self,thread_counts=16):
-        pool = ThreadPool(thread_counts)
-        pool.map(self.generate,self.get_unfinished_items(100))
-        pool.close()
-        pool.join()
+        self.drivers_pool = DriversPool(size=thread_counts)
+        task_pool = ThreadPool(thread_counts)
+        task_pool.map(self.generate,self.get_unfinished_items(100))
+        task_pool.close()
+        task_pool.join()
 
 
 if __name__=='__main__':
@@ -118,9 +122,4 @@ if __name__=='__main__':
         unfinished_item = ['Multilayer suspended stripline and coplanar line filters','123123']
     )
     '''
-    thread_counts=2
-
-    for i in range(1,thread_counts):
-        drivers_pool.append(webdriver.Chrome())
-
-    ipd.run(thread_counts)
+    ipd.run(thread_counts=4)
