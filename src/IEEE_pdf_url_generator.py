@@ -38,8 +38,9 @@ cur = conn.cursor()
 conn.autocommit = True
 
 class IEEE_Search_Model:
-    def __init__(self,title,driver):
+    def __init__(self,title,google_id,driver):
         self.title = title
+        self.google_id = google_id
         while(1):
             driver.get(
                 url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'\
@@ -64,7 +65,8 @@ class IEEE_Search_Model:
         pdf_page_url = Article(self.sec).pdf_page_url
         if pdf_page_url:
             cur.execute(
-                "update articles set pdf_temp_url = '{}' where title = '{}'".format(pdf_page_url,self.title)
+                "update articles set pdf_temp_url = %s where google_id = %s",
+                (pdf_page_url,self.google_id)
             )
             return get_pdf_link(pdf_page_url,self.driver)
 
@@ -91,6 +93,7 @@ class IEEE_pdf_url_generator:
         else:
             pdf_url = IEEE_Search_Model(
                 title = unfinished_item[0],
+                google_id = google_id,
                 driver = driverObj.engine
             ).get_pdf_url()
         driverObj.status = 'free'
@@ -108,7 +111,7 @@ class IEEE_pdf_url_generator:
         print('Database:\n\tupdate pdf_url of {} ok '.format(google_id))
 
     def run(self,thread_counts=16):
-        self.drivers_pool = DriversPool(size=thread_counts)
+        self.drivers_pool = DriversPool(size=thread_counts,visual=False)
         task_pool = ThreadPool(thread_counts)
         task_pool.map(self.generate,self.get_unfinished_items(100))
         task_pool.close()
@@ -116,10 +119,10 @@ class IEEE_pdf_url_generator:
 
 
 if __name__=='__main__':
-    ipd = IEEE_pdf_url_generator()
-    '''
-    ipd.download(
-        unfinished_item = ['Multilayer suspended stripline and coplanar line filters','123123']
-    )
-    '''
-    ipd.run(thread_counts=4)
+    from WatchDog import get_prev_procs
+    for proc in get_prev_procs(grep='phantom'):
+        print(proc.name)
+        print('killing {} ...'.format(proc.pid))
+        os.kill(proc.pid,9)
+
+    IEEE_pdf_url_generator().run(thread_counts=4)
