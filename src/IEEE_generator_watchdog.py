@@ -50,6 +50,6 @@ if __name__=="__main__":
         self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_generator_watchdog.py']
         proc_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_pdf_url_generator.py']
     else:
-        self_cmd_line=['python','~/scholar_articles/src/IEEE_generator_watchdog.py']
-        proc_cmd_line=['python','~/scholar_articles/src/IEEE_pdf_url_generator.py']
+        self_cmd_line=['python','IEEE_generator_watchdog.py']
+        proc_cmd_line=['python','IEEE_pdf_url_generator.py']
     IEEE_Generator_Watchdog(self_cmd_line,proc_cmd_line).run()
