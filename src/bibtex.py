@@ -16,8 +16,6 @@ from multiprocessing.dummy import Pool as ThreadPool
 import psycopg2
 import time,random,os
 
-
-
 if os.name is 'nt':
     conn = psycopg2.connect(
         host = '45.32.131.53',

@@ -11,7 +11,7 @@ from random import randint
 import random,os
 
 if os.name is 'nt':
-    No_Prox = True
+    No_Prox = False
 else:
     No_Prox = False
 
@@ -44,7 +44,10 @@ def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=No
     time.sleep(sleep)
     r = None
     if not use_ss:
-        proxy_port = rand_port(9054, 9155, [])
+        if os.name is 'nt':
+            proxy_port = 9050
+        else:
+            proxy_port = rand_port(9054, 9155, [])
         proxies = {
                 "http": "socks5://127.0.0.1:{}".format(proxy_port),
                 "https": "socks5://127.0.0.1:{}".format(proxy_port)

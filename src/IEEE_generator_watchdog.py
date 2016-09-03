@@ -20,14 +20,14 @@ class IEEE_Generator_Watchdog(WatchDog):
     @property
     def counts_of_unfinished_items(self):
         cur.execute(
-            "select count(*) from articles where journal_temp_info like '%ieee%' and resource_link is null and id > 314060"
+            "select count(*) from articles where journal_temp_info like '%ieee%' and resource_link is null"
         )
         return cur.fetchall()[0][0]
 
     @property
     def counts_of_finished_items(self):
         cur.execute(
-            "select count(*) from articles where journal_temp_info like '%ieee%' and resource_link is not null and id > 314060"
+            "select count(*) from articles where journal_temp_info like '%ieee%' and resource_link is not null"
         )
         return cur.fetchall()[0][0]
 
