@@ -13,7 +13,7 @@
 import requests,random
 from bs4 import BeautifulSoup
 from ua_pool import agents
-
+from request_with_proxy import request_with_proxy
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
@@ -24,7 +24,7 @@ def except_or_none(func):
             return None
     return wrapper
 
-
+'''
 @except_or_none
 def get_pdf_link(pdf_page_url):
     with requests.Session() as s:
@@ -38,6 +38,16 @@ def get_pdf_link(pdf_page_url):
             ).text,"lxml"
         )
         return soup.find_all('frame')[1].get('src')
+'''
+
+def get_pdf_link(pdf_page_url):
+    soup = BeautifulSoup(
+        request_with_proxy(
+            url = pdf_page_url
+        ).text,"lxml"
+    )
+    return soup.find_all('frame')[1].get('src')
+
 
 
 class IEEE_HTML_Parser:

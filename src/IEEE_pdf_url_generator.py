@@ -86,7 +86,7 @@ class IEEE_pdf_url_generator:
     def generate(self,unfinished_item):
         google_id = unfinished_item[1]
         pdf_temp_url = unfinished_item[2]
-        print('IEEE_PDF_URL_Generator:\n\tGot task of {}\n'.format(google_id))
+        print('IEEE_PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
         if pdf_temp_url:
             pdf_url = get_pdf_link(pdf_temp_url)
         else:
