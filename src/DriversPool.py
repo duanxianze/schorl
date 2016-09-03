@@ -23,8 +23,9 @@ class Driver:
 
 
 class DriversPool:
-    def __init__(self,size=4):
+    def __init__(self,size=4,visual=True):
         self.size = size
+        self.visual = visual
         self.pool = []
         self.create()
 
@@ -32,7 +33,7 @@ class DriversPool:
         for i in range(self.size):
             print("DriversPool:\n\tLaunching Engine-{}...".format(i))
             self.pool.append(
-                Driver(visual=True,index=i)
+                Driver(visual=self.visual,index=i)
             )
 
     def alter_driver_status(self,index,status):
