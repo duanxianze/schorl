@@ -64,6 +64,7 @@ class WatchDog:
     def close_task_proc(self):
         print('WatchDog:\n\tKilling process:  {}  ...'.format(self.task_proc.pid))
         os.kill(self.task_proc.pid,9)
+        #os.system('kill -9 {}'.format(self.task_proc.pid))
 
     def create_new_task_proc(self):
         print('WatchDog:\n\tCreating new task_process...')
@@ -138,6 +139,7 @@ def close_procs(pids):
     for pid in pids:
         try:
             os.kill(pid,9)
+            #os.system('kill -9 {}'.format(pid))
             print (
                 '\tKill pid:{} ok!'.format(pid)
             )
