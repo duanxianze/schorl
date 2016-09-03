@@ -6,7 +6,7 @@
 @description:
             从db中检索出resource_link集,下载pdf
 """
-import requests,psycopg2,os
+import requests,psycopg2,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
 
@@ -21,9 +21,9 @@ cur = conn.cursor()
 conn.autocommit = True
 
 if os.name is 'nt':
-    DOWNLOAD_FOLDER = "F:\scholar_articles\src\download"
+    DOWNLOAD_FOLDER = "F:/scholar_articles/src/download/"
 else:
-    DOWNLOAD_FOLDER = "~/scholar_articles/src/download"
+    DOWNLOAD_FOLDER = "~/scholar_articles/src/download/"
 
 class PdfDownloader:
     '''
@@ -36,12 +36,23 @@ class PdfDownloader:
         self.save_folder = save_folder
         self.download_folder_files = os.listdir(save_folder)
 
-    def get_unfinished_items(self,length=1000):
-        #从db中检索出未下载pdf的表项
+    def get_max_unfinished_item_id(self):
         cur.execute(
-            "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF' limit {}".format(length)
+            "select max(id) from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF'"
         )
-        return cur.fetchall()
+        return cur.fetchall()[0][0]
+
+    def get_unfinished_items(self,left=None,length=1000):
+        #从db中检索出未下载pdf的表项
+        max_id = self.get_max_unfinished_item_id()
+        left = random.randint(1,max_id-length)
+        right = left + length
+        cur.execute(
+            "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF' and id > {} and id < {}".format(left,right)
+        )
+        data = cur.fetchall()
+        print('PdfDownloader:\n\tGot {} items in range [{},{}]'.format(len(data),left,right))
+        return data
 
     def download(self,unfinished_item):
         #对于单条item的下载处理
@@ -57,20 +68,16 @@ class PdfDownloader:
                     os.path.join(self.save_folder, save_name), 'wb'
                 ) as pdf_file:
                     pdf_file.write(resp.content)
-                    self.download_folder_files.append(save_name)
+                    file_kb = os.path.getsize(self.save_folder+save_name)*1.0 / 1024
+                    if file_kb > 3:
+                        self.download_folder_files.append(save_name)
+                        print('Downloader:\n\t'+ save_name + '( {} Kb ) wrote ok...'.format(file_kb))
+                    else:
+                        raise Exception('File size = {}k < 3k'.format(file_kb))
             #下载完成后，在数据库中做记录：已下载
-            cur.execute(
-                "update articles set is_downloaded = 1 where google_id = %s",
-                (google_id,)
-            )
-            print('Downloader:\n\t'+ save_name + ' wrote ok...')
+            self.mark(google_id,ok=True)
         except Exception as e:
-            cur.execute(
-                "update articles set is_downloaded = -1 where google_id = %s",
-                (google_id,)
-            )
-            print('Downloader:\n\t{}.pdf wrote error\n\t{}'.format(google_id,str(e)))
-            #os.remove(path=save_name)
+            self.mark(google_id,ok=False,err=e)
 
     def get_delta(self):
         print('Downloader:\n\tSearch file foler...')
@@ -87,12 +94,20 @@ class PdfDownloader:
         print('Downloader:\n\tCaculate {} both-have items,mark them...'.format(len(delta)))
         return delta
 
-    def mark_ok(self,google_id):
-        cur.execute(
-                    "update articles set is_downloaded = 1 where google_id = %s",
-                    (google_id,)
-                )
-        print('Downloader:\n\t'+ google_id + ' wrote ok...')
+    def mark(self,google_id,ok=True,err=None):
+        if ok:
+            cur.execute(
+                        "update articles set is_downloaded = 1 where google_id = %s",
+                        (google_id,)
+                    )
+            print('Databse:\n\t'+ google_id + ' update ok...')
+        else:
+            cur.execute(
+                "update articles set is_downloaded = -1 where google_id = %s",
+                (google_id,)
+            )
+            print('Downloader:\n\t{}.pdf wrote error\n\t{}'.format(google_id,str(err)))
+
 
     def initSync(self,pool):
         #初始化时检测增量，直接标记同步远程记录为1
@@ -106,8 +121,11 @@ class PdfDownloader:
         if init:
             self.initSync(pool)
         length = 1000
-        print('Downloader:\n\tLoading {} items from remote database...'.format(length))
-        unfinished_items = self.get_unfinished_items(length)
+        while True:
+            print('Downloader:\n\tLoading items from remote database...'.format(length))
+            unfinished_items = self.get_unfinished_items(length)
+            if len(unfinished_items)>0:
+                break
         #random.shuffle(unfinished_items)#打乱顺序
         pool.map(self.download, unfinished_items)
         #主循环，对于检索的结果列表中每个item都交给download函数执行
