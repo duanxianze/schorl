@@ -21,9 +21,15 @@ cur = conn.cursor()
 conn.autocommit = True
 
 if os.name is 'nt':
+<<<<<<< HEAD
+    DOWNLOAD_FOLDER = "F:\scholar_articles\src\download"
+else:
+    DOWNLOAD_FOLDER = "~/scholar_articles/src/download"
+=======
     DOWNLOAD_FOLDER = "F:/scholar_articles/src/download/"
 else:
     DOWNLOAD_FOLDER = "~/scholar_articles/src/download/"
+>>>>>>> c936ee6f66c7ceb7e35ede5b0f54a0b5eca70a29
 
 class PdfDownloader:
     '''
