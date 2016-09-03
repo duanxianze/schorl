@@ -18,9 +18,10 @@ class WatchDog:
         对于每个process(对应于每个任务)的监视管理器
         如果需要定制，可做父类继承
     '''
-    def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
+    def __init__(self,cmd_line,task_proc_cmd_line,pid=None,kill_prev=True):
         self.cmd_line = cmd_line
         self.task_proc_cmd_line = task_proc_cmd_line
+        self.kill_prev = kill_prev
         self.kill_prev_watchdog_procs()#清理之前的类似看门狗进程
         if pid:
             #直接以pid初始化task_proc
@@ -32,12 +33,16 @@ class WatchDog:
             print('WatchDog:\n\tThe new pid is : {}'.format(self.task_proc.pid))
 
     def kill_prev_watchdog_procs(self):
+        if not self.kill_prev:
+            return
         prev_pids = get_prev_pids(self.cmd_line)[:-1]
         print('WatchDog:\n\tPrevious watchdog pids: {}'.format(prev_pids))
         #清理之前的看门狗进程,注意最后一项是当前watchdog自身，不要kill
         close_procs(prev_pids)
 
     def kill_prev_task_procs(self):
+        if not self.kill_prev:
+            return
         prev_pids = get_prev_pids(self.task_proc_cmd_line)
         print('WatchDog:\n\tPrevious task pids: {}'.format(prev_pids))
         #清理之前的相同task进程
@@ -63,8 +68,10 @@ class WatchDog:
 
     def close_task_proc(self):
         print('WatchDog:\n\tKilling process:  {}  ...'.format(self.task_proc.pid))
-        os.kill(self.task_proc.pid,9)
-        #os.system('kill -9 {}'.format(self.task_proc.pid))
+        if os.name is "nt" :
+            subprocess.Popen("taskkill /F /T /PID %i" % self.task_proc.pid , shell=True)
+        else :
+            os.kill(self.task_proc.pid, 9)
 
     def create_new_task_proc(self):
         print('WatchDog:\n\tCreating new task_process...')
@@ -96,7 +103,6 @@ class WatchDog:
                     self.send_mail('fuck')
                 time.sleep(timeout)
     '''
-
 
 
 '''
@@ -138,8 +144,10 @@ def get_prev_pids(cmd_line=None,pname=None):
 def close_procs(pids):
     for pid in pids:
         try:
-            os.kill(pid,9)
-            #os.system('kill -9 {}'.format(pid))
+            if os.name is "nt" :
+                subprocess.Popen("taskkill /F /T /PID %i" % pid , shell=True)
+            else :
+                os.kill(pid, 9)
             print (
                 '\tKill pid:{} ok!'.format(pid)
             )
