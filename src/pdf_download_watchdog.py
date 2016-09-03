@@ -17,11 +17,7 @@ import time,os
 
 class Pdf_Download_Watchdog(WatchDog):
     def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
-<<<<<<< HEAD
-        WatchDog.__init__(self,self_cmd_line,proc_cmd_line,pid,kill_prev=False)
-=======
         WatchDog.__init__(self,self_cmd_line,proc_cmd_line,pid,kill_prev=True)
->>>>>>> c936ee6f66c7ceb7e35ede5b0f54a0b5eca70a29
 
     @property
     def counts_of_finished_db_item(self,extend_cursor=None):
