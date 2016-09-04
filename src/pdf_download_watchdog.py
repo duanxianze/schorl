@@ -93,7 +93,13 @@ class Pdf_Download_Watchdog(WatchDog):
 
 
 if __name__=='__main__':
-    Pdf_Download_Watchdog(
-        self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download_watchdog.py'],
-        proc_cmd_line = ['C:\\Python27\\python.exe', 'F:/scholar_articles/src/download.py']
-    ).run()
+    import os,platform
+    if platform.processor()=='Intel64 Family 6 Model 69 Stepping 1, GenuineIntel':
+        self_cmd_line=['D:\\python2.7\\python.exe','Q:/scholar_articles/src/pdf_download_watchdog.py']
+        proc_cmd_line=['D:\\python2.7\\python.exe','Q:/scholar_articles/src/download.py']
+    elif platform.processor()=='Intel64 Family 6 Model 58 Stepping 9, GenuineIntel':
+        self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download_watchdog.py']
+        proc_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/download.py']
+    else:
+        pass
+    Pdf_Download_Watchdog(self_cmd_line,proc_cmd_line).run()

@@ -14,7 +14,6 @@ import os,psycopg2,random
 from multiprocessing.dummy import Pool as ThreadPool
 from IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
 from DriversPool import DriversPool
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -83,9 +82,11 @@ class IEEE_pdf_url_generator:
         return cur.fetchall()
 
     def generate(self,unfinished_item):
+        #从title出发，反馈pdf_url给db
         google_id = unfinished_item[1]
         pdf_temp_url = unfinished_item[2]
         print('IEEE_PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
+        #向pool索取一个空闲的driver对象
         driverObj = self.drivers_pool.get_one_free_driver(wait=True)
         driverObj.status = 'busy'
         if pdf_temp_url:
@@ -104,16 +105,21 @@ class IEEE_pdf_url_generator:
         self.mark_db(pdf_url,google_id)
 
     def mark_db(self,pdf_url,google_id):
-        cur.execute(
-            "update articles set resource_link = %s,resource_type = 'PDF' where google_id = %s",
-            (pdf_url,google_id)
-        )
-        print('Database:\n\tupdate pdf_url of {} ok '.format(google_id))
+        try:
+            cur.execute(
+                "update articles set resource_link = %s,resource_type = 'PDF' where google_id = %s",
+                (pdf_url,google_id)
+            )
+            print('Database:\n\tupdate pdf_url of {} ok '.format(google_id))
+        except Exception as e:
+            print('Database:\n\tMark Error:{}'.format(str(e)))
+
 
     def run(self,thread_counts=16):
+        unfinished_items = self.get_unfinished_items(1000)
         self.drivers_pool = DriversPool(size=thread_counts,visual=False)
         task_pool = ThreadPool(thread_counts)
-        task_pool.map(self.generate,self.get_unfinished_items(100))
+        task_pool.map(self.generate,unfinished_items)
         task_pool.close()
         task_pool.join()
 
@@ -125,4 +131,4 @@ if __name__=='__main__':
         print('killing {} ...'.format(proc.pid))
         os.kill(proc.pid,9)
 
-    IEEE_pdf_url_generator().run(thread_counts=4)
+    IEEE_pdf_url_generator().run(thread_counts=8)

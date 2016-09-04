@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-08-31 17:16
 @description:
-            --
+            解析IEEE搜索结果页
 """
 
 import requests,random
@@ -22,7 +22,8 @@ def except_or_none(func):
         try:
             return func(*args,**kwargs)
         except Exception as e:
-            print('IEEE_Article_Parser:\n\tError in {}(): {}'.format(func.__name__,str(e)))
+            print('IEEE_Article_Parser:\n\tError in {}(): {}'\
+                  .format(func.__name__,str(e)))
             return None
     return wrapper
 
@@ -44,11 +45,14 @@ def get_pdf_link(pdf_page_url):
         except:
             print(soup)
 '''
-@except_or_none
 def get_pdf_link(pdf_page_url,driver):
     driver.get(pdf_page_url)
     soup = BeautifulSoup(driver.page_source,'lxml')
-    return soup.find_all('frame')[1].get('src')
+    try:
+        return soup.find_all('frame')[1].get('src')
+    except:
+        print(driver.page_source)
+        return None
 
 
 class IEEE_HTML_Parser:
