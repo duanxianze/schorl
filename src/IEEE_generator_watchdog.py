@@ -32,9 +32,17 @@ class IEEE_Generator_Watchdog(WatchDog):
         return cur.fetchall()[0][0]
 
     def run(self):
+        prev = 0
+        delta_zero_cot = 0
         while(1):
-            if self.task_proc_status is 'dead':
+            current = self.counts_of_finished_items
+            delta = current - prev
+            prev = current
+            if delta_zero_cot > 10 or self.task_proc_status == 'dead':
                 self.restart_task_proc()
+                delta_zero_cot = 0
+            if delta==0:
+                delta_zero_cot += 1
             print('WatchDog:\n\t{},\t{},\t{},\t{}'.format(
                     self.counts_of_finished_items,
                     self.counts_of_unfinished_items,
