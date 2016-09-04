@@ -7,12 +7,15 @@
 @editor:    PyCharm
 @create:    2016-09-04 0:32
 @description:
-            selenium webdriver的pool类，封装staus和index
+            selenium webdriver的pool类
 """
 import time
 from selenium import webdriver
 
 class Driver:
+    '''
+        driver类，封装了webdriver和其编号，状态
+    '''
     def __init__(self,visual,index):
         self.index = index
         self.status = 'free'
@@ -41,6 +44,7 @@ class DriversPool:
 
     def get_one_free_driver(self,wait=False):
         while(1):
+            self.show_pool_info()
             for driverObj in self.pool:
                 if driverObj.status is 'free':
                     return driverObj
@@ -54,3 +58,9 @@ class DriversPool:
     def tear_down(self):
         for driverObj in self.pool:
             driverObj.engine.close()
+
+    def show_pool_info(self):
+        status_str = 'Driver_pool:\n\t'
+        for driverObj in self.pool:
+            status_str += (driverObj.status+',')
+        print(status_str[:-1])
