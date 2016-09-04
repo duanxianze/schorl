@@ -46,10 +46,10 @@ class DriversPool:
         while(1):
             self.show_pool_info()
             for driverObj in self.pool:
-                if driverObj.status is 'free':
+                if driverObj.status == 'free':
                     return driverObj
             if wait:
-                print('DriversPool:\n\tSorry, no FREE driver now.\n\t Search again in ten seconds...')
+                print('DriversPool:\n\tSorry, no FREE driver now.\n\tSearch again in ten seconds...')
                 time.sleep(10)
             else:
                 break

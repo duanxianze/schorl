@@ -51,7 +51,7 @@ def get_pdf_link(pdf_page_url,driver):
     try:
         return soup.find_all('frame')[1].get('src')
     except:
-        print(driver.page_source)
+        print(soup)
         return None
 
 
@@ -60,6 +60,7 @@ class IEEE_HTML_Parser:
         self.driver = driver
 
     @property
+    @except_or_none
     def sections(self):
         return self.driver.find_elements_by_class_name('List-results-items')
 
@@ -71,12 +72,10 @@ class Article:
         self.List_items = sec.find_elements_by_class_name('List-item')
 
     @property
-    @except_or_none
     def title(self):
         pass
 
     @property
-    @except_or_none
     def abstract(self):
         pass
 

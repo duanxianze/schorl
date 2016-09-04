@@ -63,10 +63,13 @@ class IEEE_Search_Model:
     def get_pdf_url(self):
         pdf_page_url = Article(self.sec).pdf_page_url
         if pdf_page_url:
-            cur.execute(
-                "update articles set pdf_temp_url = %s where google_id = %s",
-                (pdf_page_url,self.google_id)
-            )
+            try:
+                cur.execute(
+                    "update articles set pdf_temp_url = %s where google_id = %s",
+                    (pdf_page_url,self.google_id)
+                )
+            except Exception as e:
+                print('get_pdf_url()_update_pdf_temp_url:{}'.format(str(e)))
             return get_pdf_link(pdf_page_url,self.driver)
 
 
