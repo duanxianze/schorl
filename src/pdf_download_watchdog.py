@@ -65,12 +65,12 @@ class Pdf_Download_Watchdog(WatchDog):
         return len(os.listdir(folder))
 
     def run(self):
-        prev_cot = 0
+        prev_local_file_cot = 0
         delta_zero_cot = 0
         while(1):
-            current_cot = self.counts_of_unfinished_db_item
-            delta = prev_cot - current_cot
-            prev_cot = current_cot
+            current_local_file_cot = self.counts_of_pdf_files
+            delta = current_local_file_cot - prev_local_file_cot
+            prev_local_file_cot = current_local_file_cot
             current_status = self.task_proc_status
             if delta==0:
                 delta_zero_cot += 1
@@ -80,9 +80,9 @@ class Pdf_Download_Watchdog(WatchDog):
                 self.restart_task_proc()
                 delta_zero_cot = 0
             print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
-                    current_cot,
+                    self.counts_of_unfinished_db_item,
                     self.counts_of_exception_db_item,
-                    self.counts_of_pdf_files,
+                    current_local_file_cot,
                     delta,
                     delta_zero_cot,
                     current_status,
