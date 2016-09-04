@@ -45,10 +45,16 @@ class IEEE_Generator_Watchdog(WatchDog):
 
 
 if __name__=="__main__":
-    import os
+    import os,platform
     if os.name=='nt':
-        self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_generator_watchdog.py']
-        proc_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_pdf_url_generator.py']
+        if platform.processor()=='Intel64 Family 6 Model 69 Stepping 1, GenuineIntel':
+            self_cmd_line=['D:\\python2.7\\python.exe','Q:/scholar_articles/src/IEEE_generator_watchdog.py']
+            proc_cmd_line=['D:\\python2.7\\python.exe','Q:/scholar_articles/src/IEEE_pdf_url_generator.py']
+        elif platform.processor()=='Intel64 Family 6 Model 58 Stepping 9, GenuineIntel':
+            self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_generator_watchdog.py']
+            proc_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/IEEE_pdf_url_generator.py']
+        else:
+            pass
     else:
         self_cmd_line=['python','IEEE_generator_watchdog.py']
         proc_cmd_line=['python','IEEE_pdf_url_generator.py']
