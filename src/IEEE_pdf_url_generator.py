@@ -119,12 +119,13 @@ class IEEE_pdf_url_generator:
 
 
     def run(self,thread_counts=16):
-        unfinished_items = self.get_unfinished_items(1000)
         self.drivers_pool = DriversPool(size=thread_counts,visual=False)
         task_pool = ThreadPool(thread_counts)
-        task_pool.map(self.generate,unfinished_items)
-        task_pool.close()
-        task_pool.join()
+        while(1):
+            result = task_pool.map(self.generate,self.get_unfinished_items(1000))
+            print(result)
+            task_pool.close()
+            task_pool.join()
 
 
 if __name__=='__main__':

@@ -43,9 +43,11 @@ class IEEE_Generator_Watchdog(WatchDog):
                 delta_zero_cot = 0
             if delta==0:
                 delta_zero_cot += 1
-            print('WatchDog:\n\t{},\t{},\t{},\t{}'.format(
+            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
                     self.counts_of_finished_items,
                     self.counts_of_unfinished_items,
+                    delta,
+                    delta_zero_cot,
                     self.task_proc_status,
                     time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                 )

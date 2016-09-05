@@ -45,14 +45,12 @@ def get_pdf_link(pdf_page_url):
         except:
             print(soup)
 '''
+
+@except_or_none
 def get_pdf_link(pdf_page_url,driver):
     driver.get(pdf_page_url)
     soup = BeautifulSoup(driver.page_source,'lxml')
-    try:
-        return soup.find_all('frame')[1].get('src')
-    except:
-        print(soup)
-        return None
+    return soup.find_all('frame')[1].get('src')
 
 
 class IEEE_HTML_Parser:
