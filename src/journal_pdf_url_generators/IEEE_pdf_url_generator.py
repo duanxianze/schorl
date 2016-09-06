@@ -12,8 +12,8 @@
 
 import os,psycopg2,random
 from multiprocessing.dummy import Pool as ThreadPool
-from IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
-from DriversPool import DriversPool
+from src.journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
+from src.crawl_tools.DriversPool import DriversPool
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -64,12 +64,11 @@ class IEEE_Search_Model:
         pdf_page_url = Article(self.sec).pdf_page_url
         if pdf_page_url:
             try:
-                cur.execute(
-                    "update articles set pdf_temp_url = %s where google_id = %s",
-                    (pdf_page_url,self.google_id)
-                )
+                sql = "update articles set pdf_temp_url = '{}' where google_id = '{}'".format(pdf_page_url,self.google_id)
+                cur.execute(sql)
             except Exception as e:
                 print('get_pdf_url()_update_pdf_temp_url:{}'.format(str(e)))
+                print('Except SQL is {}'.format(sql))
             return get_pdf_link(pdf_page_url,self.driver)
 
 
@@ -117,10 +116,13 @@ class IEEE_pdf_url_generator:
         except Exception as e:
             print('Database:\n\tMark Error:{}'.format(str(e)))
 
-
-    def run(self,thread_counts=16):
-        self.drivers_pool = DriversPool(size=thread_counts,visual=False)
+    def run(self,thread_counts=16,visual=True):
         task_pool = ThreadPool(thread_counts)
+        self.drivers_pool = DriversPool(
+            size = thread_counts,
+            visual = visual,
+            launch_with_thread_pool = task_pool
+        )
         while(1):
             result = task_pool.map(self.generate,self.get_unfinished_items(1000))
             print(result)
@@ -129,10 +131,10 @@ class IEEE_pdf_url_generator:
 
 
 if __name__=='__main__':
-    from WatchDog import get_prev_procs
+    from src.crawl_tools.WatchDog import get_prev_procs
     for proc in get_prev_procs(grep='phantom'):
         print(proc.name)
         print('killing {} ...'.format(proc.pid))
         os.kill(proc.pid,9)
 
-    IEEE_pdf_url_generator().run(thread_counts=8)
+    IEEE_pdf_url_generator().run(thread_counts=16,visual=False)
