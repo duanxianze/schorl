@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-09-04 15:20
 @description:
-            ??
+            用于显示杂志社文章占比
 """
 import os,psycopg2
 
