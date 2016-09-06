@@ -13,8 +13,8 @@
 import requests,random
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from ua_pool import agents
-from request_with_proxy import request_with_proxy
+from src.crawl_tools.ua_pool import get_one_random_ua
+from src.crawl_tools.request_with_proxy import request_with_proxy
 
 
 def except_or_none(func):
@@ -36,7 +36,7 @@ def get_pdf_link(pdf_page_url):
                 url = pdf_page_url,
                 timeout=30,
                 headers = {
-                    'User-Agent':random.choice(agents)
+                    'User-Agent':get_one_random_ua()
                 }
             ).text,"lxml"
         )
