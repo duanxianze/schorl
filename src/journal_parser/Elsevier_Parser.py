@@ -22,7 +22,12 @@ class Elsevier_Parser:
     @property
     def pdf_url(self):
         try:
-            return self.soup.select_one("#pdfLink")['href']
+            link = self.soup.select_one("#pdfLink")['href']
+            if 'ShoppingCartURL' in link:
+                #被指向支付页面，不是在学校ip里的情况
+                return None
+            else:
+                return link
         except:
             return None
 
