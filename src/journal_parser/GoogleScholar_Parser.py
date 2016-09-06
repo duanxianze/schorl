@@ -3,12 +3,11 @@
     parse_html.py 用于解析学者搜索结果页
 '''
 from bs4 import BeautifulSoup
-import requests,random
-requests.packages.urllib3.disable_warnings()
 from random import randint
-from request_with_proxy import request_with_proxy
-from ua_pool import agents
-
+from src.crawl_tools.request_with_proxy import request_with_proxy
+from src.crawl_tools.ua_pool import get_one_random_ua
+import requests
+requests.packages.urllib3.disable_warnings()
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
@@ -50,7 +49,7 @@ class ParseHTML:
         self.soup = BeautifulSoup(self.html,'lxml')
         self.html_text = self.soup.text
         self.rand_port = lambda x, y: randint(x, y)
-        self.ua = random.choice(agents)
+        self.ua = get_one_random_ua()
 
     def sections(self):
         '''得到文章列表'''

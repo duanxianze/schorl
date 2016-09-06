@@ -10,17 +10,18 @@
             用于解析elsevier出版社的文章详情页
             域名：http://www.sciencedirect.com/science/article/pii/xxxx
 """
-
+from src.crawl_tools.ua_pool import get_one_random_ua
 from selenium import webdriver
 from bs4 import BeautifulSoup
-import requests,ua_pool
+import requests
+
 
 class Elsevier_Parser:
     def __init__(self,article_page_url,driver=None,from_web=True):
-        if driver and from_web:
+        if from_web:
             source = requests.get(
                 url=article_page_url,
-                headers={'User-Agent':ua_pool.get_one_random_ua()}
+                headers={'User-Agent':get_one_random_ua()}
             ).text
             if not self.pdf_url:
                 #假设requests静态爬虫被封，查不到pdf_url,调用selenium
