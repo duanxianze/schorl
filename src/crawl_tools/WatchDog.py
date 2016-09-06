@@ -172,6 +172,10 @@ def close_procs(pids):
             pass
 
 
+def close_procs_by_keyword(keyword):
+    close_procs(get_prev_pids(grep=keyword))
+
+
 if __name__=="__main__":
     #测试代码
     '''
