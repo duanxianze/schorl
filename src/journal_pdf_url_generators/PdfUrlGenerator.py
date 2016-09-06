@@ -33,14 +33,12 @@ conn.autocommit = True
 
 
 class PdfUrlGenerator:
-    def __init__(self,query_sql):
+    def __init__(self):
         self._drivers_pool = []
         self._task_thread_pool = []
-        self.query_sql = query_sql
-        print(self.query_sql)
 
-    def _get_unfinished_items(self):
-        cur.execute(self.query_sql)
+    def _get_unfinished_items(self,query_sql):
+        cur.execute(query_sql)
         return cur.fetchall()
 
     def _generate(self,unfinished_item,google_id_index,get_pdf_url_func):
@@ -48,7 +46,10 @@ class PdfUrlGenerator:
         print('PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
         driverObj = self._drivers_pool.get_one_free_driver(wait=True)
         driverObj.status = 'busy'
-        pdf_url = get_pdf_url_func(driver=driverObj.engine,unfinished_item=unfinished_item)
+        pdf_url = get_pdf_url_func(
+            unfinished_item = unfinished_item,
+            driver = driverObj.engine
+        )#本函数由子类的generator自行判断书写
         driverObj.status = 'free'
         if pdf_url:
             print('PDF_URL_Generator:\n\tGot pdf_url of {}:{}'.format(google_id,pdf_url))
@@ -62,7 +63,7 @@ class PdfUrlGenerator:
             cur.execute(sql)
             print('Database:\n\tUpdate pdf_url of {} ok '.format(google_id))
         except Exception as e:
-            print('Except sql is:\n\t{}'.format(sql))
+            print('Except SQL is:\n\t{}'.format(sql))
             print('Database:\n\tMark Error:{}'.format(str(e)))
 
     def _run(self,thread_counts=16,visual=True):
@@ -72,3 +73,8 @@ class PdfUrlGenerator:
             visual = visual,
             launch_with_thread_pool = self._task_thread_pool
         )
+
+    def _close(self):
+        self._task_thread_pool.close()
+        self._task_thread_pool.join()
+        self._drivers_pool.close()

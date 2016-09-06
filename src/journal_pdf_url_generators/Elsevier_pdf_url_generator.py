@@ -24,12 +24,10 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
     def __init__(self):
         PdfUrlGenerator.__init__(self)
 
-    def get_unfinished_items(self,limit=10000):
-        #从db中检索出出版社为Elsevier的article title集
-        return self._get_unfinished_items(
-            query_sql = "select link,google_id from articles where resource_link is null \
-                  and journal_temp_info like '%Elsevier%' limit {}".format(limit)
-        )
+    def get_unfinished_items(self):
+        ret = self._get_unfinished_items(self.query_sql)
+        print('Elsevier_pdf_url_generator:\n\tGot {} new items in limit {}...'.format(len(ret),self.query_limit))
+        return ret
 
     def generate(self,unfinished_item):
         return self._generate(unfinished_item,
@@ -37,6 +35,20 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
             get_pdf_url_func = get_elsevier_pdf_url_func
         )
 
+    def run(self,thread_counts=16,visual=True,limit=1000):
+        self.query_limit = limit
+        self._run(thread_counts,visual)
+        self.query_sql = "select link,google_id from articles where resource_link is null \
+                  and journal_temp_info like '%Elsevier%' limit {}".format(limit)
+        self._task_thread_pool.map(self.generate,self.get_unfinished_items())
+        self._close()
+
 
 if __name__=='__main__':
-    Elsevier_pdf_url_generator().run(thread_counts=8)
+    from src.crawl_tools.WatchDog import close_procs_by_keyword
+    visual=True
+    if visual:
+        close_procs_by_keyword(keyword='chrome')
+    else:
+        close_procs_by_keyword(keyword='phantom')
+    Elsevier_pdf_url_generator().run(thread_counts=8,visual=visual,limit=100)
