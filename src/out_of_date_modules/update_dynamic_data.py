@@ -9,8 +9,8 @@
 @description:
             回溯更新articles表的动态数据
 """
-from request_with_proxy import request_with_proxy
-from parse_html import ParseHTML
+from crawl_tools.request_with_proxy import request_with_proxy
+from journal_parser.GoogleScholar_Parser import ParseHTML
 import time,psycopg2
 import platform
 
