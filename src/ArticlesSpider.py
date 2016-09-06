@@ -10,7 +10,7 @@
             主爬虫，创建初始的articles表条目
 """
 from math import ceil
-from parse_html import *
+from journal_parser.GoogleScholar_Parser import *
 from multiprocessing.dummy import Pool as ThreadPool
 import re,random,os,psycopg2
 

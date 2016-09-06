@@ -1,6 +1,6 @@
 #coding:utf-8
 """
-@file:      journal_temp_status.py.py
+@file:      journal_temp_status.py
 @author:    lyn
 @contact:   tonylu716@gmail.com
 @python:    3.3

@@ -11,7 +11,7 @@
 """
 
 from bs4 import BeautifulSoup
-from request_with_proxy import request_with_proxy
+from crawl_tools.request_with_proxy import request_with_proxy
 from multiprocessing.dummy import Pool as ThreadPool
 import psycopg2
 import time,random,os
