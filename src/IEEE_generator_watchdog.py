@@ -35,23 +35,28 @@ class IEEE_Generator_Watchdog(WatchDog):
         prev = 0
         delta_zero_cot = 0
         while(1):
-            current = self.counts_of_finished_items
-            delta = current - prev
-            prev = current
-            if delta_zero_cot > 10 or self.task_proc_status == 'dead':
-                self.restart_task_proc()
-                delta_zero_cot = 0
-            if delta==0:
-                delta_zero_cot += 1
-            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
-                    self.counts_of_finished_items,
-                    self.counts_of_unfinished_items,
-                    delta,
-                    delta_zero_cot,
-                    self.task_proc_status,
-                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+            try:
+                current = self.counts_of_finished_items
+                delta = current - prev
+                prev = current
+                if delta_zero_cot > 10 or self.task_proc_status == 'dead':
+                    self.restart_task_proc()
+                    delta_zero_cot = 0
+                if delta==0:
+                    delta_zero_cot += 1
+                else:
+                    delta_zero_cot = 0
+                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{}'.format(
+                        self.counts_of_finished_items,
+                        self.counts_of_unfinished_items,
+                        delta,
+                        delta_zero_cot,
+                        self.task_proc_status,
+                        time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                    )
                 )
-            )
+            except:
+                pass
 
 
 if __name__=="__main__":

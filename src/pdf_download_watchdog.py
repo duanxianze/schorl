@@ -39,7 +39,7 @@ class Pdf_Download_Watchdog(WatchDog):
         else:
             cursor = cur
         cursor.execute(
-            "select count(*) from articles where is_downloaded = 0"
+            "select count(*) from articles where is_downloaded = 0 and resource_link is not null"
         )
         return int(cursor.fetchall()[0][0])
 

@@ -193,5 +193,6 @@ if __name__=='__main__':
     cur = conn.cursor()
     conn.autocommit = True
     for sec in ParseHTML(from_web=False).sections():
-        Article(sec).save_to_db(cur)
+        #Article(sec).save_to_db(cur)
         #Article(sec).update_journal(cur)
+        Article(sec).show_in_cmd()
