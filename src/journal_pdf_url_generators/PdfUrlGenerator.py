@@ -11,7 +11,7 @@
 """
 
 from multiprocessing.dummy import Pool as ThreadPool
-from src.crawl_tools import DriversPool
+from src.crawl_tools.DriversPool import DriversPool
 import os,psycopg2
 
 if os.name is 'nt':
@@ -33,27 +33,30 @@ conn.autocommit = True
 
 
 class PdfUrlGenerator:
-    def __init__(self):
-        self.drivers_pool = []
+    def __init__(self,query_sql):
+        self._drivers_pool = []
+        self._task_thread_pool = []
+        self.query_sql = query_sql
+        print(self.query_sql)
 
-    def _get_unfinished_items(self,query_sql):
-        cur.execute(query_sql)
+    def _get_unfinished_items(self):
+        cur.execute(self.query_sql)
         return cur.fetchall()
 
     def _generate(self,unfinished_item,google_id_index,get_pdf_url_func):
         google_id = unfinished_item[google_id_index]
-        print('{}_PDF_URL_Generator:\n\tGot task of {}'.format(self.__class__,google_id))
-        driverObj = self.drivers_pool.get_one_free_driver(wait=True)
+        print('PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
+        driverObj = self._drivers_pool.get_one_free_driver(wait=True)
         driverObj.status = 'busy'
         pdf_url = get_pdf_url_func(driver=driverObj.engine,unfinished_item=unfinished_item)
         driverObj.status = 'free'
         if pdf_url:
-            print('{}_PDF_URL_Generator:\n\tGot pdf_url of {}:{}'.format(self.__class__,google_id,pdf_url))
-            self.mark_db(pdf_url,google_id)
+            print('PDF_URL_Generator:\n\tGot pdf_url of {}:{}'.format(google_id,pdf_url))
+            self._mark_db(pdf_url,google_id)
         else:
-            print('{}_PDF_URL_Generator:\n\tFail to get pdf_url of {}'.format(self.__class__,google_id))
+            print('PDF_URL_Generator:\n\tFail to get pdf_url of {}'.format(google_id))
 
-    def mark_db(self,pdf_url,google_id):
+    def _mark_db(self,pdf_url,google_id):
         try:
             sql = "update articles set resource_link = '{}',resource_type = 'PDF' where google_id = '{}'".format(pdf_url,google_id)
             cur.execute(sql)
@@ -62,16 +65,10 @@ class PdfUrlGenerator:
             print('Except sql is:\n\t{}'.format(sql))
             print('Database:\n\tMark Error:{}'.format(str(e)))
 
-    def run(self,thread_counts=16,visual=True,limit=1000):
-        task_pool = ThreadPool(thread_counts)
-        print(type(task_pool))
-        self.drivers_pool = DriversPool(
+    def _run(self,thread_counts=16,visual=True):
+        self._task_thread_pool = ThreadPool(thread_counts)
+        self._drivers_pool = DriversPool(
             size = thread_counts,
             visual = visual,
-            launch_with_thread_pool = task_pool
+            launch_with_thread_pool = self._task_thread_pool
         )
-        while(1):
-            result = task_pool.map(self.generate,self.get_unfinished_items(limit))
-            print(result)
-            task_pool.close()
-            task_pool.join()

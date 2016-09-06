@@ -39,4 +39,4 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
 
 
 if __name__=='__main__':
-    Elsevier_pdf_url_generator().run(thread_counts=8,visual=True)
+    Elsevier_pdf_url_generator().run(thread_counts=8)

@@ -63,13 +63,10 @@ def get_ieee_pdf_url_func(driver,unfinished_item):
             google_id = unfinished_item[1],
         ).get_pdf_url()
 
-class IEEE_pdf_url_generator(PdfUrlGenerator):
-    def __init__(self):
-        PdfUrlGenerator.__init__(self)
 
-    def get_unfinished_items(self,limit=10000):
-        #从db中检索出出版社为IEEE的article title集
-        return self._get_unfinished_items(
+class IEEE_pdf_url_generator(PdfUrlGenerator):
+    def __init__(self,limit=1000):
+        PdfUrlGenerator.__init__(self,
             query_sql = "select title,google_id,pdf_temp_url from articles where resource_link is null\
                     and journal_temp_info like '%ieee%' limit {}".format(limit)
         )
@@ -81,13 +78,25 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
             get_pdf_url_func = get_ieee_pdf_url_func
         )
 
+    def run(self,thread_counts=16,visual=True):
+        self._run(thread_counts,visual)
+        self._task_thread_pool.map(self.generate,self._get_unfinished_items())
+        self._task_thread_pool.close()
+        self._task_thread_pool.join()
 
 
 if __name__=='__main__':
     from src.crawl_tools.WatchDog import get_prev_procs
-    for proc in get_prev_procs(grep='phantom'):
-        print(proc.name)
-        print('killing {} ...'.format(proc.pid))
-        os.kill(proc.pid,9)
+    visual=True
+    if visual:
+        for proc in get_prev_procs(grep='chrome'):
+            print(proc.name)
+            print('killing {} ...'.format(proc.pid))
+            os.kill(proc.pid,9)
+    else:
+        for proc in get_prev_procs(grep='phantom'):
+            print(proc.name)
+            print('killing {} ...'.format(proc.pid))
+            os.kill(proc.pid,9)
 
-    IEEE_pdf_url_generator().run(thread_counts=8,visual=False)
+    IEEE_pdf_url_generator(limit=100).run(thread_counts=4,visual=True)

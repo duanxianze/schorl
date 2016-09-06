@@ -38,7 +38,7 @@ class DriversPool:
             Driver(visual=self.visual,index=index)
         )
 
-    def create(self,launch_with_thread_pool=False):
+    def create(self,launch_with_thread_pool=None):
         if launch_with_thread_pool:
             #启动大幅加速
             launch_with_thread_pool.map(self.add_to_pool,range(self.size))
