@@ -26,18 +26,26 @@ class Driver:
 
 
 class DriversPool:
-    def __init__(self,size=4,visual=True):
+    def __init__(self,size=4,visual=True,launch_with_thread_pool=None):
         self.size = size
         self.visual = visual
         self.pool = []
-        self.create()
+        self.create(launch_with_thread_pool)
 
-    def create(self):
-        for i in range(self.size):
-            print("DriversPool:\n\tLaunching Engine-{}...".format(i))
-            self.pool.append(
-                Driver(visual=self.visual,index=i)
-            )
+    def add_to_pool(self,index):
+        print("DriversPool:\n\tLaunching Engine-{}...".format(index))
+        self.pool.append(
+            Driver(visual=self.visual,index=index)
+        )
+
+    def create(self,launch_with_thread_pool=False):
+        if launch_with_thread_pool:
+            #启动大幅加速
+            launch_with_thread_pool.map(self.add_to_pool,range(self.size))
+        else:
+            for i in range(self.size):
+                self.add_to_pool(i)
+
 
     def alter_driver_status(self,index,status):
         self.pool[index].status = status
