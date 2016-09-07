@@ -13,7 +13,7 @@ from math import ceil
 from journal_parser.GoogleScholar_Parser import *
 from multiprocessing.dummy import Pool as ThreadPool
 import re,random,os,psycopg2
-
+'''
 if os.name is 'nt':
     conn = psycopg2.connect(
         host = '45.32.131.53',
@@ -28,6 +28,14 @@ else:
         user = "gao",
         password = "gaotongfei13"
     )
+'''
+conn = psycopg2.connect(
+    host = '45.32.131.53',
+    port = 5432,
+    dbname = "sf_development",
+    user = "gao",
+    password = "gaotongfei13"
+)
 cur = conn.cursor()
 conn.autocommit = True
 
