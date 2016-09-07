@@ -39,7 +39,7 @@ class Pdf_Download_Watchdog(WatchDog):
         else:
             cursor = cur
         cursor.execute(
-            "select count(*) from articles where is_downloaded = 0"
+            "select count(*) from articles where is_downloaded = 0 and resource_link is not null"
         )
         return int(cursor.fetchall()[0][0])
 
@@ -68,27 +68,30 @@ class Pdf_Download_Watchdog(WatchDog):
         prev_local_file_cot = 0
         delta_zero_cot = 0
         while(1):
-            current_local_file_cot = self.counts_of_pdf_files
-            delta = current_local_file_cot - prev_local_file_cot
-            prev_local_file_cot = current_local_file_cot
-            current_status = self.task_proc_status
-            if delta==0:
-                delta_zero_cot += 1
-            else:
-                delta_zero_cot = 0
-            if delta_zero_cot>=3 or current_status is 'dead':
-                self.restart_task_proc()
-                delta_zero_cot = 0
-            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
-                    self.counts_of_unfinished_db_item,
-                    self.counts_of_exception_db_item,
-                    current_local_file_cot,
-                    delta,
-                    delta_zero_cot,
-                    current_status,
-                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+            try:
+                current_local_file_cot = self.counts_of_pdf_files
+                delta = current_local_file_cot - prev_local_file_cot
+                prev_local_file_cot = current_local_file_cot
+                current_status = self.task_proc_status
+                if delta==0:
+                    delta_zero_cot += 1
+                else:
+                    delta_zero_cot = 0
+                if delta_zero_cot>=5 or current_status is 'dead':
+                    self.restart_task_proc()
+                    delta_zero_cot = 0
+                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
+                        self.counts_of_unfinished_db_item,
+                        self.counts_of_exception_db_item,
+                        current_local_file_cot,
+                        delta,
+                        delta_zero_cot,
+                        current_status,
+                        time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                    )
                 )
-            )
+            except Exception as e:
+                print(str(e))
             time.sleep(10)
 
 
