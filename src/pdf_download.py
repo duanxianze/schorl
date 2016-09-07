@@ -29,17 +29,17 @@ class PdfDownloader:
 
     def get_max_unfinished_item_id(self):
         cur.execute(
-            "select max(id) from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF'"
+            "select max(id) from articles where is_downloaded = 0 and resource_link is not null"
         )
         return cur.fetchall()[0][0]
 
-    def get_unfinished_items(self,left=None,length=1000):
+    def get_unfinished_items(self,left=None,length=10000):
         #从db中检索出未下载pdf的表项
         max_id = self.get_max_unfinished_item_id()
         left = random.randint(1,max_id-length)
         right = left + length
         cur.execute(
-            "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and resource_type='PDF' and id > {} and id < {}".format(left,right)
+            "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and id > {} and id < {}".format(left,right)
         )
         data = cur.fetchall()
         print('PdfDownloader:\n\tGot {} items in range [{},{}]'.format(len(data),left,right))
@@ -88,14 +88,12 @@ class PdfDownloader:
     def mark(self,google_id,ok=True,err=None):
         if ok:
             cur.execute(
-                        "update articles set is_downloaded = 1 where google_id = %s",
-                        (google_id,)
-                    )
+                "update articles set is_downloaded = 1 where google_id = '{}'".format(google_id)
+            )
             print('Databse:\n\t'+ google_id + ' update ok...')
         else:
             cur.execute(
-                "update articles set is_downloaded = -1 where google_id = %s",
-                (google_id,)
+                "update articles set is_downloaded = -1 where google_id = '{}'".format(google_id)
             )
             print('Downloader:\n\t{}.pdf wrote error\n\t{}'.format(google_id,str(err)))
 
@@ -111,7 +109,8 @@ class PdfDownloader:
         pool = ThreadPool(thread_counts)
         if init:
             self.initSync(pool)
-        length = 1000
+        length = 100000
+
         while True:
             print('Downloader:\n\tLoading items from remote database...'.format(length))
             unfinished_items = self.get_unfinished_items(length)

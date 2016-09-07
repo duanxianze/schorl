@@ -20,9 +20,13 @@ class Pdf_Download_Watchdog(WatchDog):
         WatchDog.__init__(self,self_cmd_line,proc_cmd_line,pid,kill_prev=True)
 
     @property
-    def counts_of_finished_db_item(self):
+    def counts_of_finished_db_item(self,extend_cursor=None):
         #db显示已下载项的数量
-        cur.execute(
+        if extend_cursor:
+            cursor = extend_cursor
+        else:
+            cursor = cur
+        cursor.execute(
             "select count(id) from articles where is_downloaded = 1"
         )
         return int(cur.fetchall()[0][0])
@@ -30,18 +34,26 @@ class Pdf_Download_Watchdog(WatchDog):
     @property
     def counts_of_unfinished_db_item(self,extend_cursor=None):
         #db显示未下载项的数量
-        cur.execute(
+        if extend_cursor:
+            cursor = extend_cursor
+        else:
+            cursor = cur
+        cursor.execute(
             "select count(*) from articles where is_downloaded = 0 and resource_link is not null"
         )
-        return int(cur.fetchall()[0][0])
+        return int(cursor.fetchall()[0][0])
 
     @property
     def counts_of_exception_db_item(self,extend_cursor=None):
         #db显示未下载项的数量
-        cur.execute(
+        if extend_cursor:
+            cursor = extend_cursor
+        else:
+            cursor = cur
+        cursor.execute(
             "select count(*) from articles where is_downloaded = -1"
         )
-        return int(cur.fetchall()[0][0])
+        return int(cursor.fetchall()[0][0])
 
     @property
     def counts_of_pdf_files(self,extend_folder=None):
@@ -56,38 +68,35 @@ class Pdf_Download_Watchdog(WatchDog):
         prev_local_file_cot = 0
         delta_zero_cot = 0
         while(1):
-            current_local_file_cot = self.counts_of_pdf_files
-            delta = current_local_file_cot - prev_local_file_cot
-            prev_local_file_cot = current_local_file_cot
-            current_status = self.task_proc_status
-            if delta==0:
-                delta_zero_cot += 1
-            else:
-                delta_zero_cot = 0
-            if delta_zero_cot>=3 or current_status is 'dead':
-                self.restart_task_proc()
-                delta_zero_cot = 0
-            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
-                    self.counts_of_unfinished_db_item,
-                    self.counts_of_exception_db_item,
-                    current_local_file_cot,
-                    delta,
-                    delta_zero_cot,
-                    current_status,
-                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+            try:
+                current_local_file_cot = self.counts_of_pdf_files
+                delta = current_local_file_cot - prev_local_file_cot
+                prev_local_file_cot = current_local_file_cot
+                current_status = self.task_proc_status
+                if delta==0:
+                    delta_zero_cot += 1
+                else:
+                    delta_zero_cot = 0
+                if delta_zero_cot>=5 or current_status is 'dead':
+                    self.restart_task_proc()
+                    delta_zero_cot = 0
+                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
+                        self.counts_of_unfinished_db_item,
+                        self.counts_of_exception_db_item,
+                        current_local_file_cot,
+                        delta,
+                        delta_zero_cot,
+                        current_status,
+                        time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                    )
                 )
-            )
+            except Exception as e:
+                print(str(e))
             time.sleep(10)
 
 
 if __name__=='__main__':
-    import os,platform
-    if platform.processor()=='Intel64 Family 6 Model 69 Stepping 1, GenuineIntel':
-        self_cmd_line=['D:\\python2.7\\python.exe','Q:/scholar_articles/src/pdf_download_watchdog.py']
-        proc_cmd_line=['D:\\python2.7\\python.exe','Q:/scholar_articles/src/pdf_download.py']
-    elif platform.processor()=='Intel64 Family 6 Model 58 Stepping 9, GenuineIntel':
-        self_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download_watchdog.py']
-        proc_cmd_line=['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download.py']
-    else:
-        pass
-    Pdf_Download_Watchdog(self_cmd_line,proc_cmd_line).run()
+    Pdf_Download_Watchdog(
+        self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download_watchdog.py'],
+        proc_cmd_line = ['C:\\Python27\\python.exe', 'F:/scholar_articles/src/pdf_download.py']
+    ).run()
