@@ -6,19 +6,10 @@
 @description:
             从db中检索出resource_link集,下载pdf
 """
-import requests,psycopg2,os,random
+import requests,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
-
-conn = psycopg2.connect(
-    host = '45.32.131.53',
-    port = 5432,
-    dbname = "sf_development",
-    user = "gao",
-    password = "gaotongfei13"
-)
-cur = conn.cursor()
-conn.autocommit = True
+from db_config import conn,cur
 
 if os.name is 'nt':
     DOWNLOAD_FOLDER = "F:/scholar_articles/src/download/"

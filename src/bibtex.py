@@ -9,29 +9,11 @@
 @description:
             获取articles的bibtex(bs4版本)
 """
-
+from db_config import conn,cur
 from bs4 import BeautifulSoup
 from crawl_tools.request_with_proxy import request_with_proxy
 from multiprocessing.dummy import Pool as ThreadPool
-import psycopg2
 import time,random,os
-
-if os.name is 'nt':
-    conn = psycopg2.connect(
-        host = '45.32.131.53',
-        port = 5432,
-        dbname = "sf_development",
-        user = "gao",
-        password = "gaotongfei13"
-    )
-else:
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "gao",
-        password = "gaotongfei13"
-    )
-cur = conn.cursor()
-conn.autocommit = True
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
