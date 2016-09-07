@@ -10,8 +10,8 @@
             从db中获得elsevier杂志社的文章title集合，
             生成pdf_url反馈给db
 """
-from src.journal_parser.Elsevier_Parser import Elsevier_Parser
-from PdfUrlGenerator import *
+from journal_parser.Elsevier_Parser import Elsevier_Parser
+from journal_pdf_url_generators.PdfUrlGenerator import *
 
 def get_elsevier_pdf_url_func(driver,unfinished_item):
     return Elsevier_Parser(
@@ -45,7 +45,7 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
 
 
 if __name__=='__main__':
-    from src.crawl_tools.WatchDog import close_procs_by_keyword
+    from crawl_tools.WatchDog import close_procs_by_keyword
     visual=True
     if visual:
         close_procs_by_keyword(keyword='chrome')

@@ -13,8 +13,8 @@
 import requests,random
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from src.crawl_tools.ua_pool import get_one_random_ua
-from src.crawl_tools.request_with_proxy import request_with_proxy
+from crawl_tools.ua_pool import get_one_random_ua
+from crawl_tools.request_with_proxy import request_with_proxy
 
 
 def except_or_none(func):

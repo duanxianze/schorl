@@ -10,9 +10,8 @@
             专门为IEEE出版社的pdf下载模块
 """
 
-from PdfUrlGenerator import *
-from src.journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
-
+from journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
+from journal_pdf_url_generators.PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -91,12 +90,13 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
 
 
 if __name__=='__main__':
-    from src.crawl_tools.WatchDog import close_procs_by_keyword
-    visual=True
+    from crawl_tools.WatchDog import close_procs_by_keyword
+
+    visual = False
 
     if visual:
         close_procs_by_keyword(keyword='chrome')
     else:
         close_procs_by_keyword(keyword='phantom')
 
-    IEEE_pdf_url_generator().run(thread_counts=2,visual=visual,limit=100)
+    IEEE_pdf_url_generator().run(thread_counts=4,visual=visual,limit=100)

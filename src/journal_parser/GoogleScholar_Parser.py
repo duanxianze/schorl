@@ -4,8 +4,8 @@
 '''
 from bs4 import BeautifulSoup
 from random import randint
-from src.crawl_tools.request_with_proxy import request_with_proxy
-from src.crawl_tools.ua_pool import get_one_random_ua
+from crawl_tools.request_with_proxy import request_with_proxy
+from crawl_tools.ua_pool import get_one_random_ua
 import requests
 requests.packages.urllib3.disable_warnings()
 

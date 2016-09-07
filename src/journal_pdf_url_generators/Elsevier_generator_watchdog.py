@@ -9,8 +9,8 @@
 @description:
             监控获取Elsevier生成pdf_url的任务
 """
-from src.crawl_tools.WatchDog import WatchDog
-from Elsevier_pdf_url_generator import *
+from crawl_tools.WatchDog import WatchDog
+from journal_pdf_url_generators.Elsevier_pdf_url_generator import *
 import time
 
 class Elsevier_Generator_Watchdog(WatchDog):

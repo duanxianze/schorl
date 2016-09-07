@@ -9,8 +9,8 @@
 @description:
             监控获取IEEE pdf_url的任务
 """
-from src.crawl_tools.WatchDog import WatchDog
-from IEEE_pdf_url_generator import *
+from crawl_tools.WatchDog import WatchDog
+from journal_pdf_url_generators.IEEE_pdf_url_generator import *
 import time
 
 class IEEE_Generator_Watchdog(WatchDog):

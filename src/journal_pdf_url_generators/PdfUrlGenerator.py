@@ -11,7 +11,7 @@
 """
 
 from multiprocessing.dummy import Pool as ThreadPool
-from src.crawl_tools.DriversPool import DriversPool
+from crawl_tools.DriversPool import DriversPool
 import os,psycopg2
 
 if os.name is 'nt':

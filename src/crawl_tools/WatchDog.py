@@ -9,7 +9,7 @@
 @description:
             The basic class of process monitor of one specific task.
 """
-from Email import Email
+from crawl_tools.Email import Email
 import psutil,os,subprocess
 
 
@@ -126,7 +126,7 @@ def get_existed_proc(cmd_line=None,pname=None):
 def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
     #cmd_line is like:  ['python','amount_status.py']
     #print('cmd_line',cmd_line)
-    #后面三个筛选参数有且仅有一个
+    #前面三个筛选参数有且仅有一个
     procs = []
     for proc in psutil.process_iter():
         try:
@@ -144,7 +144,7 @@ def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
                 key = lambda x:x['create_time']
             )#否则默认按id大小排
     try:
-        return map(lambda x:x['proc'],procs)
+        return list(map(lambda x:x['proc'],procs))
     except:
         return None
 
@@ -153,7 +153,7 @@ def get_prev_pids(cmd_line=None,pname=None,grep=None,sort_by_time=True):
     procs = get_prev_procs(cmd_line,pname,grep,sort_by_time)
     #print(procs)
     try:
-        return map(lambda x:x.pid,procs)
+        return list(map(lambda x:x.pid,procs))
     except:
         return None
 
