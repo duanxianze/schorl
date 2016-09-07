@@ -9,7 +9,7 @@
 @description:
             The basic class of process monitor of one specific task.
 """
-from Email import Email
+from crawl_tools.Email import Email
 import psutil,os,subprocess
 
 
