@@ -4,7 +4,7 @@
 '''
 
 import time
-from ua_pool import agents
+from crawl_tools.ua_pool import agents
 import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint

@@ -12,7 +12,7 @@
 """
 
 import time
-from WatchDog import WatchDog
+from crawl_tools.WatchDog import WatchDog
 from ArticlesSpider import *
 
 

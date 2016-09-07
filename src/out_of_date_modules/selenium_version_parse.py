@@ -4,7 +4,7 @@
 '''
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-
+import time
 from pyvirtualdisplay import Display
 
 display = Display(visible=0, size=(800, 600))

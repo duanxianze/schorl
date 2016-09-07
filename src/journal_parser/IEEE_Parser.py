@@ -7,14 +7,14 @@
 @editor:    PyCharm
 @create:    2016-08-31 17:16
 @description:
-            --
+            解析IEEE搜索结果页
 """
 
 import requests,random
 from bs4 import BeautifulSoup
 from selenium import webdriver
-from ua_pool import agents
-from request_with_proxy import request_with_proxy
+from crawl_tools.ua_pool import get_one_random_ua
+from crawl_tools.request_with_proxy import request_with_proxy
 
 
 def except_or_none(func):
@@ -22,7 +22,8 @@ def except_or_none(func):
         try:
             return func(*args,**kwargs)
         except Exception as e:
-            print('IEEE_Article_Parser:\n\tError in {}(): {}'.format(func.__name__,str(e)))
+            print('IEEE_Article_Parser:\n\tError in {}(): {}'\
+                  .format(func.__name__,str(e)))
             return None
     return wrapper
 
@@ -35,7 +36,7 @@ def get_pdf_link(pdf_page_url):
                 url = pdf_page_url,
                 timeout=30,
                 headers = {
-                    'User-Agent':random.choice(agents)
+                    'User-Agent':get_one_random_ua()
                 }
             ).text,"lxml"
         )
@@ -44,6 +45,7 @@ def get_pdf_link(pdf_page_url):
         except:
             print(soup)
 '''
+
 @except_or_none
 def get_pdf_link(pdf_page_url,driver):
     driver.get(pdf_page_url)
@@ -56,6 +58,7 @@ class IEEE_HTML_Parser:
         self.driver = driver
 
     @property
+    @except_or_none
     def sections(self):
         return self.driver.find_elements_by_class_name('List-results-items')
 
@@ -67,12 +70,10 @@ class Article:
         self.List_items = sec.find_elements_by_class_name('List-item')
 
     @property
-    @except_or_none
     def title(self):
         pass
 
     @property
-    @except_or_none
     def abstract(self):
         pass
 
