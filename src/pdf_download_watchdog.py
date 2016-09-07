@@ -10,8 +10,8 @@
             关于pdf下载的数据监视器类，继承于基本的看门狗类
 """
 
-from WatchDog import WatchDog
-from download import *
+from crawl_tools.WatchDog import WatchDog
+from pdf_download import *
 import time,os
 
 
@@ -98,5 +98,5 @@ class Pdf_Download_Watchdog(WatchDog):
 if __name__=='__main__':
     Pdf_Download_Watchdog(
         self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/pdf_download_watchdog.py'],
-        proc_cmd_line = ['C:\\Python27\\python.exe', 'F:/scholar_articles/src/download.py']
+        proc_cmd_line = ['C:\\Python27\\python.exe', 'F:/scholar_articles/src/pdf_download.py']
     ).run()
