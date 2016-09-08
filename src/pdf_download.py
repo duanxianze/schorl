@@ -9,7 +9,9 @@
 import requests,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
-from db_config import conn,cur
+import os,psycopg2
+from db_config import cur
+
 
 if os.name is 'nt':
     DOWNLOAD_FOLDER = "F:/scholar_articles/src/download/"
@@ -33,10 +35,13 @@ class PdfDownloader:
         )
         return cur.fetchall()[0][0]
 
-    def get_unfinished_items(self,left=None,length=10000):
+    def get_unfinished_items(self,left=None,length=1000000):
         #从db中检索出未下载pdf的表项
         max_id = self.get_max_unfinished_item_id()
-        left = random.randint(1,max_id-length)
+        try:
+            left = random.randint(1,max_id-length)
+        except:
+            left = 0
         right = left + length
         cur.execute(
             "select resource_link, google_id from articles where is_downloaded = 0 and resource_link is not null and id > {} and id < {}".format(left,right)
@@ -97,6 +102,8 @@ class PdfDownloader:
             )
             print('Downloader:\n\t{}.pdf wrote error\n\t{}'.format(google_id,str(err)))
 
+    def mark_ok(self,google_id):
+        self.mark(google_id=google_id,ok=True)
 
     def initSync(self,pool):
         #初始化时检测增量，直接标记同步远程记录为1

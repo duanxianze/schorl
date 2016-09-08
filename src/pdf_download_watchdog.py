@@ -9,7 +9,7 @@
 @description:
             关于pdf下载的数据监视器类，继承于基本的看门狗类
 """
-
+from db_config import conn,cur
 from crawl_tools.WatchDog import WatchDog
 from pdf_download import *
 import time,os
@@ -68,30 +68,30 @@ class Pdf_Download_Watchdog(WatchDog):
         prev_local_file_cot = 0
         delta_zero_cot = 0
         while(1):
-            try:
-                current_local_file_cot = self.counts_of_pdf_files
-                delta = current_local_file_cot - prev_local_file_cot
-                prev_local_file_cot = current_local_file_cot
-                current_status = self.task_proc_status
-                if delta==0:
-                    delta_zero_cot += 1
-                else:
-                    delta_zero_cot = 0
-                if delta_zero_cot>=5 or current_status is 'dead':
-                    self.restart_task_proc()
-                    delta_zero_cot = 0
-                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
-                        self.counts_of_unfinished_db_item,
-                        self.counts_of_exception_db_item,
-                        current_local_file_cot,
-                        delta,
-                        delta_zero_cot,
-                        current_status,
-                        time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
-                    )
+            current_local_file_cot = self.counts_of_pdf_files
+            delta = current_local_file_cot - prev_local_file_cot
+            prev_local_file_cot = current_local_file_cot
+            current_status = self.task_proc_status
+            if delta==0:
+                delta_zero_cot += 1
+            else:
+                delta_zero_cot = 0
+            if delta_zero_cot>=2 or current_status is 'dead':
+                self.restart_task_proc()
+                delta_zero_cot = 0
+            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\n\t{}'.format(
+                    self.counts_of_unfinished_db_item,
+                    self.counts_of_exception_db_item,
+                    current_local_file_cot,
+                    delta,
+                    delta_zero_cot,
+                    current_status,
+                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                 )
-            except Exception as e:
-                print(str(e))
+            )
+            if self.counts_of_unfinished_db_item==0:
+                print('Task Completed')
+                return
             time.sleep(10)
 
 

@@ -17,6 +17,8 @@ from bs4 import BeautifulSoup
 class Elsevier_Parser:
     def __init__(self,article_page_url,driver):
         driver.get(article_page_url)
+        if 'sciencedirect' not in article_page_url:
+            raise Exception('[Error] in Elsevier_Parser:\n\tUrl pattern is wrong.')
         self.soup = BeautifulSoup(driver.page_source,'lxml')
 
     @property
