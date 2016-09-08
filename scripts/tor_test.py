@@ -39,8 +39,8 @@ duplicate = 0
 error = 0
 error_ports = []
 ip_list = []
-#for i in range(9054, 9154):
-for i in [9058, 9102, 9119]:
+for i in range(9054, 9154):
+#for i in [9058, 9102, 9119]:
     try:
         ip = test_port(i)
         print(ip)
