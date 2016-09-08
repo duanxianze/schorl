@@ -12,25 +12,8 @@
 
 from multiprocessing.dummy import Pool as ThreadPool
 from crawl_tools.DriversPool import DriversPool
-import os,psycopg2,time
-
-if os.name is 'nt':
-    conn = psycopg2.connect(
-        host = '45.32.11.113',
-        port = 5432,
-        dbname = "sf_development",
-        user = "lyn",
-        password = "tonylu716"
-    )
-else:
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "lyn",
-        password = "tonylu716"
-    )
-cur = conn.cursor()
-conn.autocommit = True
-
+from crawl_tools.Timer import Timer
+from db_config import cur
 
 class PdfUrlGenerator:
     def __init__(self):
@@ -44,7 +27,8 @@ class PdfUrlGenerator:
     def _generate(self,unfinished_item,google_id_index,get_pdf_url_func):
         google_id = unfinished_item[google_id_index]
         print('PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
-        start_time = time.time()
+        tik = Timer()
+        tik.start()
         driverObj = self._drivers_pool.get_one_free_driver(wait=True)
         driverObj.status = 'busy'
         pdf_url = None
@@ -58,9 +42,9 @@ class PdfUrlGenerator:
         driverObj.status = 'free'
         if pdf_url:
             self._mark_db(pdf_url,google_id)
-            gap = time.time() - start_time
+            tik.end()
             print('PDF_URL_Generator:\n\tFinish task in {} s\
-                    \n\tGot pdf_url of {}:{}'.format(gap,google_id,pdf_url))
+                    \n\tGot pdf_url of {}:{}'.format(tik.gap,google_id,pdf_url))
         else:
             print('PDF_URL_Generator:\n\tFail to get pdf_url of {}'.format(google_id))
 
