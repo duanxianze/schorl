@@ -46,10 +46,14 @@ class PdfUrlGenerator:
         print('PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
         driverObj = self._drivers_pool.get_one_free_driver(wait=True)
         driverObj.status = 'busy'
-        pdf_url = get_pdf_url_func(
-            unfinished_item = unfinished_item,
-            driver = driverObj.engine
-        )#本函数由子类的generator自行判断书写
+        pdf_url = None
+        try:
+            pdf_url = get_pdf_url_func(
+                unfinished_item = unfinished_item,
+                driver = driverObj.engine
+            )#本函数由子类的generator自行判断书写
+        except Exception as e:
+            print('[Error] in PdfUrlGenerator__get_pdf_url():\n\t{}'.format(str(e)))
         driverObj.status = 'free'
         if pdf_url:
             print('PDF_URL_Generator:\n\tGot pdf_url of {}:{}'.format(google_id,pdf_url))
