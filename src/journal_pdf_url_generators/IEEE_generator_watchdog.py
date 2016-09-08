@@ -39,7 +39,7 @@ class IEEE_Generator_Watchdog(WatchDog):
                 current = self.counts_of_finished_items
                 delta = current - prev
                 prev = current
-                if delta_zero_cot > 3 or self.task_proc_status == 'dead':
+                if delta_zero_cot > 5 or self.task_proc_status == 'dead':
                     self.restart_task_proc()
                     delta_zero_cot = 0
                 if delta==0:
@@ -57,6 +57,7 @@ class IEEE_Generator_Watchdog(WatchDog):
                 )
             except Exception as e:
                 print('EXCEPTION IN BIG LOOP:{}'.format(str(e)))
+            time.sleep(10)
 
 
 if __name__=="__main__":

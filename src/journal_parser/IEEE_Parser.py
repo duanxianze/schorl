@@ -46,12 +46,15 @@ def get_pdf_link(pdf_page_url):
             print(soup)
 '''
 
-@except_or_none
-def get_pdf_link(pdf_page_url,driver):
+def get_ieee_pdf_link(pdf_page_url,driver):
     driver.get(pdf_page_url)
     soup = BeautifulSoup(driver.page_source,'lxml')
-    return soup.find_all('frame')[1].get('src')
-
+    try:
+        return soup.find_all('frame')[1].get('src')
+    except Exception as e:
+        print('[Error] in get_ieee_pdf_link():{}'.format(str(e)))
+        print('The url of issue is {}'.format(pdf_page_url))
+        return None
 
 class IEEE_HTML_Parser:
     def __init__(self,driver):

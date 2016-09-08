@@ -9,8 +9,7 @@
 @description:
             专门为IEEE出版社的pdf下载模块
 """
-
-from journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_pdf_link
+from journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_ieee_pdf_link
 from journal_pdf_url_generators.PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -21,9 +20,10 @@ class IEEE_Search_Model:
         self.title = title
         self.google_id = google_id
         while(1):
-            driver.get(
-                url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'\
+            search_result_url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'\
                     .format('%20'.join(title.split(' ')))
+            driver.get(
+                url = search_result_url
             )#尝试selenium进入搜索页
             try:
                 WebDriverWait(driver, 20).until(
@@ -36,7 +36,8 @@ class IEEE_Search_Model:
                 print('IEEE_Search_Model:\n\tGot search result of <{}>\n\tDeliver to parser...'.format(title+'...'))
                 break
             except Exception as e:
-                print('IEEE_Search_Model:\n\tError in search page:{}, reload again...'.format(str(e)))
+                print('[Error] in IEEE_Search_Model():{}'.format(str(e)))
+                print('The url of issue is:{}\nReload again..'.format(search_result_url))
         self.sec = IEEE_HTML_Parser(driver).sections[0]
         self.driver = driver
 
@@ -47,15 +48,15 @@ class IEEE_Search_Model:
                 sql = "update articles set pdf_temp_url = '{}' where google_id = '{}'".format(pdf_page_url,self.google_id)
                 cur.execute(sql)
             except Exception as e:
-                print('get_pdf_url()_update_pdf_temp_url:{}'.format(str(e)))
+                print('[Error] in get_pdf_url()_update_pdf_temp_url:{}'.format(str(e)))
                 print('Except SQL is {}'.format(sql))
-            return get_pdf_link(pdf_page_url,self.driver)
+            return get_ieee_pdf_link(pdf_page_url,self.driver)
 
 
 def get_ieee_pdf_url_func(driver,unfinished_item):
     pdf_temp_url = unfinished_item[2]
     if pdf_temp_url:
-        return get_pdf_link(pdf_temp_url,driver)
+        return get_ieee_pdf_link(pdf_temp_url,driver)
     else:
         return IEEE_Search_Model(
             title = unfinished_item[0],
