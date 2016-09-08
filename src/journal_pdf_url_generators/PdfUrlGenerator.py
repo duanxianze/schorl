@@ -12,7 +12,7 @@
 
 from multiprocessing.dummy import Pool as ThreadPool
 from crawl_tools.DriversPool import DriversPool
-import os,psycopg2
+import os,psycopg2,time
 
 if os.name is 'nt':
     conn = psycopg2.connect(
@@ -44,6 +44,7 @@ class PdfUrlGenerator:
     def _generate(self,unfinished_item,google_id_index,get_pdf_url_func):
         google_id = unfinished_item[google_id_index]
         print('PDF_URL_Generator:\n\tGot task of {}'.format(google_id))
+        start_time = time.time()
         driverObj = self._drivers_pool.get_one_free_driver(wait=True)
         driverObj.status = 'busy'
         pdf_url = None
@@ -56,8 +57,10 @@ class PdfUrlGenerator:
             print('[Error] in PdfUrlGenerator__get_pdf_url():\n\t{}'.format(str(e)))
         driverObj.status = 'free'
         if pdf_url:
-            print('PDF_URL_Generator:\n\tGot pdf_url of {}:{}'.format(google_id,pdf_url))
             self._mark_db(pdf_url,google_id)
+            gap = time.time() - start_time
+            print('PDF_URL_Generator:\n\tFinish task in {} s\
+                    \n\tGot pdf_url of {}:{}'.format(gap,google_id,pdf_url))
         else:
             print('PDF_URL_Generator:\n\tFail to get pdf_url of {}'.format(google_id))
 
