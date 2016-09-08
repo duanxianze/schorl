@@ -14,6 +14,7 @@ from journal_parser.Elsevier_Parser import Elsevier_Parser
 from journal_pdf_url_generators.PdfUrlGenerator import *
 
 def get_elsevier_pdf_url_func(driver,unfinished_item):
+    #print('url:{}'.format(unfinished_item[0]))
     return Elsevier_Parser(
         article_page_url = unfinished_item[0],
         driver = driver
@@ -46,9 +47,12 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
 
 if __name__=='__main__':
     from crawl_tools.WatchDog import close_procs_by_keyword
-    visual=True
+
+    visual = False
+
     if visual:
         close_procs_by_keyword(keyword='chrome')
     else:
         close_procs_by_keyword(keyword='phantom')
-    Elsevier_pdf_url_generator().run(thread_counts=8,visual=visual,limit=100)
+
+    Elsevier_pdf_url_generator().run(thread_counts=8,visual=visual,limit=1000)
