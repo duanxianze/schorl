@@ -35,6 +35,7 @@ class WatchDog:
     def kill_prev_watchdog_procs(self):
         if not self.kill_prev:
             return
+        print(self.cmd_line)
         prev_pids = get_prev_pids(self.cmd_line)[:-1]
         print('WatchDog:\n\tPrevious watchdog pids: {}'.format(prev_pids))
         #清理之前的看门狗进程,注意最后一项是当前watchdog自身，不要kill
@@ -130,9 +131,9 @@ def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
     procs = []
     for proc in psutil.process_iter():
         try:
-            #print(proc.create_time())
-            if proc.cmdline() is cmd_line \
-                or ( pname is not None and proc.name().lower() is pname.lower() )\
+            #print(proc.create_time(),proc.cmdline())
+            if proc.cmdline() == cmd_line \
+                or ( pname is not None and proc.name().lower() == pname.lower() )\
                     or ( grep is not None and grep in proc.name() ):
                 procs.append({'proc':proc,'create_time':proc.create_time()})
         except psutil.AccessDenied:
@@ -145,7 +146,8 @@ def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
             )#否则默认按id大小排
     try:
         return list(map(lambda x:x['proc'],procs))
-    except:
+    except Exception as e:
+        print(' [Error] in get_prev_procs():{}'.format(str(e)))
         return None
 
 
@@ -154,7 +156,8 @@ def get_prev_pids(cmd_line=None,pname=None,grep=None,sort_by_time=True):
     #print(procs)
     try:
         return list(map(lambda x:x.pid,procs))
-    except:
+    except Exception as e:
+        print(' [Error] in get_prev_pids():{}'.format(str(e)))
         return None
 
 

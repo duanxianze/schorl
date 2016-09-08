@@ -17,8 +17,8 @@ from ArticlesSpider import *
 
 
 class Artciles_Spider_WatchDog(WatchDog):
-    def __init__(self,self_cmd_line,proc_cmd_line,pid=None):
-        WatchDog.__init__(self,self_cmd_line,proc_cmd_line,pid)
+    def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
+        WatchDog.__init__(self,cmd_line,task_proc_cmd_line,pid)
 
     @property
     def articles_amount(self):
@@ -83,11 +83,11 @@ class Artciles_Spider_WatchDog(WatchDog):
 if __name__=='__main__':
     if os.name is 'nt':
         proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/ArticlesSpider.py']
+        self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/articles_watchdog.py']
     else:
         #os.system('source ~/scholar_articles/py3env/bin/activate')
         proc_cmd_line = ['python', 'ArticlesSpider.py']
-
-    self_cmd_line = ['python','articles_watchdog.py']
+        self_cmd_line = ['python','articles_watchdog.py']
 
     Artciles_Spider_WatchDog(self_cmd_line,proc_cmd_line).run()
 
