@@ -9,12 +9,13 @@
 import requests,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
-import os,psycopg2
+import os
+from crawl_tools.ua_pool import get_one_random_ua
 from db_config import cur
 
 
 if os.name is 'nt':
-    DOWNLOAD_FOLDER = "F:/scholar_articles/src/download/"
+    DOWNLOAD_FOLDER = "./download/"
 else:
     DOWNLOAD_FOLDER = "~/scholar_articles/src/download/"
 
@@ -50,7 +51,7 @@ class PdfDownloader:
         print('PdfDownloader:\n\tGot {} items in range [{},{}]'.format(len(data),left,right))
         return data
 
-    def download(self,unfinished_item):
+    def download(self,unfinished_item,need_mark_err=True):
         #对于单条item的下载处理
         #print(unfinished_item)
         try:
@@ -59,7 +60,10 @@ class PdfDownloader:
             #若查询到该文件名不存在，即没有被下载，则执行下载
             save_name = google_id + '.pdf'
             if save_name not in self.download_folder_files:
-                resp = requests.get(url, verify=False)
+                resp = requests.get(
+                    url=url, verify=False,
+                    headers={'User-agent':get_one_random_ua()}
+                )
                 with open(
                     os.path.join(self.save_folder, save_name), 'wb'
                 ) as pdf_file:
@@ -69,11 +73,15 @@ class PdfDownloader:
                         self.download_folder_files.append(save_name)
                         print('Downloader:\n\t'+ save_name + '( {} Kb ) wrote ok...'.format(file_kb))
                     else:
-                        raise Exception('File size = {}k < 3k'.format(file_kb))
+                        raise Exception('File size = {}k < 10k'.format(file_kb))
             #下载完成后，在数据库中做记录：已下载
             self.mark(google_id,ok=True)
+            return True
         except Exception as e:
-            self.mark(google_id,ok=False,err=e)
+            if need_mark_err:
+                self.mark(google_id,ok=False,err=e)
+            print(str(e))
+            return False
 
     def get_delta(self):
         print('Downloader:\n\tSearch file foler...')
