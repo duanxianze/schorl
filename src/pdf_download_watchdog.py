@@ -9,7 +9,6 @@
 @description:
             关于pdf下载的数据监视器类，继承于基本的看门狗类
 """
-from db_config import conn,cur
 from crawl_tools.WatchDog import WatchDog
 from pdf_download import *
 import time,os
