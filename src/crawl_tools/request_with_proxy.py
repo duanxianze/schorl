@@ -4,16 +4,11 @@
 '''
 
 import time
-from crawl_tools.ua_pool import agents
+from crawl_tools.ua_pool import get_one_random_ua
 import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint
 import random,os
-
-if os.name is 'nt':
-    No_Prox = False
-else:
-    No_Prox = False
 
 '''
 功能：随机分配端口
@@ -28,6 +23,19 @@ def rand_port(x, y, exclude):
         r = randint(x, y)
     return r
 
+def test_port(port_num):
+    proxies = {
+        "http": "socks5://127.0.0.1:{}".format(port_num),
+        "https": "socks5://127.0.0.1:{}".format(port_num)
+    }
+    r = requests.get(
+        url="https://api.ipify.org/",
+        proxies=proxies,
+        timeout=10,
+        headers=get_one_random_ua()
+    )
+    return r.text
+
 '''
 功能：发送代理请求
 传入参数：
@@ -37,30 +45,31 @@ def rand_port(x, y, exclude):
     sleep:   运行前等待时间
 返回请求结果
 '''
-def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=No_Prox):
-    headers = {'User-Agent': random.choice(agents)}
+def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=False):
+    headers = {'User-Agent': get_one_random_ua()}
     if no_proxy_test:
         return requests.get(url, headers=headers, timeout=timeout)
     time.sleep(sleep)
-    r = None
     if not use_ss:
-        if os.name is 'nt':
-            proxy_port = 9050
-        else:
+        for i in range(100):
             proxy_port = rand_port(9054, 9155, [])
+            if test_port(proxy_port):
+                #检测端口有效再request
+                break
+            if i==99:
+                print('No available port...check tor')
+                return None
         proxies = {
                 "http": "socks5://127.0.0.1:{}".format(proxy_port),
                 "https": "socks5://127.0.0.1:{}".format(proxy_port)
         }
-        r = requests.get(url, proxies=proxies, headers=headers, timeout=timeout)
+        return requests.get(url, proxies=proxies, headers=headers, timeout=timeout)
     else:
-        port_range = (1080, 1108)
+        #port_range = (1080, 1108)
         error_ports = [1094, 1098]
         port = rand_port(1080, 1108, error_ports)
         proxies = {
             "http": "socks5://127.0.0.1:{}".format(port),
             "https": "socks5://127.0.0.1:{}".format(port)
         }
-        r = requests.get(url, proxies=proxies, timeout=timeout, headers=headers)
-
-    return r
+        return requests.get(url, proxies=proxies, timeout=timeout, headers=headers)
