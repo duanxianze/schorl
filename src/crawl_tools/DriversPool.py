@@ -63,7 +63,7 @@ class DriversPool:
                 break
         return None
 
-    def tear_down(self):
+    def close(self):
         for driverObj in self.pool:
             driverObj.engine.close()
 
