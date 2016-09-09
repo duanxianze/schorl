@@ -32,7 +32,7 @@ def test_port(port_num):
         url="https://api.ipify.org/",
         proxies=proxies,
         timeout=10,
-        headers=get_one_random_ua()
+        headers={'User-Agent': get_one_random_ua()}
     )
     return r.text
 

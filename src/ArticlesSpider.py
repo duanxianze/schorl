@@ -46,7 +46,7 @@ class ArticleSpider:
             for page_url in ScholarSearch(full_name).page_urls():
                 for sec in ParseHTML(url=page_url).sections():
                     Article(sec).save_to_db(cur)
-            cur.execute("update scholars set is_added = 1 where id = (%s)", (scholar_db_id,))
+            cur.execute("update scholars set is_added = 1 where id = {}".format(scholar_db_id))
         except Exception as e:
             print('ArticleSpider:\n\tERROR:{}'.format(str(e)))
         '''
