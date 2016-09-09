@@ -28,14 +28,16 @@ def test_port(port_num):
         "http": "socks5://127.0.0.1:{}".format(port_num),
         "https": "socks5://127.0.0.1:{}".format(port_num)
     }
-    r = requests.get(
-        url="https://api.ipify.org/",
-        proxies=proxies,
-        timeout=10,
-        headers={'User-Agent': get_one_random_ua()}
-    )
-    return r.text
-
+    try:
+        r = requests.get(
+            url="https://api.ipify.org/",
+            proxies=proxies,
+            timeout=10,
+            headers={'User-Agent': get_one_random_ua()}
+        )
+        return r.text
+    except:
+        return None
 '''
 功能：发送代理请求
 传入参数：
@@ -56,7 +58,7 @@ def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=Fa
             if test_port(proxy_port):
                 #检测端口有效再request
                 break
-            if i==99:
+            if i==20:
                 print('No available port...check tor')
                 return None
         proxies = {
