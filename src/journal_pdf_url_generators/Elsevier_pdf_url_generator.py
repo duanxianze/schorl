@@ -25,10 +25,15 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
     def __init__(self):
         PdfUrlGenerator.__init__(self)
 
-    def get_unfinished_items(self):
-        ret = self._get_unfinished_items(self.query_sql)
-        print('Elsevier_pdf_url_generator:\n\tGot {} new items in limit {}...'.format(len(ret),self.query_limit))
-        return ret
+    def get_unfinished_items(self,length):
+        return self._get_unfinished_items(
+            query_sql = self.query_sql,
+            max_id_where_sqls=[
+                ['resource_link','is','null'],
+                ['journal_temp_info','like','%Elsevier%']
+            ],
+            length = length
+        )
 
     def generate(self,unfinished_item):
         return self._generate(unfinished_item,
@@ -36,12 +41,12 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
             get_pdf_url_func = get_elsevier_pdf_url_func
         )
 
-    def run(self,thread_counts=16,visual=True,limit=1000):
+    def run(self,thread_counts=16,visual=True,limit=1000,length=1000):
         self.query_limit = limit
         self._run(thread_counts,visual)
         self.query_sql = "select link,google_id from articles where resource_link is null \
                   and journal_temp_info like '%Elsevier%' limit {}".format(limit)
-        self._task_thread_pool.map(self.generate,self.get_unfinished_items())
+        self._task_thread_pool.map(self.generate,self.get_unfinished_items(length))
         self._close()
 
 
@@ -55,4 +60,9 @@ if __name__=='__main__':
     else:
         close_procs_by_keyword(keyword='phantom')
 
-    Elsevier_pdf_url_generator().run(thread_counts=8,visual=visual,limit=1000)
+    Elsevier_pdf_url_generator().run(
+        thread_counts=8,
+        visual=visual,
+        limit=1000000,
+        length=1000
+    )

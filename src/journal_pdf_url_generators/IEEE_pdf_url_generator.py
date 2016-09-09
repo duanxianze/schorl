@@ -86,7 +86,7 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
             get_pdf_url_func = get_ieee_pdf_url_func
         )
 
-    def run(self,thread_counts=16,visual=True,limit=1000,length=100000):
+    def run(self,thread_counts=16,visual=True,limit=1000,length=1000):
         self.query_limit = limit
         self._run(thread_counts,visual)
         self.query_sql = "select title,google_id,pdf_temp_url from articles where resource_link is null\
