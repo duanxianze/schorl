@@ -14,12 +14,14 @@ from journal_pdf_url_generators.PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import random
+
 
 class IEEE_Search_Model:
     def __init__(self,title,google_id,driver):
         self.title = title
         self.google_id = google_id
-        while(1):
+        for i in range(10):
             search_result_url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText={}&newsearch=true'\
                     .format('%20'.join(title.split(' ')))
             driver.get(
@@ -69,6 +71,13 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
     def __init__(self):
         PdfUrlGenerator.__init__(self)
 
+    def get_max_unfinished_item_id(self):
+        cur.execute(
+            "select max(id) from articles where resource_link is null\
+             and journal_temp_info like '%ieee%'"
+        )
+        return cur.fetchall()[0][0]
+
     def get_unfinished_items(self):
         ret = self._get_unfinished_items(self.query_sql)
         print('IEEE_pdf_url_generator:\n\tGot {} new items in limit {}...'.format(len(ret),self.query_limit))
@@ -100,4 +109,4 @@ if __name__=='__main__':
     else:
         close_procs_by_keyword(keyword='phantom')
 
-    IEEE_pdf_url_generator().run(thread_counts=4,visual=visual,limit=100)
+    IEEE_pdf_url_generator().run(thread_counts=8,visual=visual,limit=500)

@@ -52,7 +52,7 @@ def get_ieee_pdf_link(pdf_page_url,driver):
     try:
         return soup.find_all('frame')[1].get('src')
     except Exception as e:
-        print('[Error] in get_ieee_pdf_link():{}'.format(str(e)))
+        print('[Error] in IEEE_Parser:get_ieee_pdf_link():{}'.format(str(e)))
         print('The url of issue is {}'.format(pdf_page_url))
         return None
 
@@ -89,7 +89,7 @@ class Article:
 
     @property
     def pdf_url(self):
-        return get_pdf_link(self.pdf_page_url,self.driver)
+        return get_ieee_pdf_link(self.pdf_page_url,self.driver)
 
     @property
     @except_or_none
