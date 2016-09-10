@@ -15,7 +15,7 @@ from db_config import cur
 
 
 if os.name is 'nt':
-    DOWNLOAD_FOLDER = "./download/"
+    DOWNLOAD_FOLDER = "F:scholar_articles/src/download/"
 else:
     DOWNLOAD_FOLDER = "~/scholar_articles/src/download/"
 

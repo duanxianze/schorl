@@ -35,7 +35,7 @@ class GooglePatent_PDF_Downloader:
         google_id = item[1]
         patent_id = item[0].split('/')[-1]
         pdf_url = 'https://patentimages.storage.googleapis.com/pdfs/{}.pdf'.format(patent_id)
-        print(google_id,patent_id)
+        print(patent_id)
         if PdfDownloader(save_folder=DOWNLOAD_FOLDER).download(
             unfinished_item = (pdf_url,google_id),
             need_mark_err = False
@@ -43,7 +43,7 @@ class GooglePatent_PDF_Downloader:
             self.mark(pdf_url,google_id)
 
     def run(self):
-        pool = ThreadPool(16)
+        pool = ThreadPool(8)
         pool.map(self.download,self.get_unfinished_items())
         pool.close()
         pool.join()
