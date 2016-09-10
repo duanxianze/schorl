@@ -86,10 +86,10 @@ class ScholarSearch:
                 对于full_name的运算，若middle_name不存在，需要区分对待
             '''
             self.full_name = self.name[0].strip() + ' ' + self.name[2].strip()
-            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&as_sdt=0,5'
+            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&lr=lang_en&as_sdt=0,5'
         else:
             self.full_name = self.name[0].strip() + ' ' + self.name[1].strip() + ' ' + self.name[2].strip()
-            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&as_sdt=0,5'
+            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&lr=lang_en&as_sdt=0,5'
 
     def page(self):
         '''
@@ -120,7 +120,7 @@ class ScholarSearch:
         if pages>10:
             pages = 10
         '''10页以后意义不大，故大于10页取10页爬取'''
-        urls = ['https://scholar.google.com/scholar?start={0}&q={1}&hl=en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
+        urls = ['https://scholar.google.co.uk/scholar?start={0}&q={1}&hl=en&lr=lang_en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
         return urls
 
 

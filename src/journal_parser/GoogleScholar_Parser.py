@@ -1,6 +1,6 @@
 #coding:utf-8
 '''
-    parse_html.py 用于解析学者搜索结果页
+    parse_html.py 用于解析学者英文搜索结果页
 '''
 from bs4 import BeautifulSoup
 from random import randint
@@ -181,16 +181,6 @@ class Article:
 
 
 if __name__=='__main__':
-    import psycopg2
-    conn = psycopg2.connect(
-        host = '45.32.131.53',
-        port = 5432,
-        dbname = "sf_development",
-        user = "gao",
-        password = "gaotongfei13"
-    )
-    cur = conn.cursor()
-    conn.autocommit = True
     for sec in ParseHTML(from_web=False).sections():
         #Article(sec).save_to_db(cur)
         #Article(sec).update_journal(cur)
