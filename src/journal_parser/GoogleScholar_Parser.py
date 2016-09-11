@@ -145,7 +145,7 @@ class Article:
             if None in self.db_item_values(cur):
                 #假如数据库中该item存在空项，则更新
                 print('Somthing is null in db,Updating...')
-                if self.journal_temp_info and self.citations_count:
+                if self.journal_temp_info and self.citations_count is not None:
                     #假如爬虫数据获取正常
                     cur.execute(
                         "update articles set journal_temp_info = '{}' ,\
@@ -169,19 +169,23 @@ class Article:
                     (self.title, self.year, self.citations_count, self.citations_link, self.link, \
                      self.resource_type, self.resource_link, self.summary, self.google_id,self.journal_temp_info)
                 )
+                print('**************New Article Info******************')
                 self.show_in_cmd()
+                print('**************New Article Info******************')
                 return True
             else:
                 print('[Insert Error]:Some method is null...')
         except Exception as e:
-            self.show_in_cmd()
+            if 'User profiles for' not in self.title:
+                print('**************ERROR Article Info******************')
+                self.show_in_cmd()
+                print('**************ERROR Article Info******************')
             print('Article save error:{}'.format(str(e)))
             #print('The except sql is {}'.format(sql))
         return False
 
 
     def show_in_cmd(self):
-        print('**************New Article Info******************')
         print('title:\t\t{}'.format(self.title))
         print('google_id:\t{}'.format(self.google_id))
         print('year:\t\t{}'.format(self.year))
@@ -192,7 +196,6 @@ class Article:
         print('link:\t\t\t{}'.format(self.link))
         print('summary:\t\t{}'.format(self.summary))
         print('journal_temp_info:\t\t{}'.format(self.journal_temp_info))
-        print('**************New Article Info******************')
 
 
 
