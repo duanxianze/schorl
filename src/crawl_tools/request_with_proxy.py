@@ -68,7 +68,7 @@ def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=Fa
                 "http": "socks5://127.0.0.1:{}".format(proxy_port),
                 "https": "socks5://127.0.0.1:{}".format(proxy_port)
         }
-        return requests.get(url, proxies=proxies, headers=headers, timeout=timeout)
+        return requests.get(url, proxies=proxies, headers=headers, timeout=timeout,verify=False)
     else:
         #port_range = (1080, 1108)
         error_ports = [1094, 1098]
@@ -77,4 +77,4 @@ def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=Fa
             "http": "socks5://127.0.0.1:{}".format(port),
             "https": "socks5://127.0.0.1:{}".format(port)
         }
-        return requests.get(url, proxies=proxies, timeout=timeout, headers=headers)
+        return requests.get(url, proxies=proxies, timeout=timeout, headers=headers,verify=False)
