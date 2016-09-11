@@ -58,8 +58,11 @@ class ArticleSpider:
                 parser = ParseHTML(url=page_url)
                 success = True
                 for sec in parser.sections():
-                    if not Article(sec).save_to_db(cur):
-                        success = False
+                    article = Article(sec)
+                    if not article.save_to_db(cur):
+                        if 'User profiles for' not in article.title:
+                            #首个结果是用户介绍，不判断失败
+                            success = False
                 if not success:
                     self.save_local_htmls(text=parser.html)
             #cur.execute("update scholars set is_added = 1 where id = {}".format(scholar_db_id))
@@ -102,10 +105,10 @@ class ScholarSearch:
                 对于full_name的运算，若middle_name不存在，需要区分对待
             '''
             self.full_name = self.name[0].strip() + ' ' + self.name[2].strip()
-            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&lr=lang_en&as_sdt=0,5'
+            self.start_url = 'http://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&lr=lang_en&as_sdt=0,5'
         else:
             self.full_name = self.name[0].strip() + ' ' + self.name[1].strip() + ' ' + self.name[2].strip()
-            self.start_url = 'https://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&lr=lang_en&as_sdt=0,5'
+            self.start_url = 'http://scholar.google.com/scholar?start=0&q='+self.full_name+'&hl=en&lr=lang_en&as_sdt=0,5'
 
     def page(self):
         '''
