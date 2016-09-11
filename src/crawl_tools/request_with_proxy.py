@@ -53,6 +53,7 @@ def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=Fa
         return requests.get(url, headers=headers, timeout=timeout)
     time.sleep(sleep)
     if not use_ss:
+        '''
         for i in range(100):
             proxy_port = rand_port(9054, 9155, [])
             if test_port(proxy_port):
@@ -61,6 +62,8 @@ def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=Fa
             if i==20:
                 print('No available port...check tor')
                 return None
+        '''
+        proxy_port = rand_port(9054, 9155, [])
         proxies = {
                 "http": "socks5://127.0.0.1:{}".format(proxy_port),
                 "https": "socks5://127.0.0.1:{}".format(proxy_port)
