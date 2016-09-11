@@ -42,7 +42,7 @@ class ArticleSpider:
         print(save_name)
         try:
             with open(
-                os.path.join('./html_results/', save_name), 'wb'
+                os.path.join('./html_results/', save_name), 'w'
             ) as html_file:
                 html_file.write(text)
         except Exception as e:
