@@ -30,23 +30,39 @@ class GoogleScholarParserTest:
             ) as html_file:
                 html_file.write(resp.content)
 
-    def parse(self,file_name,cur):
+    def parse(self,file_name):
         print('--------{}----------'.format(file_name))
+        whole_page_success = True
         for sec in ParseHTML(
             from_web=False,
             file_name=self.folder+file_name
         ).sections():
             article = Article(sec)
             if not article.save_to_db(cur):
+                print('**************ERROR Article Info******************')
                 article.show_in_cmd()
+                print('**************ERROR Article Info******************')
+                if 'User pro' not in article.title:
+                    whole_page_success = False
+        if whole_page_success:
+            os.remove(self.folder+file_name)
+            print('del {} ok'.format(self.folder+file_name))
         print('-------page out-----------')
+
+
+
+def run(file_name):
+    test = GoogleScholarParserTest('123','./html_results/')
+    #test.generate_htmls()
+    test.parse(file_name=file_name)
 
 
 if __name__=="__main__":
     from db_config import cur
     Folder = './html_results/'
     print(os.listdir(Folder))
-    for name in os.listdir(Folder):
-        test = GoogleScholarParserTest(name,Folder)
-        #test.generate_htmls()
-        test.parse(file_name=name,cur=cur)
+
+    for file_name in os.listdir(Folder):
+        run(file_name)
+
+
