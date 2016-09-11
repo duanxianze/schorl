@@ -50,22 +50,37 @@ class Article:
     @property
     @except_or_none
     def title(self):
-        return self.sec.select('.gs_rt > a')[0].text
-    
+        try:
+            return self.sec.select('.gs_rt > a')[0].text
+        except:
+            return self.sec.select('.gs_rt')[0].text
+
     @property
     @except_or_none
     def year(self):
-        return self.sec.select('.gs_a')[0].text.split('-')[-2].split(',')[-1][1:-1]
-    
+        try:
+            return int(self.sec.select('.gs_a')[0].text.split('-')[-2].split(',')[-1][1:-1])
+        except:
+            try:
+                return int(self.sec.select('.gs_a')[0].text.split(',')[-1].split('-')[0].strip(' '))
+            except:
+                return -1
     @property
-    @except_or_none
     def citations_count(self):
-        return int(self.sec.select('.gs_fl > a')[0].text[9:])
-    
+        try:
+            return int(self.sec.select('.gs_fl > a')[0].text.split(' ')[-1])
+        except:
+            return 0
+
     @property
     @except_or_none
     def citations_link(self):
-        return self.sec.select('.gs_fl > a')[0]['href']
+        res = self.sec.select('.gs_fl > a')[0]['href']
+        if res == '#':
+            return None
+        else:
+            return res
+
 
     @property
     @except_or_none
@@ -73,12 +88,13 @@ class Article:
         return self.sec.select('.gs_rt > a')[0]['href']
 
     @property
-    @except_or_none
     def resource_type(self):
-        return self.sec.select('.gs_ggsS')[0].text.split(' ')[1][1:-1]
+        try:
+            return self.sec.select('.gs_ggsS')[0].text.split(' ')[1][1:-1]
+        except:
+            return None
 
     @property
-    @except_or_none
     def resource_link(self):
         if self.resource_type:
             return self.sec.select('.gs_md_wp > a')[0]['href']
@@ -116,7 +132,7 @@ class Article:
 
     def db_item_values(self,cur):
         cur.execute(
-            "select journal_temp_info,citations_count,citations_link,link from articles where google_id = '{}'".format(self.google_id)
+            "select journal_temp_info,citations_count from articles where google_id = '{}'".format(self.google_id)
         )
         return cur.fetchall()[0]
 
@@ -125,27 +141,27 @@ class Article:
             print('Get google_id Error')
             return False
         if self.is_saved(cur):
-            print('"{}" already saved before.Updating...'.format(self.google_id))
+            print('"{}" already saved before...'.format(self.google_id))
             if None in self.db_item_values(cur):
                 #假如数据库中该item存在空项，则更新
-                if self.journal_temp_info and self.citations_count and self.citations_link and self.link:
+                print('Somthing is null in db,Updating...')
+                if self.journal_temp_info and self.citations_count:
                     #假如爬虫数据获取正常
                     cur.execute(
                         "update articles set journal_temp_info = '{}' ,\
-                         citations_count = {},citations_link='{}',link='{}' \
+                         citations_count = {},citations_link='{}' \
                          where google_id = '{}'".format(
                             self.journal_temp_info,self.citations_count,\
-                            self.citations_link,self.link,self.google_id
+                            self.citations_link,self.google_id
                         )
                     )
+                    print('Update all methods of {} ok!'.format(self.google_id))
                 else:
                     print('Upate Error:Got some methods whose value is null...')
                     return False
-            print('Update all methods of {} ok!'.format(self.google_id))
             return True
         try:
-            if self.title and self.year and self.citations_count and self.citations_link \
-                and self.link and self.summary and self.google_id and self.journal_temp_info:
+            if self.title and self.year and self.google_id and self.journal_temp_info:
                 cur.execute(
                     "insert into articles (title, year, citations_count, citations_link, link, \
                     resource_type, resource_link, summary, google_id,journal_temp_info) "
@@ -156,9 +172,11 @@ class Article:
                 self.show_in_cmd()
                 return True
             else:
-                print('Insert Error:Some method is null...')
+                print('[Insert Error]:Some method is null...')
         except Exception as e:
+            self.show_in_cmd()
             print('Article save error:{}'.format(str(e)))
+            #print('The except sql is {}'.format(sql))
         return False
 
 
