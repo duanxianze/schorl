@@ -8,6 +8,14 @@
 @create:    2016-09-06 19:18
 @description:
             The basic class of pdf url generator for different journals
+
+	* 检索 articles title
+	* 交给parser解析
+	* 获得pdf_url
+	* 反馈给db，填充至resource_link列
+	* 所有购买版权的杂志社同理，首要任务是更新其pdf_url，后续download模块会统一处理
+
+
 """
 
 from multiprocessing.dummy import Pool as ThreadPool
