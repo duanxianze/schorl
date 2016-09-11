@@ -17,8 +17,8 @@
 ## virtualenv
 
 * virtualenv安装: `pip install virtualenv`
+* 创建py3env:`virtualenv -p python3 venv`
 * 启动虚拟环境: `source py3env/source/activate`
-* 其他linux机器部署可直接用`py2env,py3env`中的解释器
 * 安装依赖: `pip install -r requirements.txt`
 
 注意: 在pip install 安装依赖之前，确保启动了虚拟环境，这样才不会把全局依赖和虚拟环境的依赖混淆
@@ -27,6 +27,8 @@
 接手前articles表中有314037条数据
 但是最大id为314060
 截止到2016-8-26，大约46w
+截止到2016-9-11，大约52w
+大部分条目已存，目前速率较低，只爬谷歌最近的 增量
 
 #Module
 ##条目的初步创建
@@ -50,10 +52,14 @@
 - 分别生成`Article`对象获得所有文章属性，存入数据库
 
 ##异步获取细节
-### download.py
+### pdf_download.py
 - 仅包含一个`pdf_downloader`类
 - 从远程db中检索出**存在且未下载**的pdf_url条目，存于本地
 - 可脱离于主程序，在宿机器上运行
+
+###**journal_pdf_url_generate.py
+-  某些pdf_url谷歌无法拿到，需要版权
+-  针对每一学校购置版权的杂志社，写好parser，由db中的title，去搜索页检索，得到pdf_url，反馈给db
 
 ### bibtex.py
 包含:
