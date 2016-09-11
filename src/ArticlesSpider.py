@@ -13,7 +13,7 @@ from math import ceil
 from journal_parser.GoogleScholar_Parser import *
 from multiprocessing.dummy import Pool as ThreadPool
 from db_config import cur
-import random,re
+import random,re,os,time
 
 class ArticleSpider:
     '''
@@ -37,16 +37,32 @@ class ArticleSpider:
                 )
         return int(cur.fetchall[0][0])
 
+    def save_local_htmls(self,text):
+        save_name = time.strftime("%Y%m%d%H%M%S",time.localtime(time.time())) + '.html'
+        print(save_name)
+        try:
+            with open(
+                os.path.join('./html_results/', save_name), 'wb'
+            ) as html_file:
+                html_file.write(text)
+        except Exception as e:
+            print('[ERROR] in Article_spider.save_local_htmls():{}'.format(str(e)))
+
     def crawl(self,unfinished_item):
         print(unfinished_item)
         #对于单条学者item的爬取处理
         try:
-            scholar_db_id = unfinished_item[0]
+            #scholar_db_id = unfinished_item[0]
             full_name = unfinished_item[1:]
             for page_url in ScholarSearch(full_name).page_urls():
-                for sec in ParseHTML(url=page_url).sections():
-                    Article(sec).save_to_db(cur)
-            cur.execute("update scholars set is_added = 1 where id = {}".format(scholar_db_id))
+                parser = ParseHTML(url=page_url)
+                success = True
+                for sec in parser.sections():
+                    if not Article(sec).save_to_db(cur):
+                        success = False
+                if not success:
+                    self.save_local_htmls(text=parser.html)
+            #cur.execute("update scholars set is_added = 1 where id = {}".format(scholar_db_id))
         except Exception as e:
             print('ArticleSpider:\n\tERROR:{}'.format(str(e)))
         '''
