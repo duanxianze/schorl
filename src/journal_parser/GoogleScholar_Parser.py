@@ -25,14 +25,7 @@ class ParseHTML:
     '''
     def __init__(self, from_web=True, url=None, no_proxy_test=False,file_name=None):
         '''
-            from_web和url参数是需要一边爬取一边解析的情况，
-            若本地解析html则实例化时不需要传入
-
-            类属性包括:
-                self.soup:  BeautifulSoup解析模型生成的文档结构
-                self.html_text：soup中包含的text
-                self.rand_port：代理端口
-                self.ua：       代理实例对象
+            本地测试解析时from_web = False
         '''
         if from_web and url:
             #print("from web")
@@ -41,24 +34,13 @@ class ParseHTML:
             print("from local file")
             with open(file_name, 'rb') as f:
                 self.html = f.read()
-        '''
-        # write html
-        with open("test.html", "w+") as test:
-            test.write(self.html)
-        '''
         self.soup = BeautifulSoup(self.html,'lxml')
-        self.html_text = self.soup.text
-        self.rand_port = lambda x, y: randint(x, y)
-        self.ua = get_one_random_ua()
 
+    @except_or_none
     def sections(self):
         '''得到文章列表'''
-        sections = None
-        try:
-            sections = self.soup.select('.gs_r')
-        except Exception as e:
-            print("ERROR:ParseHTML:sections:{}".format(str(e)))
-        return sections
+        return self.soup.select('.gs_r')
+
 
 
 class Article:
@@ -126,43 +108,59 @@ class Article:
         # 本属性也只属于articles表临时列，成品可删除
         return self.sec.select('.gs_a')[0].text.split('-')[-1]
 
-
     def is_saved(self,cur):
         cur.execute(
             "select id from articles where google_id = '{}'".format(self.google_id)
         )
         return cur.fetchall()
 
-    def has_journal_temp(self,cur):
+    def db_item_values(self,cur):
         cur.execute(
-            "select journal_temp_info from articles where google_id = '{}'".format(self.google_id)
+            "select journal_temp_info,citations_count,citations_link,link from articles where google_id = '{}'".format(self.google_id)
         )
-        return cur.fetchall()[0][0]
+        return cur.fetchall()[0]
 
     def save_to_db(self,cur):
+        if not self.google_id:
+            print('Get google_id Error')
+            return False
         if self.is_saved(cur):
-            print('Article save error: "{}" already saved before.'.format(self.google_id))
-            if not self.has_journal_temp(cur):
-                if 'ieee' in self.journal_temp_info:
-                    #IEEE买了独享资源
+            print('"{}" already saved before.Updating...'.format(self.google_id))
+            if None in self.db_item_values(cur):
+                #假如数据库中该item存在空项，则更新
+                if self.journal_temp_info and self.citations_count and self.citations_link and self.link:
+                    #假如爬虫数据获取正常
                     cur.execute(
-                        "update articles set resource_type = 'PDF' where google_id = '{}'".format(self.google_id)
+                        "update articles set journal_temp_info = '{}' ,\
+                         citations_count = {},citations_link='{}',link='{}' \
+                         where google_id = '{}'".format(
+                            self.journal_temp_info,self.citations_count,\
+                            self.citations_link,self.link,self.google_id
+                        )
                     )
-                print('Get journal temp information: {}'.format(self.journal_temp_info))
-                cur.execute(
-                    "update articles set journal_temp_info = '{}' where google_id = '{}'".format(self.journal_temp_info,self.google_id)
-                )
-                print('update_journal ok!')
-            return
+                else:
+                    print('Upate Error:Got some methods whose value is null...')
+                    return False
+            print('Update all methods of {} ok!'.format(self.google_id))
+            return True
         try:
-            cur.execute(
-                "insert into articles (title, year, citations_count, citations_link, link, resource_type, resource_link, summary, google_id,journal_temp_info) "
-                "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
-                (self.title, self.year, self.citations_count, self.citations_link, self.link, self.resource_type, self.resource_link, self.summary, self.google_id,self.journal_temp_info)
-            )
-            self.show_in_cmd()
+            if self.title and self.year and self.citations_count and self.citations_link \
+                and self.link and self.summary and self.google_id and self.journal_temp_info:
+                cur.execute(
+                    "insert into articles (title, year, citations_count, citations_link, link, \
+                    resource_type, resource_link, summary, google_id,journal_temp_info) "
+                    "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
+                    (self.title, self.year, self.citations_count, self.citations_link, self.link, \
+                     self.resource_type, self.resource_link, self.summary, self.google_id,self.journal_temp_info)
+                )
+                self.show_in_cmd()
+                return True
+            else:
+                print('Insert Error:Some method is null...')
         except Exception as e:
             print('Article save error:{}'.format(str(e)))
+        return False
+
 
     def show_in_cmd(self):
         print('**************New Article Info******************')
@@ -181,7 +179,9 @@ class Article:
 
 
 if __name__=='__main__':
-    for sec in ParseHTML(from_web=False).sections():
-        #Article(sec).save_to_db(cur)
+    from db_config import cur
+    for sec in ParseHTML(from_web=False,file_name='scholar_articles.htm').sections():
+        Article(sec).save_to_db(cur)
+        #print(Article(sec).db_item_values(cur))
         #Article(sec).update_journal(cur)
-        Article(sec).show_in_cmd()
+        #Article(sec).show_in_cmd()
