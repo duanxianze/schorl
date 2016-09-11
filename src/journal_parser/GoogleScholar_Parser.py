@@ -161,8 +161,7 @@ class Article:
                     return False
             return True
         try:
-            if self.title and self.year and self.citations_link \
-                  and self.google_id and self.journal_temp_info:
+            if self.title and self.year and self.google_id and self.journal_temp_info:
                 cur.execute(
                     "insert into articles (title, year, citations_count, citations_link, link, \
                     resource_type, resource_link, summary, google_id,journal_temp_info) "
