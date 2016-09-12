@@ -9,11 +9,11 @@
 @description:
             获取articles的bibtex(bs4版本)
 """
-from db_config import conn,cur
+from db_config import cur
 from bs4 import BeautifulSoup
 from crawl_tools.request_with_proxy import request_with_proxy
 from multiprocessing.dummy import Pool as ThreadPool
-import time,random,os
+import time,random
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):

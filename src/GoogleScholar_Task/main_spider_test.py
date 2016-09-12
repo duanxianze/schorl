@@ -59,7 +59,7 @@ def run(file_name):
 
 if __name__=="__main__":
     from db_config import cur
-    Folder = './html_results/'
+    Folder = '../html_results/'
     print(os.listdir(Folder))
 
     for file_name in os.listdir(Folder):

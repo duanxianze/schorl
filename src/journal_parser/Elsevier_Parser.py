@@ -32,7 +32,7 @@ class Elsevier_Parser:
                 return link
         except Exception as e:
             print('[Error] in Elsevier_Parser.pdf_url():{}'.format(str(e)))
-            print('The url of issue is:{}\n'.format(link))
+            #print('The url of issue is:{}\n'.format(link))
             return None
 
 
