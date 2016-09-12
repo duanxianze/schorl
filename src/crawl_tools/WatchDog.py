@@ -8,6 +8,13 @@
 @create:    2016-08-19 14:33
 @description:
             The basic class of process monitor of one specific task.
+
+	* 是对于今后所有任务的通用模块
+	* 父进程是watchdog，子进程为特定的task
+	* 主类包含进程级别的task异常的处理方法，杀进程，重启进程，管理员邮件提示等
+	* 子类具体写task逻辑异常的识别，如数据量异常等
+	* 子类再写一些关键数据的打印，交互性的东西，以及数据的监控统计之类
+
 """
 from crawl_tools.Email import Email
 import psutil,os,subprocess

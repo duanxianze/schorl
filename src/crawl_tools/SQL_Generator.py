@@ -8,6 +8,12 @@
 @create:    2016-09-09 16:57
 @description:
             SQL generator with paras_dict initialized.
+
+	* 通用模块，包括sql解析至dict以及dict解析至sql，两个大方法
+	* 作为sql转储为python数据结构的一种方式
+	* 在抽象基类方法中将大幅使用
+	* 比如增加sql中where语句的条件，不转储只做字符串的处理难于实现，且代码较乱
+
 """
 
 class SQL_Generator:

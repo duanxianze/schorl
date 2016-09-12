@@ -8,6 +8,23 @@
 @create:    2016-09-04 0:32
 @description:
             selenium webdriver的pool类
+
+	* 通用模块
+	* 适用于大量需要selenium webdriver工作的环境
+	* webdriver启动关闭耗时耗配置，影响了爬虫的工作进度
+	* pool开启后：
+	*
+		* driver无任务时status为‘free’，等待调用
+		* 有任务status为‘busy’，会被检测器忽略
+
+	* 封装了函数：get_one_free_driver（wait=True）
+	*
+		* 返回一个闲置的driver对象
+		* wait模式开启，会等待闲置driver出现再返回
+		* wait模式未开启，仅检查当前，无则返回空列表
+
+	* 某项任务需要，调用get_one_free即可
+
 """
 import time
 from selenium import webdriver
