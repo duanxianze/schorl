@@ -139,7 +139,7 @@ class ScholarSearch:
         if pages>10:
             pages = 10
         '''10页以后意义不大，故大于10页取10页爬取'''
-        urls = ['https://scholar.google.co.uk/scholar?start={0}&q={1}&hl=en&lr=lang_en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
+        urls = ['http://scholar.google.com/scholar?start={0}&q={1}&hl=en&lr=lang_en&as_sdt=0,5'.format(p*10-10, self.full_name) for p in range(1, pages+1)]
         return urls
 
 

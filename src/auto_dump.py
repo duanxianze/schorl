@@ -4,7 +4,7 @@ auto_dump.py：
     用于自动导出备份数据库，并云同步至dropbox
 '''
 import os,time
-from crawl_tools.WacthDog import close_procs_by_keyword
+from crawl_tools.WatchDog import close_procs_by_keyword
 
 def auto_dump_sql(date_str):
     #dump_file_name = date_str + '.sql'
