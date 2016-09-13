@@ -10,8 +10,8 @@
             用于监测bibtex.py的工作情况
 """
 
-from crawl_tools.WatchDog import WatchDog
-from bibtex import *
+from ..crawl_tools.WatchDog import WatchDog
+from .bibtex import *
 
 
 class Bibtex_Spider_WatchDog(WatchDog):

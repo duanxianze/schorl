@@ -10,10 +10,12 @@
             主爬虫，创建初始的articles表条目
 """
 from math import ceil
-from journal_parser.GoogleScholar_Parser import *
 from multiprocessing.dummy import Pool as ThreadPool
-from db_config import cur
 import random,re,os,time
+
+from ..journal_parser.GoogleScholar_Parser import *
+from ..db_config import cur
+
 
 class ArticleSpider:
     '''

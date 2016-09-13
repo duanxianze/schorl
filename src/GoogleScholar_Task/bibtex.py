@@ -9,9 +9,10 @@
 @description:
             获取articles的bibtex(bs4版本)
 """
-from db_config import cur
+from ..db_config import cur
+from ..crawl_tools.request_with_proxy import request_with_proxy
+
 from bs4 import BeautifulSoup
-from crawl_tools.request_with_proxy import request_with_proxy
 from multiprocessing.dummy import Pool as ThreadPool
 import time,random
 

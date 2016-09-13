@@ -11,9 +11,8 @@
             若delta数据长时为零，则邮件通知管理员
 """
 
-from crawl_tools.WatchDog import WatchDog
-from ArticlesSpider import *
-
+from ..crawl_tools.WatchDog import WatchDog
+from .ArticlesSpider import *
 
 class Artciles_Spider_WatchDog(WatchDog):
     def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
