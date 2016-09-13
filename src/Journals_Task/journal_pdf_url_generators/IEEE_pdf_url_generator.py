@@ -9,16 +9,8 @@
 @description:
             专门为IEEE出版社的pdf下载模块
 """
-import sys,os
-up_level_N = 2
-SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
-root_dir = SCRIPT_DIR
-for i in range(up_level_N):
-    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
-sys.path.append(root_dir)
-
 from journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_ieee_pdf_link
-from PdfUrlGenerator import *
+from journal_pdf_url_generators.PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -77,15 +69,10 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
     def __init__(self):
         PdfUrlGenerator.__init__(self)
 
-    def get_unfinished_items(self,length):
-        return self._get_unfinished_items(
-            query_sql = self.query_sql,
-            max_id_where_sqls=[
-                ['resource_link','is','null'],
-                ['journal_temp_info','like','%ieee%']
-            ],
-            length = length
-        )
+    def get_unfinished_items(self):
+        ret = self._get_unfinished_items(self.query_sql)
+        print('IEEE_pdf_url_generator:\n\tGot {} new items in limit {}...'.format(len(ret),self.query_limit))
+        return ret
 
     def generate(self,unfinished_item):
         #从title出发，反馈pdf_url给db
@@ -94,12 +81,12 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
             get_pdf_url_func = get_ieee_pdf_url_func
         )
 
-    def run(self,thread_counts=16,visual=True,limit=1000,length=1000):
+    def run(self,thread_counts=16,visual=True,limit=1000):
         self.query_limit = limit
         self._run(thread_counts,visual)
         self.query_sql = "select title,google_id,pdf_temp_url from articles where resource_link is null\
                     and journal_temp_info like '%ieee%' ORDER by id desc limit {}".format(limit)
-        self._task_thread_pool.map(self.generate,self.get_unfinished_items(length))
+        self._task_thread_pool.map(self.generate,self.get_unfinished_items())
         self._close()
 
 
@@ -113,9 +100,4 @@ if __name__=='__main__':
     else:
         close_procs_by_keyword(keyword='phantom')
 
-    IEEE_pdf_url_generator().run(
-        thread_counts=8,
-        visual=visual,
-        limit=1000000,
-        length=100000
-    )
+    IEEE_pdf_url_generator().run(thread_counts=8,visual=visual,limit=1000)
