@@ -9,8 +9,16 @@
 @description:
             专门为IEEE出版社的pdf下载模块
 """
+import sys,os
+up_level_N = 2
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
 from journal_parser.IEEE_Parser import IEEE_HTML_Parser,Article,get_ieee_pdf_link
-from journal_pdf_url_generators.PdfUrlGenerator import *
+from PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC

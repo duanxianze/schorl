@@ -10,8 +10,16 @@
             从db中获得elsevier杂志社的文章title集合，
             生成pdf_url反馈给db
 """
+import sys,os
+up_level_N = 2
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
 from journal_parser.Elsevier_Parser import Elsevier_Parser
-from journal_pdf_url_generators.PdfUrlGenerator import *
+from PdfUrlGenerator import *
 
 def get_elsevier_pdf_url_func(driver,unfinished_item):
     #print('url:{}'.format(unfinished_item[0]))

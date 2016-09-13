@@ -9,8 +9,16 @@
 @description:
             监控获取Elsevier生成pdf_url的任务
 """
+import sys,os
+up_level_N = 2
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
 from crawl_tools.WatchDog import WatchDog
-from journal_pdf_url_generators.Elsevier_pdf_url_generator import *
+from Elsevier_pdf_url_generator import *
 import time
 
 class Elsevier_Generator_Watchdog(WatchDog):

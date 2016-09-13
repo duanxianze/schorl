@@ -9,6 +9,14 @@
 @description:
             谷歌专利的pdf下载器
 """
+import sys,os
+up_level_N = 2
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
 from db_config import cur
 from pdf_download import PdfDownloader,DOWNLOAD_FOLDER
 from multiprocessing.dummy import Pool as ThreadPool
