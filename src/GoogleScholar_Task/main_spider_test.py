@@ -9,9 +9,14 @@
 @description:
             --
 """
+import os,sys
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
 from journal_parser.GoogleScholar_Parser import ParseHTML,Article
 from crawl_tools.request_with_proxy import request_with_proxy
-import os
+
 
 class GoogleScholarParserTest:
     def __init__(self,name,save_folder):

@@ -9,9 +9,13 @@
 @description:
             用于监测bibtex.py的工作情况
 """
+import sys,os
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from ..crawl_tools.WatchDog import WatchDog
-from .bibtex import *
+from crawl_tools.WatchDog import WatchDog
+from GoogleScholar_Task.bibtex import *
 
 
 class Bibtex_Spider_WatchDog(WatchDog):

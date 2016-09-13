@@ -11,8 +11,13 @@
             若delta数据长时为零，则邮件通知管理员
 """
 
-from ..crawl_tools.WatchDog import WatchDog
-from .ArticlesSpider import *
+import sys,os
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
+from crawl_tools.WatchDog import WatchDog
+from GoogleScholar_Task.ArticlesSpider import *
 
 class Artciles_Spider_WatchDog(WatchDog):
     def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
