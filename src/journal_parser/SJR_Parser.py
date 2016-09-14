@@ -26,6 +26,7 @@ class JournalRankPageParser:
             '/html/body/div[6]/div[7]/table/tbody'
         ).find_elements_by_tag_name('tr')
 
+
 class RankJournal:
     def __init__(self,sec):
         self.sec = sec
@@ -38,7 +39,7 @@ class RankJournal:
             key = kv.split('=')[0]
             value = kv.split('=')[1]
             if key == 'q':
-                return value
+                return int(value)
 
     @property
     def name(self):
@@ -58,30 +59,89 @@ class RankJournal:
         print('sjr_id:{}'.format(self.sjr_id))
         print('open_access:{}'.format(self.open_access))
 
-    def save_to_db(self):
-        #记得最后存关联表
-        pass
+    @property
+    def is_saved(self):
+        cur.execute(
+            "select sjr_id from journal where sjr_id = {}"\
+                .format(self.sjr_id)
+        )
+        return cur.fetchall()
+
+    def save_to_db(self,cur,category_sjr_id):
+        self.show_in_cmd()
+        if None in (self.name,self.sjr_id,self.open_access):
+            return False
+        if not self.is_saved:
+            try:
+                cur.execute(
+                    'insert into journal(name,sjr_id,open_access)'
+                    'values(%s,%s,%s)',
+                    (self.name,self.sjr_id,self.open_access)
+                )
+                self.save_category_journal(category_sjr_id,self.sjr_id)
+            except Exception as e:
+                print('[ERROR]:RankJournal:save_to_db:{}'.format(str(e)))
+        else:
+            print('RankJournal:{} Already saved...'.format(self.sjr_id))
+
+    def save_category_journal(self,
+            category_sjr_id,journal_sjr_id):
+        #print(category_sjr_id,journal_sjr_id)
+        #注意，这里就不做unique判断了，作为save_to_db的子模块
+        cur.execute(
+            'insert into journal_category(journal_id,category_id)'
+            'values(%s,%s)',
+            (journal_sjr_id,category_sjr_id)
+        )
+
+
+
 
 class JournalDetailPageParser:
     pass
 
 
 class DetailJournal:
+    def __init__(self):
+        pass
+
+    @property
+    def h_index(self):
+        return
+
+    @property
+    def country(self):
+        return
+
+    @property
+    def issn(self):
+        return
+
+    @property
+    def publisher_id(self):
+        return
+
+
     def update_db_journal(self):
         pass
 
-    def save_publisher_journal(self):
+    def save_publisher(self):
         pass
+
+
+
 
 
 if __name__=="__main__":
     from selenium import webdriver
+    from src.db_config import cur
+    category_id = 1101
     for sec in  JournalRankPageParser(
         area_id = 1100,
-        category_id = 1101,
+        category_id = category_id,
         driver = webdriver.Chrome()
     ).secs:
         journal = RankJournal(sec)
-        journal.show_in_cmd()
-        print(sec.text)
+        journal.save_to_db(cur,category_id)
+        #print(sec.text)
         print('----------')
