@@ -47,7 +47,8 @@ def test_port(port_num):
     sleep:   运行前等待时间
 返回请求结果
 '''
-def request_with_proxy(url, timeout=30, use_ss=False, sleep=10, no_proxy_test=False):
+def request_with_proxy(url, timeout=10, use_ss=False, 
+        sleep=10, no_proxy_test=False):
     headers = {'User-Agent': get_one_random_ua()}
     if no_proxy_test:
         return requests.get(url, headers=headers, timeout=timeout)
