@@ -80,9 +80,9 @@ class RankJournal:
                 )
                 self.save_category_journal(category_sjr_id,self.sjr_id)
             except Exception as e:
-                print('[ERROR]:RankJournal:save_to_db:{}'.format(str(e)))
+                print('[ERROR] in RankJournal:save_to_db:{}'.format(str(e)))
         else:
-            print('RankJournal:{} Already saved...'.format(self.sjr_id))
+            print('[ERROR] in RankJournal: {} Already saved...'.format(self.sjr_id))
 
     def save_category_journal(self,
             category_sjr_id,journal_sjr_id):
