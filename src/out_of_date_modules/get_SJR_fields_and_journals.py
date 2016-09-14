@@ -50,7 +50,7 @@ hrefs = hrefs[1:]
 '''
 
 cur.execute(
-    'select name,sjr_id,id from sjr_area'
+    'select name,sjr_id from sjr_area'
 )
 data = cur.fetchall()
 print(data)
@@ -61,11 +61,10 @@ driver = webdriver.Chrome()
 '''以下是未得到category表前的执行代码，之后执行会触发sjr_id的unique约束'''
 for item in data:
     #print(item)
-    name = item[0]
-    sjr_id = item[1]
-    area_db_id = item[2]
-    print(sjr_id,area_db_id,name)
-    href = 'http://www.scimagojr.com/journalrank.php?area={}'.format(sjr_id)
+    area_name = item[0]
+    area_sjr_id = item[1]
+    print(area_sjr_id,area_name)
+    href = 'http://www.scimagojr.com/journalrank.php?area={}'.format(area_sjr_id)
     driver.get(href)
     time.sleep(2)
     driver.find_element_by_xpath('//*[@id="rankingcontrols"]/div[2]').click()
@@ -80,10 +79,10 @@ for item in data:
         if category_id%100 == 0:
             #是area_id
             continue
-        print(category_name,category_href,category_id)
+        print(category_name,category_id)
         cur.execute(
             'insert into sjr_category(name,area_id,sjr_id)'
             'values(%s,%s,%s)',
-            (category_name,area_db_id,category_id)
+            (category_name,area_sjr_id,category_id)
         )
 

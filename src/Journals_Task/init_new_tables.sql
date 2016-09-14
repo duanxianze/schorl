@@ -14,7 +14,7 @@ CREATE TABLE SJR_Category
   SJR_id int,
   CONSTRAINT category_pk PRIMARY KEY(id),
   CONSTRAINT area_fk FOREIGN KEY(area_id)
-    REFERENCES SJR_Area(id)
+    REFERENCES SJR_Area(sjr_id)
 );
 
 -- 杂志和专业（多对多）
