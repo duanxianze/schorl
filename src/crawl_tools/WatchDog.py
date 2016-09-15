@@ -16,6 +16,12 @@
 	* 子类再写一些关键数据的打印，交互性的东西，以及数据的监控统计之类
 
 """
+
+import sys,os
+PACKAGE_PARENT = '..'
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
+
 from crawl_tools.Email import Email
 import psutil,os,subprocess
 
@@ -196,6 +202,4 @@ if __name__=="__main__":
         create_time = time.strftime('%Y-%m-%d %H:%M:%S',time_str)
         print create_time
     '''
-    for proc in get_prev_procs(grep='phantom'):
-        print(proc.name)
-        os.kill(proc.pid,9)
+    close_procs_by_keyword('chromedriver')
