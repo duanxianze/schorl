@@ -29,7 +29,8 @@ from multiprocessing.dummy import Pool as ThreadPool
 from crawl_tools.DriversPool import DriversPool
 from crawl_tools.Timer import Timer
 from crawl_tools.SQL_Generator import SQL_Generator,SQL_Parser
-from db_config import cur
+from src.db_config import new_db_cursor
+cur = new_db_cursor()
 import random
 
 class PdfUrlGenerator:

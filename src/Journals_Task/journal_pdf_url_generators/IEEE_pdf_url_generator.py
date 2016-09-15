@@ -14,6 +14,8 @@ from journal_pdf_url_generators.PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from src.db_config import new_db_cursor
+cur = new_db_cursor()
 
 class IEEE_Search_Model:
     def __init__(self,title,google_id,driver):
