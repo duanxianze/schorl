@@ -111,14 +111,13 @@ class RankJournal:
             print('RankJournal:\n\t[{},{}] relation saved before'.format(category_sjr_id,journal_sjr_id))
 
 
+import requests
 
 class JournalDetailPageParser:
-    pass
-
-
-class DetailJournal:
-    def __init__(self):
-        pass
+    def __init__(self,journal_sjr_id):
+        url = 'http://www.scimagojr.com/journalsearch.php?q={}&tip=sid&clean=0'.format(journal_sjr_id)
+        resp = requests.get(url)
+        print(resp.text)
 
     @property
     def h_index(self):
@@ -143,4 +142,6 @@ class DetailJournal:
     def save_publisher(self):
         pass
 
+if __name__=="__main__":
+    JournalDetailPageParser(journal_sjr_id=25208)
 
