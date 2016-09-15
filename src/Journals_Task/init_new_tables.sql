@@ -45,4 +45,11 @@ CREATE TABLE Publisher
   CONSTRAINT publisher_pk PRIMARY KEY(id)
 );
 
+CREATE TABLE Journal_Area(
+  id SERIAL,
+  journal_id int NOT NULL,
+  area_id int NOT NULL,
+  CONSTRAINT JA_pk PRIMARY KEY(id)
+);
+
 
