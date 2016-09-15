@@ -11,7 +11,7 @@
         该文件对某领域的杂志社排名页，以及杂志社详情页做解析
 """
 import time
-
+from src.db_config import new_db_cursor
 
 class JournalRankPageParser:
     def __init__(self,area_id,category_id,driver):
@@ -31,6 +31,7 @@ class RankJournal:
     def __init__(self,sec):
         self.sec = sec
         self.tit = sec.find_element_by_class_name('tit')
+        self.cur = new_db_cursor()
 
     @property
     def sjr_id(self):
@@ -59,41 +60,40 @@ class RankJournal:
         print('sjr_id:{}'.format(self.sjr_id))
         print('open_access:{}'.format(self.open_access))
 
-    @property
-    def is_saved(self):
+    def is_saved(self,sjr_id):
+        cur = self.cur
         cur.execute(
             "select sjr_id from journal where sjr_id = {}"\
-                .format(self.sjr_id)
+                .format(sjr_id)
         )
         return cur.fetchall()
 
-    def save_to_db(self,cur,category_sjr_id):
+    def save_to_db(self,category_sjr_id):
         self.show_in_cmd()
-        if None in (self.name,self.sjr_id,self.open_access):
+        sjr_id = self.sjr_id
+        if None in (self.name,sjr_id,self.open_access):
             return False
-        if not self.is_saved:
-            try:
-                cur.execute(
-                    'insert into journal(name,sjr_id,open_access)'
-                    'values(%s,%s,%s)',
-                    (self.name,self.sjr_id,self.open_access)
-                )
-                self.save_category_journal(category_sjr_id,self.sjr_id)
-            except Exception as e:
-                print('[ERROR] in RankJournal:save_to_db:{}'.format(str(e)))
+        if not self.is_saved(sjr_id):
+            self.cur.execute(
+                'insert into journal(name,sjr_id,open_access)'
+                'values(%s,%s,%s)',
+                (self.name,sjr_id,self.open_access)
+            )
+            self.save_category_journal(category_sjr_id,sjr_id)
         else:
-            print('[ERROR] in RankJournal: {} Already saved...'.format(self.sjr_id))
+            print('{} [ERROR] in RankJournal: {} Already saved...'.format(category_sjr_id,self.sjr_id))
+        self.cur.close()
+
 
     def save_category_journal(self,
             category_sjr_id,journal_sjr_id):
         #print(category_sjr_id,journal_sjr_id)
         #注意，这里就不做unique判断了，作为save_to_db的子模块
-        cur.execute(
+        self.cur.execute(
             'insert into journal_category(journal_id,category_id)'
             'values(%s,%s)',
             (journal_sjr_id,category_sjr_id)
         )
-
 
 
 
@@ -131,17 +131,3 @@ class DetailJournal:
 
 
 
-
-if __name__=="__main__":
-    from selenium import webdriver
-    from src.db_config import cur
-    category_id = 1101
-    for sec in  JournalRankPageParser(
-        area_id = 1100,
-        category_id = category_id,
-        driver = webdriver.Chrome()
-    ).secs:
-        journal = RankJournal(sec)
-        journal.save_to_db(cur,category_id)
-        #print(sec.text)
-        print('----------')
