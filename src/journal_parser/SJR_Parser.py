@@ -68,8 +68,18 @@ class RankJournal:
         )
         return cur.fetchall()
 
+    def is_saved_cj_relation(self,category_sjr_id,journal_sjr_id):
+        cur = self.cur
+        sql = 'select count(*) from journal_category\
+             where category_id={} and journal_id={}'\
+                .format(category_sjr_id,journal_sjr_id)
+        #print(sql)
+        cur.execute(sql)
+        amount = cur.fetchall()[0][0]
+        return amount
+
+
     def save_to_db(self,category_sjr_id):
-        self.show_in_cmd()
         sjr_id = self.sjr_id
         if None in (self.name,sjr_id,self.open_access):
             return False
@@ -79,21 +89,26 @@ class RankJournal:
                 'values(%s,%s,%s)',
                 (self.name,sjr_id,self.open_access)
             )
-            self.save_category_journal(category_sjr_id,sjr_id)
+            print('********New journal info***********')
+            self.show_in_cmd()
         else:
             print('{} [ERROR] in RankJournal: {} Already saved...'.format(category_sjr_id,self.sjr_id))
+        #关系表在journal表之后存
+        self.save_category_journal(category_sjr_id,sjr_id)
         self.cur.close()
 
 
     def save_category_journal(self,
             category_sjr_id,journal_sjr_id):
-        #print(category_sjr_id,journal_sjr_id)
-        #注意，这里就不做unique判断了，作为save_to_db的子模块
-        self.cur.execute(
-            'insert into journal_category(journal_id,category_id)'
-            'values(%s,%s)',
-            (journal_sjr_id,category_sjr_id)
-        )
+        if not self.is_saved_cj_relation(category_sjr_id,
+                journal_sjr_id = self.sjr_id):
+            self.cur.execute(
+                'insert into journal_category(journal_id,category_id)'
+                'values(%s,%s)',
+                (journal_sjr_id,category_sjr_id)
+            )
+        else:
+            print('RankJournal:\n\t[{},{}] relation saved before'.format(category_sjr_id,journal_sjr_id))
 
 
 
@@ -127,7 +142,5 @@ class DetailJournal:
 
     def save_publisher(self):
         pass
-
-
 
 
