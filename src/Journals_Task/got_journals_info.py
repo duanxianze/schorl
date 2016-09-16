@@ -17,18 +17,13 @@ from src.db_config import new_db_cursor
 
 
 class JournalInfoGenerator:
-    def __init__(self,drivers_cot = 8):
-        if drivers_cot>0:
-            self.thread_pool = ThreadPool(drivers_cot)
-            self.drivers_pool = DriversPool(
-                visual=False,    size=drivers_cot,
-                launch_with_thread_pool=self.thread_pool,
-            )
+    def __init__(self):
+        pass
 
     def get_db_category_ids(self):
         cur = new_db_cursor()
         cur.execute(
-            'select sjr_id,area_id from sjr_category'
+            'select sjr_id,area_id from sjr_category ORDER by id desc'
         )
         return cur.fetchall()
 
@@ -69,12 +64,28 @@ class JournalInfoGenerator:
         driverObj.status = 'free'
 
     def get_db_journal_ids(self):
-        pass
+        cur = new_db_cursor()
+        cur.execute(
+            #'select sjr_id from journal WHERE is_crawled=FALSE '
+            'select sjr_id from journal'
+        )
+        journal_ids = cur.fetchall()
+        cur.close()
+        return journal_ids
 
     def get_detail_journal_info(self,db_item):
-        pass
+        JournalDetailPageParser(journal_sjr_id=db_item[0])\
+            .save_journal_area()
 
-    def run(self,mode):
+    def run(self,mode,drivers_cot=8,thread_cot=8):
+        self.thread_pool = ThreadPool(thread_cot)
+        if mode==2:
+            drivers_cot = 0
+        if drivers_cot>0:
+            self.drivers_pool = DriversPool(
+                visual=False,    size=drivers_cot,
+                launch_with_thread_pool=self.thread_pool,
+            )
         if mode==1:
             #mode 1 是在第一阶段,rank页journal没有全拿下来之前
             #主要是为了初始化生成条目
@@ -85,7 +96,10 @@ class JournalInfoGenerator:
         elif mode==2:
             #mode 2 第二阶段，进入详情页拿信息
             #出发点是从阶段一中的条目开始
-            pass
+            self.thread_pool.map(
+                func = self.get_detail_journal_info,
+                iterable = self.get_db_journal_ids()
+            )
         else:
             pass
 
@@ -93,7 +107,7 @@ class JournalInfoGenerator:
 if __name__=="__main__":
     from src.crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('phantom')
-    ge = JournalInfoGenerator(drivers_cot=8)
+    ge = JournalInfoGenerator()
     #ge.is_crawled_in_rank_page(category_id=3403)
-    ge.run(mode=1)
+    ge.run(mode=2,drivers_cot=0,thread_cot=32)
 
