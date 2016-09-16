@@ -9,7 +9,6 @@
 import requests,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
-import os
 from crawl_tools.ua_pool import get_one_random_ua
 from db_config import cur
 
