@@ -39,12 +39,12 @@ class Elsevier_Parser:
             return None
 
     @property
-    def sciencedirect_spider(self):
+    def keywords(self):
         keywords_locate = None
         try:
             keywords_locate = self.soup.find_all(class_='keyword')
             for i in keywords_locate:
-                keywords = keywords + \
+                self.__keywords = self.__keywords + \
                     '{}, '.format(i.get_text().replace(';', ', '))
         except:
             pass
