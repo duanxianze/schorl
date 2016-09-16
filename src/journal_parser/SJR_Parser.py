@@ -10,8 +10,10 @@
         SJR是罗列各领域杂志社的站点，
         该文件对某领域的杂志社排名页，以及杂志社详情页做解析
 """
-import time
+import time,requests
 from src.db_config import new_db_cursor
+from bs4 import BeautifulSoup
+from src.crawl_tools.ua_pool import get_one_random_ua
 
 class JournalRankPageParser:
     def __init__(self,area_id,category_id,driver):
@@ -58,7 +60,7 @@ class RankJournal:
     def show_in_cmd(self):
         print('name:{}'.format(self.name))
         print('sjr_id:{}'.format(self.sjr_id))
-        print('open_access:{}'.format(self.open_access))
+        #print('open_access:{}'.format(self.open_access))
 
     def is_saved(self,sjr_id):
         cur = self.cur
@@ -111,37 +113,92 @@ class RankJournal:
             print('RankJournal:\n\t[{},{}] relation saved before'.format(category_sjr_id,journal_sjr_id))
 
 
-import requests
-
 class JournalDetailPageParser:
     def __init__(self,journal_sjr_id):
         url = 'http://www.scimagojr.com/journalsearch.php?q={}&tip=sid&clean=0'.format(journal_sjr_id)
-        resp = requests.get(url)
-        print(resp.text)
+        print(url)
+        resp = requests.get(url,
+            headers = {'User-Agent':get_one_random_ua()}
+        )
+        self.journal_id = journal_sjr_id
+        self.soup = BeautifulSoup(resp.text,'lxml')
+        self.trs = self.soup.find('tbody').find_all('tr')
+        self.info_dict = {}
+        for tr in self.trs:
+            tds = tr.find_all('td')
+            self.info_dict[tds[0].text] = tds[1]
+        #print(self.info_dict.keys())
+        self.cur = new_db_cursor()
 
     @property
     def h_index(self):
-        return
+        return int(self.soup.select('.hindexnumber')[0].text)
 
     @property
     def country(self):
-        return
+        return self.info_dict['Country'].text
 
     @property
     def issn(self):
-        return
+        return self.info_dict['ISSN'].text.split(',')[0]
 
     @property
-    def publisher_id(self):
-        return
+    def publisher(self):
+        return self.info_dict['Publisher'].text
 
+    @property
+    def site_source(self):
+        if 'Scope' in self.info_dict.keys():
+            return self.info_dict['Scope'].find('a')['href']
+        else:
+            return None
+
+    @property
+    def area_sjr_ids(self):
+        a_tags = self.info_dict['Subject Area'].select('a')
+        return list(map(lambda x:int(x['href'].split('=')[-1]),a_tags))
+
+    def show_in_cmd(self):
+        print('journal_id:{}'.format(self.journal_id))
+        print('h_index:{}'.format(self.h_index))
+        print('country:{}'.format(self.country))
+        print('issn:{}'.format(self.issn))
+        print('site_source:{}'.format(self.site_source))
+        print('publisher:{}'.format(self.publisher))
+        print('area_sjr_ids:{}'.format(self.area_sjr_ids))
+
+    def is_saved_journal_area(self,journal_sjr_id,area_sjr_id):
+        self.cur.execute(
+            'select count(*) from journal_area WHERE journal_id={} and area_id={}'\
+                .format(journal_sjr_id,area_sjr_id)
+        )
+        return self.cur.fetchall()[0][0]
+
+    def save_journal_area(self):
+        #保存journal和area的关系到关联表
+        journal_sjr_id = self.journal_id
+        for area_sjr_id in self.area_sjr_ids:
+            if self.is_saved_journal_area(journal_sjr_id,area_sjr_id):
+                print('JournalDetailPageParser:\n\t[Error] The relation[{},{}]saved before'\
+                      .format(journal_sjr_id,area_sjr_id))
+                continue
+            self.cur.execute(
+                'insert into journal_area(journal_id, area_id)'
+                'VALUES (%s,%s)',
+                (journal_sjr_id,area_sjr_id)
+            )
+            print('JournalDetailPageParser:\n\t[Success] The relation[{},{}] saved ok!!'\
+                      .format(journal_sjr_id,area_sjr_id))
 
     def update_db_journal(self):
-        pass
-
-    def save_publisher(self):
-        pass
+        self.cur.execute(
+            'UPDATE journal SET publisher=%s,h_index=%s\
+              ,country=%s,issn=%s,site_source=%s,is_crawled=%s WHERE sjr_id = %s',
+            (self.publisher,self.h_index,self.country,\
+                self.issn,self.site_source,True,self.journal_id)
+        )
+        print('{} update ok '.format(self.journal_id))
 
 if __name__=="__main__":
-    JournalDetailPageParser(journal_sjr_id=25208)
-
+    jdp = JournalDetailPageParser(journal_sjr_id=25208)
+    jdp.show_in_cmd()
