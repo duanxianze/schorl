@@ -7,11 +7,12 @@
 @editor:    PyCharm
 @create:    2016-09-17 2:20
 @description:
-            The main entrance of Journal Tasks started with different Major.
+        The main entrance of Journal Tasks started with different Major.
 
-            本模块由major关键词出发，首先匹配数据表中的专业范围（包括大类和小类），
-            通过该范围来确定其杂志社范围。
-            需要注意的是，需要根据专业特性来微调参数。
+        本模块由major关键词出发，首先匹配数据表中的专业范围（包括大类和小类），
+        通过该范围来确定其杂志社范围。
+        需要注意的是，需要根据专业特性
+        （杂志社的分布情况，专业分支交叉情况）来微调参数。
 """
 
 from src.db_config import new_db_cursor
@@ -47,7 +48,7 @@ class MajorEntrance:
             index_by_category=True,single_area_relation=True):
         '''
             注意此处的几个参数，需要根据领域特性微调
-            1.假如领域分支较多，建议选index_by_area（通过大类找杂志）,反之则用小类找
+            1.假如领域分支较笼统，建议选index_by_area（通过大类找杂志）,反之则用小类找
             2.是否需要非跨领域的杂志社，可选参数single_area_relation
         '''
         if index_by_area:
@@ -97,34 +98,34 @@ def categories_of_specific_area(area_sjr_id):
 def journals_of_specific_category(category_sjr_id,single_area_relation):
     #假如多于十个则按h_index排出前十
     if single_area_relation:
-        single_area_relation_word = 'and area_relation_cot=1'
+        single_area_relation_word = ' area_relation_cot=1 and '
     else:
         single_area_relation_word = ''
     cur = new_db_cursor()
     cur.execute(
         'select name,sjr_id,h_index,site_source from journal \
-          WHERE sjr_id IN(\
+          WHERE{}sjr_id IN(\
             select journal_id from journal_category \
             WHERE site_source is not null and category_id={}\
-        ) {} ORDER by h_index desc limit 10'.format(
-            category_sjr_id,single_area_relation_word
+        ) ORDER by h_index desc limit 10'.format(
+            single_area_relation_word,category_sjr_id
         )
     )
     return cur.fetchall()
 
 def journals_of_specific_area(area_sjr_id,single_area_relation):
     if single_area_relation:
-        single_area_relation_word = 'and area_relation_cot=1'
+        single_area_relation_word = ' area_relation_cot=1 and '
     else:
         single_area_relation_word = ''
     cur = new_db_cursor()
     cur.execute(
         'select name,sjr_id,h_index,site_source from journal \
-          WHERE sjr_id IN(\
+          WHERE{}sjr_id IN(\
             select journal_id from journal_area \
             WHERE site_source is not null and area_id={}\
-        ) {} ORDER by h_index desc limit 50'.format(
-            area_sjr_id,single_area_relation_word
+        ) ORDER by h_index desc limit 50'.format(
+            single_area_relation_word,area_sjr_id
         )
     )
     return cur.fetchall()
