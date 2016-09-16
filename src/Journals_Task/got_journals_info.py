@@ -44,9 +44,9 @@ class JournalInfoGenerator:
 
     def is_crawled_in_detail_page(self,journal_sjr_id):
         '''
-            判断某杂志社与area的关联表是否已经见过
-            搜索category和journal的关联表
-            若结果数多于10则说明已爬（多了也不需要）
+            判断某杂志社与area的关联表是否已经建过
+            搜索category和area的关联表
+            若结果数非零则说明已爬（爬过必会有一个或以上）
         '''
         return self.area_relation_cot(journal_sjr_id)>0
 
@@ -138,7 +138,6 @@ class JournalInfoGenerator:
             )
         else:
             pass
-
 
 if __name__=="__main__":
     from src.crawl_tools.WatchDog import close_procs_by_keyword
