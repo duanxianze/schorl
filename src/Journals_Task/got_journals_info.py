@@ -7,14 +7,14 @@
 @editor:    PyCharm
 @create:    2016-09-15 14:30
 @description:
-            ??
+            获取所有SJRD的journal信息
 """
 
 from src.journal_parser.SJR_Parser import *
 from src.crawl_tools.DriversPool import DriversPool
 from multiprocessing.dummy import Pool as ThreadPool
 from src.db_config import new_db_cursor
-
+import random
 
 class JournalInfoGenerator:
     def __init__(self):
@@ -38,9 +38,17 @@ class JournalInfoGenerator:
         #print(sql)
         cur.execute(sql)
         amount = cur.fetchall()[0][0]
-        print('JournalInfoGenerator:\n\tCategory_id:{},Amount:{}'.format(category_id,amount))
+        print('JournalInfoGenerator:\n\tCategory_id:{}, Journal Amount:{}'.format(category_id,amount))
         cur.close()
         return amount>10
+
+    def is_crawled_in_detail_page(self,journal_sjr_id):
+        '''
+            判断某杂志社与area的关联表是否已经见过
+            搜索category和journal的关联表
+            若结果数多于10则说明已爬（多了也不需要）
+        '''
+        return self.area_relation_cot(journal_sjr_id)>0
 
     def get_rank_journal_info(self,db_item):
         #print(db_item)
@@ -67,14 +75,40 @@ class JournalInfoGenerator:
         cur = new_db_cursor()
         cur.execute(
             #'select sjr_id from journal WHERE is_crawled=FALSE '
-            'select sjr_id from journal'
+            'select sjr_id from journal WHERE area_relation_cot=0'
         )
         journal_ids = cur.fetchall()
         cur.close()
         return journal_ids
 
+    def area_relation_cot(self,journal_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select count(*) from journal_area WHERE journal_id={}'.format(journal_id)
+        )
+        amount = cur.fetchall()[0][0]
+        cur.close()
+        return amount
+
+    def update_area_relation_cot(self,journal_id):
+        amount = self.area_relation_cot(journal_id)
+        print(amount,journal_id)
+        cur = new_db_cursor()
+        cur.execute(
+            'update journal set area_relation_cot={} where sjr_id={}'.format(amount,journal_id)
+        )
+        cur.close()
+
     def get_detail_journal_info(self,db_item):
-        JournalDetailPageParser(journal_sjr_id=db_item[0])\
+        journal_sjr_id=db_item[0]
+        '''
+        self.update_area_relation_cot(journal_sjr_id)
+        '''
+        if self.is_crawled_in_detail_page(journal_sjr_id):
+            print('[Relations crawled] {}'\
+                  .format(journal_sjr_id))
+            return
+        JournalDetailPageParser(journal_sjr_id)\
             .save_journal_area()
 
     def run(self,mode,drivers_cot=8,thread_cot=8):
@@ -89,9 +123,11 @@ class JournalInfoGenerator:
         if mode==1:
             #mode 1 是在第一阶段,rank页journal没有全拿下来之前
             #主要是为了初始化生成条目
+            db_items = self.get_db_category_ids()
+            db_items = random.shuffle(db_items)
             self.thread_pool.map(
                 func = self.get_rank_journal_info,
-                iterable = self.get_db_category_ids()
+                iterable = db_items
             )
         elif mode==2:
             #mode 2 第二阶段，进入详情页拿信息
@@ -109,5 +145,5 @@ if __name__=="__main__":
     close_procs_by_keyword('phantom')
     ge = JournalInfoGenerator()
     #ge.is_crawled_in_rank_page(category_id=3403)
-    ge.run(mode=2,drivers_cot=0,thread_cot=32)
+    ge.run(mode=2,drivers_cot=0,thread_cot=16)
 

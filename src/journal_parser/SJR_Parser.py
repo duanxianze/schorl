@@ -110,13 +110,14 @@ class RankJournal:
                 (journal_sjr_id,category_sjr_id)
             )
         else:
-            print('RankJournal:\n\t[{},{}] relation saved before'.format(category_sjr_id,journal_sjr_id))
+            print('RankJournal:\n\t[{},{}] relation saved before'\
+                  .format(category_sjr_id,journal_sjr_id))
 
 
 class JournalDetailPageParser:
     def __init__(self,journal_sjr_id):
         url = 'http://www.scimagojr.com/journalsearch.php?q={}&tip=sid&clean=0'.format(journal_sjr_id)
-        print(url)
+        #print(url)
         resp = requests.get(url,
             headers = {'User-Agent':get_one_random_ua()}
         )
