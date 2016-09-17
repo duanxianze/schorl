@@ -38,10 +38,20 @@ class MajorEntrance:
     @property
     def possible_categories(self):
         cur = self.cur
-        cur.execute(
-            "select name,sjr_id,area_id from sjr_category \
-                WHERE name like '%{}%'".format(self.major_keyword)
-        )
+        possible_areas = self.possible_areas
+        if len(possible_areas)==1:
+            #假如area已经定位成功，则返回该area下的所有子类
+            cur.execute(
+                "select name,sjr_id,area_id from sjr_category \
+                    WHERE area_id={}".format(possible_areas[0][1])
+            )
+        else:
+            #若area未定位成功，模糊匹配category表
+            #area搜索结果数为0，或>1都是失败的情况
+            cur.execute(
+                "select name,sjr_id,area_id from sjr_category \
+                    WHERE name like '%{}%'".format(self.major_keyword)
+            )
         return cur.fetchall()
 
     def get_possible_journals(self,index_by_area=True,
@@ -103,7 +113,7 @@ def journals_of_specific_category(category_sjr_id,single_area_relation):
         single_area_relation_word = ''
     cur = new_db_cursor()
     cur.execute(
-        'select name,sjr_id,h_index,site_source from journal \
+        'select name,open_access,sjr_id,h_index,site_source from journal \
           WHERE{}sjr_id IN(\
             select journal_id from journal_category \
             WHERE site_source is not null and category_id={}\
@@ -120,7 +130,7 @@ def journals_of_specific_area(area_sjr_id,single_area_relation):
         single_area_relation_word = ''
     cur = new_db_cursor()
     cur.execute(
-        'select name,sjr_id,h_index,site_source from journal \
+        'select name,open_access,sjr_id,h_index,site_source from journal \
           WHERE{}sjr_id IN(\
             select journal_id from journal_area \
             WHERE site_source is not null and area_id={}\
@@ -159,7 +169,7 @@ def journals_of_specific_major(
 
 
 if __name__=="__main__":
-    major = MajorEntrance(major_keyword='Computer')
+    major = MajorEntrance(major_keyword='Computer Science')
     major.show_in_cmd()
     major.get_possible_journals(
         single_area_relation=True,
@@ -167,3 +177,4 @@ if __name__=="__main__":
         index_by_category=True
     )
     #非跨领域，且从小类分
+    # 因为前期目标是定位学者，杂志社领域精度越细越好
