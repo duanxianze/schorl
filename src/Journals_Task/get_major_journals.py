@@ -117,6 +117,7 @@ def journals_of_specific_category(category_sjr_id,single_area_relation):
           WHERE{}sjr_id IN(\
             select journal_id from journal_category \
             WHERE site_source is not null and category_id={}\
+              and is_crawled_all_article=FALSE \
         ) ORDER by h_index desc limit 10'.format(
             single_area_relation_word,category_sjr_id
         )
@@ -134,6 +135,7 @@ def journals_of_specific_area(area_sjr_id,single_area_relation):
           WHERE{}sjr_id IN(\
             select journal_id from journal_area \
             WHERE site_source is not null and area_id={}\
+              and is_crawled_all_article=FALSE \
         ) ORDER by h_index desc limit 50'.format(
             single_area_relation_word,area_sjr_id
         )
@@ -176,5 +178,5 @@ if __name__=="__main__":
         index_by_area=False,
         index_by_category=True
     )
-    #非跨领域，且从小类分
+    # 非跨领域，且从小类分
     # 因为前期目标是定位学者，杂志社领域精度越细越好
