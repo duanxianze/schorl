@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-09-18 0:01
 @description:
-            特定领域下的杂志爬虫任务调度器，连接数据库和爬虫模块
+            特定领域下的杂志爬虫任务启动模块，调度数据库和爬虫
 """
 from src.Journals_Task.ExistedSpiders import *
 from src.Journals_Task.get_major_journals import MajorEntrance
