@@ -99,8 +99,8 @@ class ElsevierAricle:
     @property
     def title(self):
         tit = self.origin_title
-        if 'Original Research Article' == self.type:
-            tit = tit[:-25]
+        if self.type:
+            tit = tit[:-len(self.type)]
         return tit
 
     @property
