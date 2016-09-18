@@ -15,6 +15,7 @@ from src.journal_parser.IEEE_Parser import *
 class IEEE_Spider:
     def __init__(self):
         '''
-            http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83
+            sample_url: http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83
         '''
         pass
+
