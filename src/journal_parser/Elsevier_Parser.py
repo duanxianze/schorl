@@ -134,8 +134,9 @@ class ElsevierAricle:
     def type(self):
         if 'Original Research Article' in self.origin_title:
             return 'Original Research Article'
-        else:
-            return None
+        if 'Review Article' in self.origin_title:
+            return 'Review Article'
+        return None
 
     @property
     def link(self):

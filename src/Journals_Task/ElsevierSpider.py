@@ -13,15 +13,24 @@
 from src.journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
 from src.crawl_tools.request_with_proxy import request_with_random_ua
 from src.db_config import new_db_cursor
+from bs4 import BeautifulSoup
 
 class ElsevierSpider:
     '''
         sample_url: http://www.sciencedirect.com/science/journal/15708268
     '''
-    def __init__(self,start_url,journal_id):
-        self.url = start_url
+    def __init__(self,url,journal_id):
+        self.url = url
         self.journal_id = journal_id
         self.cur = new_db_cursor()
+        self.handle_sciencedirect_url()
+
+    def handle_sciencedirect_url(self):
+        if 'sciencedirect' not in self.url:
+            resp = request_with_random_ua(self.url)
+            self.url = BeautifulSoup(resp.text,'lxml')\
+                .select('.cta-generic')[-1].select_one('a')['href']
+        print(self.url)
 
     def mark_journal_ok(self):
         self.cur.execute(
@@ -47,15 +56,17 @@ class ElsevierSpider:
                     html_source = request_with_random_ua(volume_link).text
                 ).secs:
                     article = ElsevierAricle(sec)
-                    if article.type=='Original Research Article':
+                    if article.type:
                         print(article.title)
                         #article.save_to_db()
                     print('----------')
             print('===================')
-        self.mark_journal_ok()
+        #self.mark_journal_ok()
 
 
 if __name__=="__main__":
     ElsevierSpider(
-        start_url = 'http://www.sciencedirect.com/science/journal/15708268',
+        #url = 'http://www.sciencedirect.com/science/journal/15708268',
+        url = 'http://www.journals.elsevier.com/journal-of-network-and-computer-applications/',
+        journal_id = 123
     ).run()
