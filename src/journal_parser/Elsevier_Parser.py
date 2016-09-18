@@ -67,19 +67,30 @@ class ElsevierAllItemsPageParser:
     '''
     def __init__(self,html_source=None):
         self.soup = BeautifulSoup(html_source,'lxml')
+        self.nav = self.soup.select_one('#volumeIssueData')
 
     @property
     def secs(self):
         return self.soup.select_one('.articleList').select('.detail')
 
     @property
-    def volumes(self):
-        return self.soup.find_all('currentVolumes')
+    def volume_area_links(self):
+        volume_a_tags = self.nav.select('.volLink')
+        return list(map(lambda x:'http://www.sciencedirect.com'+x['href'],volume_a_tags))
+
+    @property
+    def volume_divs(self):
+        return self.nav.select('.currentVolumes')[1:]
+
+    @property
+    def volume_links(self):
+        return list(map(lambda x:'http://www.sciencedirect.com'+x.select_one('a')['href'],self.volume_divs))
 
 
 class ElsevierAricle:
     def __init__(self,sec):
         self.sec = sec
+        self.cur = new_db_cursor()
 
     @property
     def origin_title(self):
