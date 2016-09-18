@@ -12,13 +12,22 @@
 """
 from src.journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
 from src.crawl_tools.request_with_proxy import request_with_random_ua
+from src.db_config import new_db_cursor
 
 class ElsevierSpider:
     '''
         sample_url: http://www.sciencedirect.com/science/journal/15708268
     '''
-    def __init__(self,start_url):
+    def __init__(self,start_url,journal_id):
         self.url = start_url
+        self.journal_id = journal_id
+        self.cur = new_db_cursor()
+
+    def mark_journal_ok(self):
+        self.cur.execute(
+            'upadte journal set is_crawled_all_article = true\
+             where journal_id = {}'.format(self.journal_id)
+        )
 
     def run(self):
         #自动切换不同年代不同卷volume的页面，得到所有结果
@@ -43,7 +52,8 @@ class ElsevierSpider:
                         #article.save_to_db()
                     print('----------')
             print('===================')
-        print('ok')
+        self.mark_journal_ok()
+
 
 if __name__=="__main__":
     ElsevierSpider(
