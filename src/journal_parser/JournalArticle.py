@@ -23,7 +23,6 @@ class JournalArticle:
         self.link = None
         self.id_by_journal = None
         self.year = None
-        self.journal_id = None
 
     @property
     def resource_type(self):
@@ -57,13 +56,10 @@ class JournalArticle:
         pass
 
     def show_in_cmd(self):
-        print('origin_title:\t{}'.format(self.origin_title))
         print('title:\t{}'.format(self.title))
         print('abstract:\t{}'.format(self.abstract))
         print('pdf_url:\t{}'.format(self.pdf_url))
         print('authors:\t{}'.format(self.authors))
-        print('type:\t{}'.format(self.type))
         print('link:\t{}'.format(self.link))
-        print('abstract_url:\t{}'.format(self.abstract_url))
         print('id_by_journal:\t{}'.format(self.id_by_journal))
         print('year:\t{}'.format(self.year))

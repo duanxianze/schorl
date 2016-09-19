@@ -10,7 +10,7 @@
             ??
 """
 from bs4 import BeautifulSoup
-from src.crawl_tools.request_with_proxy import request_with_random_ua
+from src.journal_parser.JournalArticle import JournalArticle
 
 class SpringParser:
     def __init__(self,html_source=None,from_web=True):
@@ -28,55 +28,49 @@ class SpringParser:
         return self.soup.select_one('#results-list').select('li')
 
 
-class SpringArticle:
-    def __init__(self,sec):
+class SpringArticle(JournalArticle):
+    def __init__(self,sec,journal_id):
         self.sec = sec
+        JournalArticle.__init__(self,journal_id)
+        self.generate_all_method()
 
-    @property
-    def title(self):
-        return self.sec.select_one('.title').text
+    def generate_all_method(self):
+        self.generate_pdf_url()
+        self.generate_link()
+        self.generate_abstract()
+        self.generate_authors()
+        self.generate_id_by_journal()
+        self.generate_title()
+        self.generate_year()
 
-    @property
-    def authors(self):
-        return list(map(lambda x:x.text,self.sec.select_one('.authors').select('a')))
+    def generate_title(self):
+        self.title = self.sec.select_one('.title').text
 
-    @property
-    def link(self):
-        return 'http://link.springer.com' + self.sec.select_one('.title')['href']
+    def generate_authors(self):
+        self.authors = list(map(lambda x:x.text,self.sec.select_one('.authors').select('a')))
 
-    @property
-    def abstract(self):
-        return self.sec.select_one('.snippet').text
+    def generate_link(self):
+        self.link = 'http://link.springer.com' + self.sec.select_one('.title')['href']
 
-    @property
-    def year(self):
-        return int(self.sec.select_one('.year').text[1:-1])
+    def generate_abstract(self):
+        self.abstract = self.sec.select_one('.snippet').text
 
-    @property
-    def pdf_url(self):
+    def generate_year(self):
+        self.year = int(self.sec.select_one('.year').text[1:-1])
+
+    def generate_pdf_url(self):
         try:
-            return 'http://link.springer.com'+self.sec.select_one('.pdf-link')['href']
+            self.pdf_url = 'http://link.springer.com'+self.sec.select_one('.pdf-link')['href']
         except:
-            return None
+            return
 
-    @property
-    def id_by_journal(self):
-        return
-
-    def show_in_cmd(self):
-        print('title:{}'.format(self.title))
-        print('authors:{}'.format(self.authors))
-        print('link:{}'.format(self.link))
-        print('abstract:{}'.format(self.abstract))
-        print('pdf_url:{}'.format(self.pdf_url))
-        print('year:{}'.format(self.year))
-        print('id_by_journal:{}'.format(self.id_by_journal))
-
+    def generate_id_by_journal(self):
+        self.id_by_journal = self.link.split('/')[-1]
 
 
 if __name__=="__main__":
     for sec in SpringParser(from_web=False).secs:
-        SpringArticle(sec).show_in_cmd()
+        SpringArticle(sec,'123').show_in_cmd()
         print('------------')
 
 
