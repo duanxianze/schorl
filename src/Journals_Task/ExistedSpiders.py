@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-09-18 0:51
 @description:
-            存放已经写好的publisher爬虫包
+            存放已经写好的publisher爬虫包指向以及配置
 """
 
 from src.Journals_Task.ElsevierSpider import *
@@ -16,7 +16,17 @@ from src.Journals_Task.IEEE_Spider import *
 
 
 EXISTED_SPIDERS = [
-    {'publisherSpiderClass':ElsevierSpider,  'publisherKeyword':'elsevier'},
-    {'publisherSpiderClass':SpringSpider,    'publisherKeyword':'springer'},
-    {'publisherSpiderClass':IEEE_Spider,     'publisherKeyword':'ieee'}
+    {
+        'publisherSpiderClass': ElsevierSpider,
+        'publisherKeywords':    ['elsevier','sciencedirect'],
+        'need_webdriver':       True
+    },{
+        'publisherSpiderClass': SpringSpider,
+        'publisherKeywords':    ['spring2er'],
+        'need_webdriver':       False
+    },{
+        'publisherSpiderClass': IEEE_Spider,
+        'publisherKeywords':    ['ieee'],
+        'need_webdriver':       False
+    }
 ]
