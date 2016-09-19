@@ -38,8 +38,8 @@ class MajorTaskManager:
 
     def launch_journal_spider(self,db_journal_item):
         journal_name = db_journal_item[0]
-        journal_sjr_id = db_journal_item[2]
-        journal_url = db_journal_item[4]
+        journal_sjr_id = db_journal_item[1]
+        journal_url = db_journal_item[2]
         #print(journal_name,journal_sjr_id,journal_url)
         spider = self.get_task_spider(EXISTED_SPIDERS,journal_url)
         if spider:
@@ -63,7 +63,7 @@ class MajorTaskManager:
         )
         for key in journals_info_dict.keys():
             category_name = key
-            journal_items = journals_info_dict[key]['db_items']
+            journal_items = journals_info_dict[key]
             print(category_name,journal_items)
             thread_pool.map(self.launch_journal_spider,journal_items)
 
