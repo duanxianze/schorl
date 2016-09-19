@@ -65,21 +65,67 @@ class JournalArticle:
                 self.save_scholar_category_realtion()
 
     def save_article(self):
-        self.cur.execute(
-            'insert into articles(title,year,link,\
-                resource_type,resource_link,summary,journal_id,id_by_journal)'
-            'values(%s,%s,%s,%s,%s,%s,%s,%s)',
-            (self.title,self.year,self.link,self.resource_type,\
-                self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
-        )
+        try:
+            self.cur.execute(
+                'insert into articles(title,year,link,\
+                    resource_type,resource_link,summary,journal_id,id_by_journal)'
+                'values(%s,%s,%s,%s,%s,%s,%s,%s)',
+                (self.title,self.year,self.link,self.resource_type,\
+                    self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
+            )
+            return True
+        except Exception as e:
+            print('[Error] in JournalArticle:save_article():\n{}'.format(str(e)))
+        return False
 
-    def save_scholar(self):
-        self.cur.execute(
-            ''
-        )
+    def save_scholar(self,scholar_name):
+        try:
+            self.cur.execute(
+                'insert into temp_scholar(name)'
+                'values(%s)',
+                (scholar_name)
+            )
+            return True
+        except Exception as e:
+            print('[Error] in JournalArticle:save_scholar():\n{}'.format(str(e)))
+        return False
 
-    def save_scholar_category_realtion(self):
-        pass
+    def get_scholar_db_id(self,scholar_name):
+        self.cur.execute(
+            "select id from temp_scholar where name = '{}'"\
+                .format(scholar_name)
+        )
+        return self.cur.fetchall()
+
+    def save_scholar_and_return_db_ids(self):
+        scholar_db_ids = []
+        for author_name in self.authors:
+            self.save_scholar(author_name)
+            scholar_db_id = self.get_scholar_db_id(author_name)
+            scholar_db_ids.append(scholar_db_id)
+        return scholar_db_ids
+
+    def get_category_ids_by_journal_id(self,journal_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select category_id from journal_category \
+            where journal_id={}'.format(journal_id)
+        )
+        data = cur.fetchall()
+        cur.close()
+        return data
+
+    def save_scholar_category_realtion(self,temp_scholar_id,category_id):
+        try:
+            self.cur.execute(
+                'insert into temp_scholar_category(temp_scholar_id,category_id)'
+                'values(%s,%s)',
+                (temp_scholar_id,category_id)
+            )
+            return True
+        except Exception as e:
+            print('[Error] in JournalArticle:save_scholar_category_realtion():\n{}'.format(str(e)))
+        return False
 
     def save_scholar_article_realtion(self):
         pass
