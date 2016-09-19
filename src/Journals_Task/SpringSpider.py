@@ -43,7 +43,9 @@ class SpringSpider(JournalSpider):
 
 
 if __name__=="__main__":
+    from src.Journals_Task.JournalClass import Journal
+    JournalObj=Journal()
+    JournalObj.site_source = 'http://www.springer.com/computer+science/image+processing/journal/10055'
     SpringSpider(
-        url = 'http://www.springer.com/computer/database+management+%26+information+retrieval/journal/778',
-        journal_id=23792
+        JournalObj
     ).run()

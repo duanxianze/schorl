@@ -176,12 +176,12 @@ class JournalArticle:
         return data
 
     def show_in_cmd(self):
-        print('\n*********New article of {}***********'.format(self.JournalObj.name))
-        print('title:\t{}'.format(self.title))
-        print('abstract:\t{}'.format(self.abstract))
+        print('\n*********New article of <{}>***********'.format(self.JournalObj.publisher))
+        print('title:\t\t{}'.format(self.title))
+        print('abstract:\t\t{}'.format(self.abstract))
         print('pdf_url:\t{}'.format(self.pdf_url))
         print('authors:\t{}'.format(self.authors))
-        print('link:\t{}'.format(self.link))
+        print('link:\t\t{}'.format(self.link))
         print('id_by_journal:\t{}'.format(self.id_by_journal))
-        print('year:\t{}'.format(self.year))
-        print('*********New article of {}***********'.format(self.JournalObj.name))
+        print('year:\t\t{}'.format(self.year))
+        print('*********New article of <{}>***********'.format(self.JournalObj.publisher))
