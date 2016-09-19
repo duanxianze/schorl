@@ -11,7 +11,6 @@
             上级模块有多线程分配，故此处用单线程写
 """
 from bs4 import BeautifulSoup
-
 from src.Journals_Task.JournalSpider import JournalSpider
 from src.crawl_tools.request_with_proxy import request_with_random_ua
 from src.journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
@@ -22,7 +21,7 @@ class ElsevierSpider(JournalSpider):
         sample_url: http://www.sciencedirect.com/science/journal/15708268
     '''
     def __init__(self,url,journal_id):
-        JournalSpider.__init__(journal_id)
+        JournalSpider.__init__(self,journal_id)
         self.url = url
         self.handle_sciencedirect_url()
 

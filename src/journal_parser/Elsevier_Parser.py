@@ -17,10 +17,9 @@ root_dir = SCRIPT_DIR
 for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
-
+from src.journal_parser.JournalArticle import JournalArticle
 from crawl_tools.request_with_proxy import request_with_random_ua
 from bs4 import BeautifulSoup
-from src.db_config import new_db_cursor
 
 class ElsevierDetailPageParser:
     def __init__(self, article_page_url, driver):
@@ -65,7 +64,7 @@ class ElsevierAllItemsPageParser:
     '''
         sample_url: http://www.sciencedirect.com/science/journal/15708268
     '''
-    def __init__(self,html_source=None):
+    def __init__(self,html_source):
         self.soup = BeautifulSoup(html_source,'lxml')
         self.nav = self.soup.select_one('#volumeIssueData')
 
@@ -87,48 +86,23 @@ class ElsevierAllItemsPageParser:
         return list(map(lambda x:'http://www.sciencedirect.com'+x.select_one('a')['href'],self.volume_divs))
 
 
-class ElsevierAricle:
-    def __init__(self,sec):
+class ElsevierAricle(JournalArticle):
+    def __init__(self,sec,journal_id):
+        JournalArticle.__init__(self,journal_id)
         self.sec = sec
-        self.cur = new_db_cursor()
+        self.generate_all_method()
+
+    def generate_all_method(self):
+        self.generate_pdf_url()
+        self.generate_link()
+        self.generate_abstract()
+        self.generate_authors()
+        self.generate_id_by_journal()
+        self.generate_title()
 
     @property
     def origin_title(self):
         return self.sec.select_one('.title').text
-
-    @property
-    def title(self):
-        tit = self.origin_title
-        if self.type:
-            tit = tit[:-len(self.type)]
-        return tit
-
-    @property
-    def abstract_url(self):
-        return self.sec.select_one('.absLink')['data-url']
-
-    @property
-    def abstract(self):
-        #访问abstract_url直接生成
-        try:
-            resp = request_with_random_ua(self.abstract_url)
-            return BeautifulSoup(resp.text,'lxml').select_one('.paraText').text
-        except Exception as e:
-            print('[ERROR] in Elsevier Parser:abstract():\n{}'.str(e))
-            return None
-
-    @property
-    def pdf_url(self):
-        url = self.sec.select_one('.extLinkBlock').select_one('.cLink')['href']
-        if '.pdf' in url:
-            return url
-        else:
-            print('[ERROR] in Elsevier Parser:pdf_url()')
-            return None
-
-    @property
-    def authors(self):
-        return self.sec.select_one('.authors').text.split(',')
 
     @property
     def type(self):
@@ -139,43 +113,39 @@ class ElsevierAricle:
         return None
 
     @property
-    def link(self):
-        return self.sec.select_one('.title').find('a')['href']
+    def abstract_url(self):
+        return self.sec.select_one('.absLink')['data-url']
 
-    @property
-    def id_by_journal(self):
-        return self.link.split('/')[-1]
+    def generate_title(self):
+        tit = self.origin_title
+        if self.type:
+            tit = tit[:-len(self.type)]
+        self.title = tit
 
-    def save_article(self):
-        if not self.type:
-            type('Article Type Error')
-            return False
-        pass
+    def generate_abstract(self):
+        #访问abstract_url直接生成
+        try:
+            resp = request_with_random_ua(self.abstract_url)
+            self.abstract = BeautifulSoup(resp.text,'lxml').select_one('.paraText').text
+        except Exception as e:
+            print('[ERROR] in Elsevier Parser:abstract():\n{}'.str(e))
 
-    def save_scholar(self):
-        pass
+    def generate_pdf_url(self):
+        url = self.sec.select_one('.extLinkBlock').select_one('.cLink')['href']
+        if '.pdf' in url:
+            self.pdf_url = url
+        else:
+            print('[ERROR] in Elsevier Parser:pdf_url()')
 
-    def relation_is_saved(self):
-        pass
+    def generate_authors(self):
+        self.authors = self.sec.select_one('.authors').text.split(',')
 
-    def save_scholar_category_realtion(self):
-        pass
+    def generate_link(self):
+        self.link = self.sec.select_one('.title').find('a')['href']
 
-    def save_to_db(self):
-        if self.save_article():
-            if self.save_scholar():
-                self.save_scholar_category_realtion()
-
-    def show_in_cmd(self):
-        print('origin_title:{}'.format(self.origin_title))
-        print('title:{}'.format(self.title))
-        print('abstract:{}'.format(self.abstract))
-        print('pdf_url:{}'.format(self.pdf_url))
-        print('authors:{}'.format(self.authors))
-        print('type:{}'.format(self.type))
-        print('link:{}'.format(self.link))
-        print('abstract_url:{}'.format(self.abstract_url))
-        print('id_by_journal:{}'.format(self.id_by_journal))
+    def generate_id_by_journal(self):
+        self.generate_link()
+        self.id_by_journal = self.link.split('/')[-1]
 
 
 if __name__ == "__main__":
