@@ -29,9 +29,9 @@ class SpringParser:
 
 
 class SpringArticle(JournalArticle):
-    def __init__(self,sec,journal_id):
+    def __init__(self,sec,JournalObj):
         self.sec = sec
-        JournalArticle.__init__(self,journal_id)
+        JournalArticle.__init__(self,JournalObj)
         self.generate_all_method()
 
     def generate_title(self):

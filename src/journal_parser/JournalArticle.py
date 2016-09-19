@@ -11,10 +11,10 @@
 """
 from src.db_config import new_db_cursor
 
-
 class JournalArticle:
-    def __init__(self,journal_id):
-        self.journal_id = journal_id
+    def __init__(self,JournalObj):
+        self.JournalObj = JournalObj
+        self.journal_id = JournalObj.sjr_id
         self.cur = new_db_cursor()
         self.title = None
         self.abstract = None
@@ -60,9 +60,19 @@ class JournalArticle:
             return 'PDF'
 
     def save_to_db(self):
-        if self.save_article():
-            if self.save_scholar():
-                self.save_scholar_category_realtion()
+        print('save_to_db{}'.format(self.title))
+        '''
+        self.save_article()
+        self.save_scholar()
+        self.save_scholar_article_realtion()
+        if self.JournalObj.category_relation_cot==1:
+            self.save_scholar_category_realtion()
+            #假若该杂志社属于仅一个category，则存学者与category关系表
+        if self.JournalObj.area_relation_cot==1:
+            self.save_scholar_article_realtion()
+            #假若该杂志社属于仅一个area，则存学者与category关系表
+            #前期检索出的都是一个area的杂志社，此处必会经过
+        '''
 
     def save_article(self):
         try:
@@ -73,6 +83,7 @@ class JournalArticle:
                 (self.title,self.year,self.link,self.resource_type,\
                     self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
             )
+            print('save article ok!')
             return True
         except Exception as e:
             print('[Error] in JournalArticle:save_article():\n{}'.format(str(e)))
@@ -85,6 +96,7 @@ class JournalArticle:
                 'values(%s)',
                 (scholar_name)
             )
+            print('save scholar ok!')
             return True
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar():\n{}'.format(str(e)))
@@ -95,7 +107,7 @@ class JournalArticle:
             "select id from temp_scholar where name = '{}'"\
                 .format(scholar_name)
         )
-        return self.cur.fetchall()
+        return self.cur.fetchall()[0][0]
 
     def save_scholar_and_return_db_ids(self):
         scholar_db_ids = []
@@ -147,7 +159,7 @@ class JournalArticle:
                 .format(temp_scholar_id,category_id)
         )
         data = cur.fetchall[0][0]
-        print('Sc amount',data)
+        print('SC amount',data)
         cur.close()
         return data
 
@@ -164,6 +176,7 @@ class JournalArticle:
         return data
 
     def show_in_cmd(self):
+        print('\n*********New article of {}***********'.format(self.JournalObj.name))
         print('title:\t{}'.format(self.title))
         print('abstract:\t{}'.format(self.abstract))
         print('pdf_url:\t{}'.format(self.pdf_url))
@@ -171,3 +184,4 @@ class JournalArticle:
         print('link:\t{}'.format(self.link))
         print('id_by_journal:\t{}'.format(self.id_by_journal))
         print('year:\t{}'.format(self.year))
+        print('*********New article of {}***********'.format(self.JournalObj.name))

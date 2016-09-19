@@ -20,10 +20,11 @@ class ElsevierSpider(JournalSpider):
     '''
         sample_url: http://www.sciencedirect.com/science/journal/15708268
     '''
-    def __init__(self,url,journal_id):
-        JournalSpider.__init__(self,journal_id)
-        self.url = url
+    def __init__(self,JournalObj):
+        JournalSpider.__init__(self,JournalObj)
+        self.url = JournalObj.site_source
         self.handle_sciencedirect_url()
+        print(self.url)
 
     def handle_sciencedirect_url(self):
         if 'sciencedirect' not in self.url:

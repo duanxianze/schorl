@@ -16,7 +16,7 @@ from src.Journals_Task.IEEE_Spider import *
 
 
 EXISTED_SPIDERS = [
-    {'publisherSpiderClass':ElsevierSpider,  'publisherKeyword':'elseiver'},
+    {'publisherSpiderClass':ElsevierSpider,  'publisherKeyword':'elsevier'},
     {'publisherSpiderClass':SpringSpider,    'publisherKeyword':'springer'},
     {'publisherSpiderClass':IEEE_Spider,     'publisherKeyword':'ieee'}
 ]

@@ -12,6 +12,7 @@
 from src.Journals_Task.ExistedSpiders import *
 from src.Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
+from src.Journals_Task.JournalClass import Journal
 
 class MajorTaskManager:
     def __init__(self,majorKeyword):
@@ -37,25 +38,29 @@ class MajorTaskManager:
         return None
 
     def launch_journal_spider(self,db_journal_item):
-        journal_name = db_journal_item[0]
-        journal_sjr_id = db_journal_item[1]
-        journal_url = db_journal_item[2]
+        JournalObj = Journal()
+        JournalObj.name = db_journal_item[0]
+        JournalObj.sjr_id = db_journal_item[1]
+        JournalObj.site_source = db_journal_item[2]
+        JournalObj.area_relation_cot = db_journal_item[3]
+        JournalObj.category_relation_cot = db_journal_item[4]
         #print(journal_name,journal_sjr_id,journal_url)
-        spider = self.get_task_spider(EXISTED_SPIDERS,journal_url)
+        spider = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
         if spider:
-            print('[{}]: Got Spider Task of {} ( {} )'.\
-                  format(spider.__name__,journal_name,journal_url))
-            #spider(journal_sjr_id,journal_url).run()
+            print('[{}]: Got Task of <{}> ( {} )'.\
+                  format(spider.__name__,JournalObj.name,JournalObj.site_source))
+            spider(JournalObj).run()
         else:
-            print('[Spider Not Found]: {} 所属出版社解析器未找到( {} )'\
-                  .format(journal_name,journal_url))
+            print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
+                  .format(JournalObj.name,JournalObj.site_source))
 
     def run(
             self,journal_need_single_area_relation = True,
             journal_need_index_by_area = False,
-            journal_need_index_by_category = True
+            journal_need_index_by_category = True,
+            thread_cot = 16
         ):
-        thread_pool = ThreadPool(2)
+        thread_pool = ThreadPool(thread_cot)
         journals_info_dict = self.get_journals_info_dict(
             single_area_relation = journal_need_single_area_relation,
             index_by_area = journal_need_index_by_area,
@@ -73,5 +78,6 @@ if __name__=="__main__":
     MajorTaskManager(majorKeyword = 'Artificial').run(
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
-        journal_need_index_by_category = True
+        journal_need_index_by_category = True,
+        thread_cot = 16
     )

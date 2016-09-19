@@ -18,9 +18,10 @@ class SpringSpider(JournalSpider):
     '''
         sample_url: http://link.springer.com/search?sortOrder=newestFirst&facet-content-type=Article&facet-journal-id=778
     '''
-    def __init__(self,url,journal_id):
-        JournalSpider.__init__(self,journal_id)
-        self.url = url
+    def __init__(self,JournalObj):
+        self.JournalObj = JournalObj
+        JournalSpider.__init__(self,JournalObj)
+        self.url = JournalObj.site_source
         self.handle_spring_url()
 
     def handle_spring_url(self):
@@ -38,7 +39,7 @@ class SpringSpider(JournalSpider):
             for sec in SpringParser(
                 html_source=request_with_random_ua(page_url).text
             ).secs:
-                SpringArticle(sec,self.journal_id).show_in_cmd()
+                SpringArticle(sec,self.JournalObj).show_in_cmd()
 
 
 if __name__=="__main__":
