@@ -34,15 +34,6 @@ class SpringArticle(JournalArticle):
         JournalArticle.__init__(self,journal_id)
         self.generate_all_method()
 
-    def generate_all_method(self):
-        self.generate_pdf_url()
-        self.generate_link()
-        self.generate_abstract()
-        self.generate_authors()
-        self.generate_id_by_journal()
-        self.generate_title()
-        self.generate_year()
-
     def generate_title(self):
         self.title = self.sec.select_one('.title').text
 

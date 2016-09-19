@@ -88,17 +88,9 @@ class ElsevierAllItemsPageParser:
 
 class ElsevierAricle(JournalArticle):
     def __init__(self,sec,journal_id):
-        JournalArticle.__init__(self,journal_id)
         self.sec = sec
+        JournalArticle.__init__(self,journal_id)
         self.generate_all_method()
-
-    def generate_all_method(self):
-        self.generate_pdf_url()
-        self.generate_link()
-        self.generate_abstract()
-        self.generate_authors()
-        self.generate_id_by_journal()
-        self.generate_title()
 
     @property
     def origin_title(self):
@@ -160,4 +152,4 @@ if __name__ == "__main__":
             <li><a class="mmcLinkSprite" clink="" data-docsubtype="fla" href="http://www.sciencedirect.com/science/article/pii/S1570826816300166#MMCvFirst" id="title_S1570826816300166" querystr="?_rdoc=5&amp;_fmt=high&amp;_origin=PublicationURL&amp;_srch=hubEid(1-s2.0-S1570826816X00042)&amp;_docanchor=&amp;_ct=7&amp;md5=755c8390bdd7739ca7ff0a633f22293c" s_c_arttitle=""><span class="mmcTxt">Supplementary content</span></a></li></ul><div class="previewBox abstract hidden" id="abs_S1570826816300166"></div><div class="previewBox rabstract hidden" id="rabs_S1570826816300166"></div><div class="previewBox gabstract hidden" id="gabs_S1570826816300166"></div></div></li><li class="accessBlock colLast"><span alt="Entitled to full text" class="dsub_article_sci_dir sci_dir" title="Entitled to full text"> <span class="offscreen">Entitled to full text</span></span></li></ul></li>'
 
     sec = BeautifulSoup(text,'lxml')
-    ElsevierAricle(sec).show_in_cmd()
+    ElsevierAricle(sec,'123').show_in_cmd()

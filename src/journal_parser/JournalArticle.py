@@ -24,6 +24,14 @@ class JournalArticle:
         self.id_by_journal = None
         self.year = None
 
+    def generate_all_method(self):
+        self.generate_pdf_url()
+        self.generate_link()
+        self.generate_abstract()
+        self.generate_authors()
+        self.generate_id_by_journal()
+        self.generate_title()
+
     @property
     def resource_type(self):
         if self.pdf_url:
@@ -44,7 +52,9 @@ class JournalArticle:
         )
 
     def save_scholar(self):
-        pass
+        self.cur.execute(
+            ''
+        )
 
     def save_scholar_category_realtion(self):
         pass
