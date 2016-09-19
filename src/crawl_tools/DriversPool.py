@@ -67,11 +67,12 @@ class DriversPool:
     def alter_driver_status(self,index,status):
         self.pool[index].status = status
 
-    def get_one_free_driver(self,wait=False):
+    def get_one_free_driver(self,wait=True):
         while(1):
             self.show_pool_info()
             for driverObj in self.pool:
                 if driverObj.status == 'free':
+                    driverObj.status = 'busy'
                     return driverObj
             if wait:
                 print('DriversPool:\n\tSorry, no FREE driver now.\n\tSearch again in ten seconds...')
