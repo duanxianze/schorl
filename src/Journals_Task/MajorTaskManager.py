@@ -47,7 +47,7 @@ class MajorTaskManager:
                   format(spider.__name__,journal_name,journal_url))
             #spider(journal_sjr_id,journal_url).run()
         else:
-            print('[Spider Not Found]{} 所属出版社解析器未找到( {} )'\
+            print('[Spider Not Found]: {} 所属出版社解析器未找到( {} )'\
                   .format(journal_name,journal_url))
 
     def run(
