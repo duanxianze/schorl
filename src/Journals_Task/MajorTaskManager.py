@@ -13,6 +13,8 @@ from src.Journals_Task.ExistedSpiders import *
 from src.Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
 from src.Journals_Task.JournalClass import Journal
+from src.crawl_tools.DriversPool import DriversPool
+
 
 class MajorTaskManager:
     def __init__(self,majorKeyword):
@@ -33,8 +35,9 @@ class MajorTaskManager:
 
     def get_task_spider(self,spiders_infos,journal_url):
         for spider_info in spiders_infos:
-            if spider_info['publisherKeyword'] in journal_url:
-                return spider_info['publisherSpiderClass']
+            for publisherKeyword in spider_info['publisherKeywords']:
+                if publisherKeyword in journal_url:
+                    return spider_info['publisherSpiderClass'],spider_info['need_webdriver']
         return None
 
     def launch_journal_spider(self,db_journal_item):
@@ -44,12 +47,20 @@ class MajorTaskManager:
         JournalObj.site_source = db_journal_item[2]
         JournalObj.area_relation_cot = db_journal_item[3]
         JournalObj.category_relation_cot = db_journal_item[4]
+        JournalObj.publisher = db_journal_item[5]
         #print(journal_name,journal_sjr_id,journal_url)
-        spider = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
-        if spider:
+        spider_item = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
+        print(spider_item,'spider_item')
+        if spider_item:
+            Spider = spider_item[0]
+            need_webdriver = spider_item[1]
             print('[{}]: Got Task of <{}> ( {} )'.\
-                  format(spider.__name__,JournalObj.name,JournalObj.site_source))
-            spider(JournalObj).run()
+                  format(Spider.__name__,JournalObj.name,JournalObj.site_source))
+            if need_webdriver:
+                driverObj = self.drviers_pool.get_one_free_driver()
+                Spider(JournalObj,driverObj).run()
+            else:
+                Spider(JournalObj).run()
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
                   .format(JournalObj.name,JournalObj.site_source))
@@ -60,7 +71,12 @@ class MajorTaskManager:
             journal_need_index_by_category = True,
             thread_cot = 16
         ):
+
         thread_pool = ThreadPool(thread_cot)
+        self.drviers_pool = DriversPool(
+            size = int(thread_cot/2),
+            launch_with_thread_pool=thread_pool
+        )
         journals_info_dict = self.get_journals_info_dict(
             single_area_relation = journal_need_single_area_relation,
             index_by_area = journal_need_index_by_area,
@@ -79,5 +95,5 @@ if __name__=="__main__":
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
-        thread_cot = 16
+        thread_cot = 4
     )
