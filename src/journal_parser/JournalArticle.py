@@ -1,0 +1,69 @@
+#coding:utf-8
+"""
+@file:      JournalArticle.py
+@author:    lyn
+@contact:   tonylu716@gmail.com
+@python:    3.3
+@editor:    PyCharm
+@create:    2016-09-19 11:25
+@description:
+        The basic class of article from kinds of journals
+"""
+from src.db_config import new_db_cursor
+
+
+class JournalArticle:
+    def __init__(self,journal_id):
+        self.journal_id = journal_id
+        self.cur = new_db_cursor()
+        self.title = None
+        self.abstract = None
+        self.pdf_url = None
+        self.authors = None
+        self.link = None
+        self.id_by_journal = None
+        self.year = None
+        self.journal_id = None
+
+    @property
+    def resource_type(self):
+        if self.pdf_url:
+            return 'PDF'
+
+    def save_to_db(self):
+        if self.save_article():
+            if self.save_scholar():
+                self.save_scholar_category_realtion()
+
+    def save_article(self):
+        self.cur.execute(
+            'insert into articles(title,year,link,\
+                resource_type,resource_link,summary,journal_id,id_by_journal)'
+            'values(%s,%s,%s,%s,%s,%s,%s,%s)',
+            (self.title,self.year,self.link,self.resource_type,\
+                self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
+        )
+
+    def save_scholar(self):
+        pass
+
+    def save_scholar_category_realtion(self):
+        pass
+
+    def save_scholar_article_realtion(self):
+        pass
+
+    def scholar_category_relation_is_saved(self):
+        pass
+
+    def show_in_cmd(self):
+        print('origin_title:\t{}'.format(self.origin_title))
+        print('title:\t{}'.format(self.title))
+        print('abstract:\t{}'.format(self.abstract))
+        print('pdf_url:\t{}'.format(self.pdf_url))
+        print('authors:\t{}'.format(self.authors))
+        print('type:\t{}'.format(self.type))
+        print('link:\t{}'.format(self.link))
+        print('abstract_url:\t{}'.format(self.abstract_url))
+        print('id_by_journal:\t{}'.format(self.id_by_journal))
+        print('year:\t{}'.format(self.year))
