@@ -159,6 +159,11 @@ class JournalDetailPageParser:
         a_tags = self.info_dict['Subject Area'].select('a')
         return list(map(lambda x:int(x['href'].split('=')[-1]),a_tags))
 
+    @property
+    def category_sjr_ids(self):
+        a_tags = self.info_dict['Subject Category'].select('a')
+        return list(map(lambda x:int(x['href'].split('=')[-1]),a_tags))
+
     def show_in_cmd(self):
         print('journal_id:{}'.format(self.journal_id))
         print('h_index:{}'.format(self.h_index))
@@ -167,11 +172,19 @@ class JournalDetailPageParser:
         print('site_source:{}'.format(self.site_source))
         print('publisher:{}'.format(self.publisher))
         print('area_sjr_ids:{}'.format(self.area_sjr_ids))
+        print('category_sjr_ids:{}'.format(self.category_sjr_ids))
 
     def is_saved_journal_area(self,journal_sjr_id,area_sjr_id):
         self.cur.execute(
             'select count(*) from journal_area WHERE journal_id={} and area_id={}'\
                 .format(journal_sjr_id,area_sjr_id)
+        )
+        return self.cur.fetchall()[0][0]
+
+    def is_saved_journal_category(self,journal_sjr_id,category_sjr_id):
+        self.cur.execute(
+            'select count(*) from journal_category WHERE journal_id={} and category_id={}'\
+                .format(journal_sjr_id,category_sjr_id)
         )
         return self.cur.fetchall()[0][0]
 
@@ -190,6 +203,26 @@ class JournalDetailPageParser:
             )
             print('JournalDetailPageParser:\n\t[Success] The relation[{},{}] saved ok!!'\
                       .format(journal_sjr_id,area_sjr_id))
+
+    def save_journal_category(self):
+        print(self.category_sjr_ids)
+        try:
+            for category_sjr_id in self.category_sjr_ids:
+                if self.is_saved_journal_category(self.journal_id,category_sjr_id):
+                    print('JournalDetailPageParser:\n\t[Error] The relation[{},{}]saved before'\
+                      .format(self.journal_id,category_sjr_id))
+                    continue
+                self.cur.execute(
+                    'insert into journal_category(journal_id, category_id)'
+                    'VALUES (%s,%s)',
+                    (self.journal_id,category_sjr_id)
+                )
+                print('JournalDetailPageParser:\n\t[Success] The relation[{},{}] saved ok!!'\
+                          .format(self.journal_id,category_sjr_id))
+            return True
+        except Exception as e:
+            print('save_journal_category:{}'.format(str(e)))
+            return False
 
     def update_db_journal(self):
         self.cur.execute(
