@@ -9,13 +9,13 @@
 @description:
             ??
 """
+from src.Journals_Task.JournalSpider import JournalSpider
+from src.journal_parser.IEEE_Parser import IEEE_HTML_Parser
 
-from src.journal_parser.IEEE_Parser import *
-
-class IEEE_Spider:
-    def __init__(self):
-        '''
-            sample_url: http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83
-        '''
-        pass
-
+class IEEE_Spider(JournalSpider):
+    '''
+       sample_url: http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83
+    '''
+    def __init__(self,url,journal_id):
+        JournalSpider.__init__(journal_id)
+        self.url = url

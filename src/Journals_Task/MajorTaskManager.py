@@ -10,7 +10,7 @@
             特定领域下的杂志爬虫任务启动模块，调度数据库和爬虫
 """
 from src.Journals_Task.ExistedSpiders import *
-from src.Journals_Task.get_major_journals import MajorEntrance
+from src.Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
 
 class MajorTaskManager:
