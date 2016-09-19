@@ -24,6 +24,27 @@ class JournalArticle:
         self.id_by_journal = None
         self.year = None
 
+    def generate_title(self):
+        pass
+
+    def generate_authors(self):
+        pass
+
+    def generate_link(self):
+        pass
+
+    def generate_abstract(self):
+        pass
+
+    def generate_year(self):
+        pass
+
+    def generate_pdf_url(self):
+        pass
+
+    def generate_id_by_journal(self):
+        pass
+
     def generate_all_method(self):
         self.generate_pdf_url()
         self.generate_link()
@@ -31,6 +52,7 @@ class JournalArticle:
         self.generate_authors()
         self.generate_id_by_journal()
         self.generate_title()
+        self.generate_year()
 
     @property
     def resource_type(self):

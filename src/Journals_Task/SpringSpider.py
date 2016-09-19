@@ -39,7 +39,7 @@ class SpringSpider(JournalSpider):
             for sec in SpringParser(
                 html_source=request_with_random_ua(page_url).text
             ).secs:
-                SpringArticle(sec).show_in_cmd()
+                SpringArticle(sec,self.journal_id).show_in_cmd()
 
 
 if __name__=="__main__":
