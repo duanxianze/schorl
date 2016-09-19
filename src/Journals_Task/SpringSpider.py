@@ -13,7 +13,6 @@
 from src.journal_parser.Spring_Parser import SpringArticle,SpringParser
 from src.Journals_Task.JournalSpider import JournalSpider
 from src.crawl_tools.request_with_proxy import request_with_random_ua
-from bs4 import BeautifulSoup
 
 class SpringSpider(JournalSpider):
     '''

@@ -127,11 +127,41 @@ class JournalArticle:
             print('[Error] in JournalArticle:save_scholar_category_realtion():\n{}'.format(str(e)))
         return False
 
-    def save_scholar_article_realtion(self):
-        pass
+    def save_scholar_article_realtion(self,temp_scholar_id):
+        try:
+            self.cur.execute(
+                'insert into temp_scholar_article(temp_scholar_id,article_id)'
+                'values(%s,%s)',
+                (temp_scholar_id,self.id_by_journal)
+            )
+            return True
+        except Exception as e:
+            print('[Error] in JournalArticle:save_scholar_article_realtion():\n{}'.format(str(e)))
+        return False
 
-    def scholar_category_relation_is_saved(self):
-        pass
+    def scholar_category_relation_is_saved(self,temp_scholar_id,category_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select count(*) from temp_scholar_category\
+            where temp_scholar_id={} and category_id={}'\
+                .format(temp_scholar_id,category_id)
+        )
+        data = cur.fetchall[0][0]
+        print('Sc amount',data)
+        cur.close()
+        return data
+
+    def scholar_article_relation_is_saved(self,temp_scholar_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select count(*) from temp_scholar_article\
+            where temp_scholar_id={} and category_id={}'\
+                .format(temp_scholar_id,self.id_by_journal)
+        )
+        data = cur.fetchall[0][0]
+        print('SA amount',data)
+        cur.close()
+        return data
 
     def show_in_cmd(self):
         print('title:\t{}'.format(self.title))
