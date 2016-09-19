@@ -17,5 +17,5 @@ class IEEE_Spider(JournalSpider):
        sample_url: http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83
     '''
     def __init__(self,url,journal_id):
-        JournalSpider.__init__(journal_id)
+        JournalSpider.__init__(self,journal_id)
         self.url = url
