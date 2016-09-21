@@ -18,12 +18,12 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 
-import requests,random
+import requests,random,re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from crawl_tools.ua_pool import get_one_random_ua
 from crawl_tools.request_with_proxy import request_with_proxy
-
+from journal_parser.JournalArticle import JournalArticle
 
 def except_or_none(func):
     def wrapper(*args, **kwargs):
@@ -65,6 +65,9 @@ def get_ieee_pdf_link(pdf_page_url,driver):
         return None
 
 class IEEE_HTML_Parser:
+    '''
+        the sample url is: http://ieeexplore.ieee.org/search/searchresult.jsp?queryText=hello&newsearch=true
+    '''
     def __init__(self,driver):
         self.driver = driver
 
@@ -120,9 +123,67 @@ class Article:
         print('**************New Article Info******************')
 
 
+class IEEE_AllItemsPageParser:
+    '''
+        For all-article page of specific journal by year.
+        The sample url is http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83
+    '''
+    def __init__(self,html_source=None,from_web=True):
+        if not from_web:
+            with open('IEEE_Journal.html','r') as f:
+                html_source = f.read()
+        self.soup = BeautifulSoup(html_source,'lxml')
+
+    @property
+    def volume_year(self):
+        return self.soup.select_one('.heading').text.strip().split(' ')[-1]
+
+    @property
+    def sections(self):
+        return self.soup.select_one('.results').select('li')
+
+class IEEE_Article(JournalArticle):
+    def __init__(self,sec,JournalObj,year):
+        self.sec = sec
+        JournalArticle.__init__(self,JournalObj)
+        self.year = year
+        self.title_text_span = self.sec.find(
+            id = re.compile("art-abs-title-[0-9]+")
+        )
+        self.title_parent_a_tag = self.title_text_span.parent
+        self.generate_all_method()
+
+    def generate_title(self):
+        self.title = self.title_text_span.text
+
+    def generate_authors(self):
+        try:
+            self.authors = list(map(
+                lambda x:x['data-author-name'],
+                self.sec.select('#preferredName')
+            ))
+        except Exception as e:
+            print('[ERROR] in IEEE_Article():generate_authors:{}'.format(str(e)))
+
+    def generate_link(self):
+        self.link = 'http://ieeexplore.ieee.org'+self.title_parent_a_tag['href']
+
+    def generate_abstract(self):
+        self.abstract = self.sec.select_one('.abstract').text.strip()
+
+    def generate_pdf_url(self):
+        self.generate_id_by_journal()
+        self.pdf_url = 'http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber='+self.id_by_journal
+
+    def generate_id_by_journal(self):
+        self.id_by_journal = self.title_parent_a_tag['data-arnumber']
+
+
 if __name__=="__main__":
-    from selenium import webdriver
-    driver = webdriver.Chrome()
-    driver.get(url = 'http://ieeexplore.ieee.org/search/searchresult.jsp?queryText=123&newsearch=true')
-    for sec in IEEE_HTML_Parser(driver).sections:
-        Article(sec).show_in_cmd()
+    from src.Journals_Task.JournalClass import Journal
+    parser = IEEE_AllItemsPageParser(from_web=False)
+    JournalObj=Journal()
+    JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
+    JournalObj.sjr_id = 123
+    for sec in parser.sections:
+        IEEE_Article(sec,JournalObj,year=parser.volume_year).show_in_cmd()
