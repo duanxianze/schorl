@@ -15,7 +15,7 @@ class JournalArticle:
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.journal_id = JournalObj.sjr_id
-        self.cur = new_db_cursor()
+        #self.cur = new_db_cursor()
         self.title = None
         self.abstract = None
         self.pdf_url = None

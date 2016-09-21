@@ -80,10 +80,9 @@ class MajorEntrance:
             )
         '''
             journal_dict is like:{
-                'major name 1':{'length':n,'db_items':[x,y,z]},
-                'major name 2':{'length':n,'db_items':[w,m,n]},
+                'major name 1': db_items1,
+                'major name 2': db_items2,
              }
-             建议迭代时用for key in journal_dict.keys():   pass
         '''
         return journal_dict
 
