@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-09-19 21:40
 @description:
-            ??
+            杂志社 ORM 对象
 """
 
 class Journal:
