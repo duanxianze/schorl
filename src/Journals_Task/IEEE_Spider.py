@@ -10,7 +10,7 @@
             ??
 """
 from src.Journals_Task.JournalSpider import JournalSpider
-from src.journal_parser.IEEE_Parser import *
+from src.journal_parser.IEEE_Parser import IEEE_AllItemsPageParser,IEEE_Article
 from src.crawl_tools.request_with_proxy import request_with_random_ua
 
 
@@ -21,10 +21,21 @@ class IEEE_Spider(JournalSpider):
     def __init__(self,JournalObj):
         JournalSpider.__init__(self,JournalObj)
         self.url = JournalObj.site_source
+        self.JournalObj = JournalObj
 
     def run(self):
-        html = request_with_random_ua(self.url).text
-        print(html)
+        for volume_link in IEEE_AllItemsPageParser(
+            html_source = request_with_random_ua(self.url).text
+        ).volume_links:
+            print(volume_link)
+            parser = IEEE_AllItemsPageParser(
+                html_source = request_with_random_ua(volume_link).text
+            )
+            for sec in parser.sections:
+                article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
+                if article.title_text_span==None:
+                    continue
+                article.show_in_cmd()
 
 
 if __name__=="__main__":

@@ -135,6 +135,12 @@ class IEEE_AllItemsPageParser:
         self.soup = BeautifulSoup(html_source,'lxml')
 
     @property
+    def volume_links(self):
+        return list(map(
+            lambda x:'http://ieeexplore.ieee.org/'+x['href'],
+            self.soup.select_one('.volumes').select('a')))
+
+    @property
     def volume_year(self):
         return self.soup.select_one('.heading').text.strip().split(' ')[-1]
 
@@ -145,11 +151,13 @@ class IEEE_AllItemsPageParser:
 class IEEE_Article(JournalArticle):
     def __init__(self,sec,JournalObj,year):
         self.sec = sec
-        JournalArticle.__init__(self,JournalObj)
-        self.year = year
         self.title_text_span = self.sec.find(
             id = re.compile("art-abs-title-[0-9]+")
         )
+        if not self.title_text_span:
+            return
+        JournalArticle.__init__(self,JournalObj)
+        self.year = year
         self.title_parent_a_tag = self.title_text_span.parent
         self.generate_all_method()
 
@@ -176,7 +184,7 @@ class IEEE_Article(JournalArticle):
         self.pdf_url = 'http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber='+self.id_by_journal
 
     def generate_id_by_journal(self):
-        self.id_by_journal = self.title_parent_a_tag['data-arnumber']
+        self.id_by_journal = 'IEEE'+self.title_parent_a_tag['data-arnumber']
 
 
 if __name__=="__main__":
@@ -185,5 +193,10 @@ if __name__=="__main__":
     JournalObj=Journal()
     JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
     JournalObj.sjr_id = 123
+    print(parser.volume_links)
+    for link in parser.volume_links:
+        print(link)
+    '''
     for sec in parser.sections:
         IEEE_Article(sec,JournalObj,year=parser.volume_year).show_in_cmd()
+    '''
