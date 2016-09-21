@@ -27,7 +27,6 @@ class ElsevierSpider(JournalSpider):
         self.driverObj = driverObj
         self.JournalObj = JournalObj
         self.handle_sciencedirect_url()
-        print(self.driverObj)
 
     def handle_sciencedirect_url(self):
         #print(self.url)
@@ -74,10 +73,16 @@ class ElsevierSpider(JournalSpider):
             #得到该区间所有年份的page_url
             for volume_link in volume_links:
                 print(volume_link)
-                for sec in ElsevierAllItemsPageParser(
+                parser = ElsevierAllItemsPageParser(
                     html_source = request_with_random_ua(volume_link).text
-                ).secs:
-                    article = ElsevierAricle(sec,self.JournalObj)
+                )
+                print(parser.volume_year)
+                for sec in parser.secs:
+                    article = ElsevierAricle(
+                        sec = sec,
+                        JournalObj = self.JournalObj,
+                        year = parser.volume_year
+                    )
                     if article.type:
                         article.show_in_cmd()
                         #print(article.title)
@@ -94,5 +99,6 @@ if __name__=="__main__":
     JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
     JournalObj.sjr_id = 123
     ElsevierSpider(
-        JournalObj=JournalObj,driverObj=Driver(visual=True)
+        JournalObj=JournalObj,
+        driverObj=Driver(visual=True)
     ).run()

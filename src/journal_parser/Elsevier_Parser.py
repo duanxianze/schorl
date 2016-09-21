@@ -73,6 +73,11 @@ class ElsevierAllItemsPageParser:
         return self.soup.select_one('.articleList').select('.detail')
 
     @property
+    def volume_year(self):
+        return int(self.soup.select_one('.volumeHeader').\
+            text.strip().split(' ')[-1][:-1])
+
+    @property
     def volume_area_links(self):
         volume_a_tags = self.nav.select('.volLink')
         return list(map(lambda x:'http://www.sciencedirect.com'+x['href'],volume_a_tags))
@@ -87,9 +92,10 @@ class ElsevierAllItemsPageParser:
 
 
 class ElsevierAricle(JournalArticle):
-    def __init__(self,sec,JournalObj):
+    def __init__(self,sec,JournalObj,year):
         self.sec = sec
         JournalArticle.__init__(self,JournalObj)
+        self.year = year
         self.generate_all_method()
 
     @property
@@ -118,7 +124,7 @@ class ElsevierAricle(JournalArticle):
         #访问abstract_url直接生成
         try:
             resp = request_with_random_ua(self.abstract_url)
-            self.abstract = BeautifulSoup(resp.text,'lxml').select_one('.paraText').text
+            self.abstract = BeautifulSoup(resp.text,'lxml').select_one('.paraText').text.strip()
         except Exception as e:
             pass
             # print('[ERROR] in Elsevier Parser:abstract():\n{}'.format(str(e)))
@@ -156,6 +162,5 @@ if __name__ == "__main__":
     JournalObj=Journal()
     JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
     JournalObj.sjr_id = 123
-
     sec = BeautifulSoup(text,'lxml')
     ElsevierAricle(sec,JournalObj).show_in_cmd()
