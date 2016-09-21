@@ -40,5 +40,5 @@ if __name__=="__main__":
         #time.sleep(2)
         #conn.close()
         cur.close()
-        print(new_db_cur())
+        print(new_db_cursor())
         print('------------')
