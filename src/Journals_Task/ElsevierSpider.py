@@ -16,6 +16,7 @@ from src.crawl_tools.request_with_proxy import request_with_random_ua
 from src.journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
 import time
 
+
 class ElsevierSpider(JournalSpider):
     '''
         sample_url: http://www.sciencedirect.com/science/journal/15708268
@@ -29,25 +30,35 @@ class ElsevierSpider(JournalSpider):
         print(self.driverObj)
 
     def handle_sciencedirect_url(self):
-        from selenium import webdriver
-        if 'sciencedirect' not in self.url:
-            driver = self.driverObj.engine
-            '''
+        #print(self.url)
+        if 'sciencedirect' in self.url:
+            return
+        try:
             resp = request_with_random_ua(self.url)
             html = resp.text
-            '''
+            #print('by request ok')
+            method = 'request'
+        except Exception as e:
+            print('Handle URL:  request error:{}'.format(str(e)))
+            driver = self.driverObj.engine
             while(1):
                 try:
                     driver.get(self.url)
                     time.sleep(2)
                     html = driver.page_source
-                    self.url = BeautifulSoup(html,'lxml')\
-                        .select_one('.view-articles')['href']
                     break
                 except Exception as e:
                     print('[Error] in ElsevierSpider:init_url:\n{}'.format(str(e)))
                     time.sleep(2)
+            method = 'driver'
         self.driverObj.status = 'free'
+        soup = BeautifulSoup(html,'lxml')
+        if method == 'request':
+            jouranl_index = soup.select_one('.cta-primary')['href'].split('/')[0].split('-')
+            self.url = 'http://www.sciencedirect.com/science/journal/{}'\
+                .format(jouranl_index[0]+jouranl_index[1])
+        else:
+            self.url = soup.select_one('.view-articles')['href']
 
     def run(self):
         #自动切换不同年代不同卷volume的页面，得到所有结果
@@ -68,7 +79,8 @@ class ElsevierSpider(JournalSpider):
                 ).secs:
                     article = ElsevierAricle(sec,self.JournalObj)
                     if article.type:
-                        print(article.title)
+                        article.show_in_cmd()
+                        #print(article.title)
                         #article.save_to_db()
                     print('----------')
             print('===================')
@@ -77,11 +89,10 @@ class ElsevierSpider(JournalSpider):
 
 if __name__=="__main__":
     from src.Journals_Task.JournalClass import Journal
-    from src.crawl_tools.DriversPool import DriversPool
+    from src.crawl_tools.DriversPool import Driver
     JournalObj=Journal()
     JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
     JournalObj.sjr_id = 123
-    driverObj = DriversPool(1).get_one_free_driver()
     ElsevierSpider(
-        JournalObj=JournalObj,driverObj=driverObj
+        JournalObj=JournalObj,driverObj=Driver(visual=True)
     ).run()
