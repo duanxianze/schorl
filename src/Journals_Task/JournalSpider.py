@@ -12,15 +12,16 @@
 from src.db_config import new_db_cursor
 
 class JournalSpider:
-    def __init__(self,journal_id):
-        self.journal_id = journal_id
-        self.cur = new_db_cursor()
+    def __init__(self,JournalObj):
+        self.JournalObj = JournalObj
 
     def mark_journal_ok(self):
-        self.cur.execute(
+        cur = new_db_cursor()
+        cur.execute(
             'upadte journal set is_crawled_all_article = true\
-             where journal_id = {}'.format(self.journal_id)
+             where journal_id = {}'.format(self.JournalObj.sjr_id)
         )
+        cur.close()
 
     def handle_db_url(self):
         pass
