@@ -50,7 +50,7 @@ class MajorTaskManager:
         JournalObj.publisher = db_journal_item[5]
         #print(journal_name,journal_sjr_id,journal_url)
         spider_item = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
-        print(spider_item,'spider_item')
+        #print(spider_item,'spider_item')
         if spider_item:
             Spider = spider_item[0]
             need_webdriver = spider_item[1]
@@ -69,12 +69,14 @@ class MajorTaskManager:
             self,journal_need_single_area_relation = True,
             journal_need_index_by_area = False,
             journal_need_index_by_category = True,
+            drvier_is_visual = False,
             thread_cot = 16
         ):
 
         thread_pool = ThreadPool(thread_cot)
         self.drviers_pool = DriversPool(
             size = int(thread_cot/2),
+            visual = drvier_is_visual,
             launch_with_thread_pool=thread_pool
         )
         journals_info_dict = self.get_journals_info_dict(
@@ -91,9 +93,13 @@ class MajorTaskManager:
 
 if __name__=="__main__":
     #为使远程数据库传输压力变小，建议选择比较精细的领域关键词
+    from src.crawl_tools.WatchDog import close_procs_by_keyword
+    close_procs_by_keyword('chromedriver')
+    close_procs_by_keyword('phantom')
     MajorTaskManager(majorKeyword = 'Artificial').run(
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
+        drvier_is_visual=False,
         thread_cot = 4
     )

@@ -33,7 +33,7 @@ class Driver:
     '''
         driver类，封装了webdriver和其编号，状态
     '''
-    def __init__(self,visual,index):
+    def __init__(self,visual,index=None):
         self.index = index
         self.status = 'free'
         if visual:

@@ -120,7 +120,8 @@ class ElsevierAricle(JournalArticle):
             resp = request_with_random_ua(self.abstract_url)
             self.abstract = BeautifulSoup(resp.text,'lxml').select_one('.paraText').text
         except Exception as e:
-            print('[ERROR] in Elsevier Parser:abstract():\n{}'.str(e))
+            pass
+            # print('[ERROR] in Elsevier Parser:abstract():\n{}'.format(str(e)))
 
     def generate_pdf_url(self):
         url = self.sec.select_one('.extLinkBlock').select_one('.cLink')['href']

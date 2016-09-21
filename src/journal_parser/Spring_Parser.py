@@ -38,7 +38,10 @@ class SpringArticle(JournalArticle):
         self.title = self.sec.select_one('.title').text
 
     def generate_authors(self):
-        self.authors = list(map(lambda x:x.text,self.sec.select_one('.authors').select('a')))
+        try:
+            self.authors = list(map(lambda x:x.text,self.sec.select_one('.authors').select('a')))
+        except:
+            return
 
     def generate_link(self):
         self.link = 'http://link.springer.com' + self.sec.select_one('.title')['href']

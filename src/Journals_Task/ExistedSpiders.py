@@ -22,7 +22,7 @@ EXISTED_SPIDERS = [
         'need_webdriver':       True
     },{
         'publisherSpiderClass': SpringSpider,
-        'publisherKeywords':    ['spring2er'],
+        'publisherKeywords':    ['springer'],
         'need_webdriver':       False
     },{
         'publisherSpiderClass': IEEE_Spider,
