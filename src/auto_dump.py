@@ -22,11 +22,11 @@ def auto_dump_sql(date_str):
 def auto_dump_log():
     print('dropbox:')
     os.system(
-        '~/dropbox_uploader.sh upload ~/scholar_articles/src/amount_log.txt backups'
+        '~/dropbox_uploader.sh upload ~/scholar_articles/src/GoogleScholar_Task/amount_log.txt backups'
     )
     print('swift bucket:')
     os.system(
-        'swift upload visualspider amount_log.txt -A https://auth.sinas3.com/v1.0 -U 1mzlkylny3 -K jx13044wz5khz555mj3ky2jjimjjlzii41whzziz'
+        'swift upload visualspider ./GoogleScholar_Task/amount_log.txt -A https://auth.sinas3.com/v1.0 -U 1mzlkylny3 -K jx13044wz5khz555mj3ky2jjimjjlzii41whzziz'
     )#only use in 'src'
     print('upload log ok!')
 

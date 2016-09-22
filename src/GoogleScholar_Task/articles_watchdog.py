@@ -89,8 +89,8 @@ if __name__=='__main__':
         self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/articles_watchdog.py']
     else:
         #os.system('source ~/scholar_articles/py3env/bin/activate')
-        proc_cmd_line = ['python', 'ArticlesSpider.py']
-        self_cmd_line = ['python','articles_watchdog.py']
+        proc_cmd_line = ['python3', 'ArticlesSpider.py']
+        self_cmd_line = ['python3','articles_watchdog.py']
 
     Artciles_Spider_WatchDog(self_cmd_line,proc_cmd_line).run()
 
