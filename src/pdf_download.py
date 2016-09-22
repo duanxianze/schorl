@@ -10,11 +10,13 @@ import requests,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
 from crawl_tools.ua_pool import get_one_random_ua
-from db_config import cur
+from src.db_config import new_db_cursor
+
+cur =new_db_cursor()
 
 
 if os.name is 'nt':
-    DOWNLOAD_FOLDER = "F:scholar_articles/src/download/"
+    DOWNLOAD_FOLDER = "F:download/"
 else:
     DOWNLOAD_FOLDER = "~/scholar_articles/src/download/"
 
