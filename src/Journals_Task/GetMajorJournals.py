@@ -111,7 +111,7 @@ def journals_of_specific_index(index_sjr_id,single_area_relation,index_name):
         single_area_relation_word = ''
     cur = new_db_cursor()
     sql =  'select name,sjr_id,site_source,area_relation_cot,\
-                category_relation_cot,publisher from journal \
+                category_relation_cot,publisher,volume_links_got from journal \
           WHERE{}site_source is not null \
           and is_crawled_all_article=FALSE and \
           sjr_id IN(\

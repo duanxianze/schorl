@@ -35,6 +35,7 @@ class ElsevierSpider(JournalSpider):
         self.driverObj = driverObj
         self.JournalObj = JournalObj
         self.handle_sciencedirect_url()
+        self.get_unfinished_volume_links()
 
     def handle_sciencedirect_url(self):
         #print(self.url)
@@ -67,39 +68,43 @@ class ElsevierSpider(JournalSpider):
         else:
             self.url = soup.select_one('.view-articles')['href']
 
-    def run(self):
-        #自动切换不同年代不同卷volume的页面，得到所有结果
+    def generate_volume_links(self):
+        if self.JournalObj.volume_links_got:
+            return
+        #假如数据库中已保存，直接读取即可，无需生成
         for volume_area_link in ElsevierAllItemsPageParser(
             html_source = request_with_random_ua(self.url).text
         ).volume_area_links:
             #先分volume年份区间（十年）
             print(volume_area_link)
-            volume_links = ElsevierAllItemsPageParser(
+            area_volume_links = ElsevierAllItemsPageParser(
                 html_source = request_with_random_ua(volume_area_link).text
             ).volume_links
-            volume_links.append(volume_area_link)
+            area_volume_links.append(volume_area_link)
             #得到该区间所有年份的page_url
-            for volume_link in volume_links:
-                print(volume_link)
-                parser = ElsevierAllItemsPageParser(
-                    html_source = request_with_random_ua(volume_link).text
-                )
-                print(parser.volume_year)
-                for sec in parser.secs:
-                    article = ElsevierAricle(
-                        sec = sec,
-                        JournalObj = self.JournalObj,
-                        year = parser.volume_year
-                    )
-                    if article.type:
-                        while(1):
-                            try:
-                                article.save_to_db()
-                            except psycopg2.OperationalError:
-                                print('db error,again')
-                                time.sleep(2)
-                        #print(article.title)
-        self.mark_journal_ok()
+            self.volume_links.extend(area_volume_links)
+
+    def run(self):
+        unfinished_links = self.get_unfinished_volume_links()
+        for volume_link in unfinished_links:
+            print(volume_link)
+            parser = ElsevierAllItemsPageParser(
+                html_source = request_with_random_ua(volume_link).text
+            )
+            for sec in parser.secs:
+                article = ElsevierAricle(sec,JournalObj,parser.volume_year)
+                if article.type:
+                    while(1):
+                        try:
+                            article.save_to_db()
+                            break
+                        except psycopg2.OperationalError:
+                            print('db error,again')
+                            time.sleep(2)
+            if len(parser.secs)>0:
+                self.mark_volume_ok(volume_link)
+        if len(unfinished_links)>0:
+            self.mark_journal_ok()
 
 
 if __name__=="__main__":

@@ -30,11 +30,19 @@ class IEEE_Spider(JournalSpider):
         JournalSpider.__init__(self,JournalObj)
         self.url = JournalObj.site_source
         self.JournalObj = JournalObj
+        self.generate_volume_links()
+
+    def generate_volume_links(self):
+        if self.JournalObj.volume_links_got:
+            return
+        #假如数据库中已保存，直接读取即可，无需生成
+        self.volume_links = IEEE_AllItemsPageParser(
+            html_source = request_with_random_ua(self.url).text
+        ).volume_links
 
     def run(self):
-        for volume_link in IEEE_AllItemsPageParser(
-            html_source = request_with_random_ua(self.url).text
-        ).volume_links:
+        unfinished_links = self.get_unfinished_volume_links()
+        for volume_link in unfinished_links:
             print(volume_link)
             parser = IEEE_AllItemsPageParser(
                 html_source = request_with_random_ua(volume_link).text
@@ -46,11 +54,15 @@ class IEEE_Spider(JournalSpider):
                 while(1):
                     try:
                         article.save_to_db()
+                        break
                     except psycopg2.OperationalError:
                         print('db error,again')
                         time.sleep(2)
-        self.mark_journal_ok()
-
+            print('xxxxxxxxxxxxxxxxxx')
+            if len(parser.sections)>0:
+                self.mark_volume_ok(volume_link)
+        if len(unfinished_links)>0:
+            self.mark_journal_ok()
 
 if __name__=="__main__":
     from Journals_Task.JournalClass import Journal

@@ -23,3 +23,4 @@ class Journal:
         self.open_access = None
         self.h_index = None
         self.publisher = None
+        self.volume_links_got = None

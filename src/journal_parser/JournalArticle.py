@@ -27,7 +27,7 @@ class JournalArticle:
         self.title = None
         self.abstract = None
         self.pdf_url = None
-        self.authors = None
+        self.authors = []
         self.link = None
         self.id_by_journal = None
         self.year = None
@@ -116,7 +116,7 @@ class JournalArticle:
 
     def save_scholar(self,scholar_name):
         if self.get_scholar_db_id(scholar_name):
-            print('The author: <{}> has been saved'\
+            print('[Error]The author: <{}> has been saved'\
                   .format(scholar_name))
             return
         try:
@@ -131,8 +131,9 @@ class JournalArticle:
 
     def get_scholar_db_id(self,scholar_name):
         self.cur.execute(
-            "select id from temp_scholar where name = '{}'"\
-                .format(scholar_name)
+            "select id from temp_scholar "
+            "where name = %s",
+            (scholar_name,)
         )
         return self.cur.fetchall()
 
