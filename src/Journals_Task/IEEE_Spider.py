@@ -20,7 +20,7 @@ sys.path.append(root_dir)
 from Journals_Task.JournalSpider import JournalSpider
 from journal_parser.IEEE_Parser import IEEE_AllItemsPageParser,IEEE_Article
 from crawl_tools.request_with_proxy import request_with_random_ua
-
+import psycopg2,time
 
 class IEEE_Spider(JournalSpider):
     '''
@@ -43,7 +43,12 @@ class IEEE_Spider(JournalSpider):
                 article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
                 if article.title_text_span==None:
                     continue
-                article.save_to_db()
+                while(1):
+                    try:
+                        article.save_to_db()
+                    except psycopg2.OperationalError:
+                        print('db error,again')
+                        time.sleep(2)
         self.mark_journal_ok()
 
 

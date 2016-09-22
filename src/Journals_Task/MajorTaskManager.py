@@ -72,17 +72,16 @@ class MajorTaskManager:
             drvier_is_visual = False,
             thread_cot = 16
         ):
-
+        journals_info_dict = self.get_journals_info_dict(
+            single_area_relation = journal_need_single_area_relation,
+            index_by_area = journal_need_index_by_area,
+            index_by_category = journal_need_index_by_category
+        )
         thread_pool = ThreadPool(thread_cot)
         self.drviers_pool = DriversPool(
             size = int(thread_cot/2),
             visual = drvier_is_visual,
             launch_with_thread_pool=thread_pool
-        )
-        journals_info_dict = self.get_journals_info_dict(
-            single_area_relation = journal_need_single_area_relation,
-            index_by_area = journal_need_index_by_area,
-            index_by_category = journal_need_index_by_category
         )
         for key in journals_info_dict.keys():
             category_name = key
@@ -91,12 +90,13 @@ class MajorTaskManager:
             thread_pool.map(self.launch_journal_spider,journal_items)
 
 
+
 if __name__=="__main__":
     #为使远程数据库传输压力变小，建议选择比较精细的领域关键词
     from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
-    MajorTaskManager(majorKeyword = 'Artificial').run(
+    MajorTaskManager(majorKeyword = 'Computer Science Applications').run(
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,

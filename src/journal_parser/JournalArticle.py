@@ -88,7 +88,7 @@ class JournalArticle:
 
     def save_article(self):
         if self.is_saved:
-            print('[Error] in JournalArticle:save_article():\n\t<{}> already saved before'\
+            print('Article <{}> already saved before'\
                   .format(self.title))
             return
         try:
@@ -116,7 +116,7 @@ class JournalArticle:
 
     def save_scholar(self,scholar_name):
         if self.get_scholar_db_id(scholar_name):
-            print('[Error] in JournalArticle:save_scholar():\n\tThe author: <{}> has been saved'\
+            print('The author: <{}> has been saved'\
                   .format(scholar_name))
             return
         try:
@@ -125,7 +125,7 @@ class JournalArticle:
                 'values(%s)',
                 (scholar_name,)
             )
-            print('[Success] Save scholar "{}" ok!'.format(scholar_name))
+            print('[Success] Save scholar "{}" ok!'.format(scholar_name.strip()))
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar():\n\t{}'.format(str(e)))
 

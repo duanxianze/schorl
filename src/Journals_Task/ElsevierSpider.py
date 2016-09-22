@@ -22,7 +22,7 @@ from bs4 import BeautifulSoup
 from Journals_Task.JournalSpider import JournalSpider
 from crawl_tools.request_with_proxy import request_with_random_ua
 from journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
-import time
+import time,psycopg2
 
 
 class ElsevierSpider(JournalSpider):
@@ -92,7 +92,12 @@ class ElsevierSpider(JournalSpider):
                         year = parser.volume_year
                     )
                     if article.type:
-                        article.save_to_db()
+                        while(1):
+                            try:
+                                article.save_to_db()
+                            except psycopg2.OperationalError:
+                                print('db error,again')
+                                time.sleep(2)
                         #print(article.title)
         self.mark_journal_ok()
 

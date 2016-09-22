@@ -20,6 +20,7 @@ sys.path.append(root_dir)
 from journal_parser.Spring_Parser import SpringArticle,SpringParser
 from Journals_Task.JournalSpider import JournalSpider
 from crawl_tools.request_with_proxy import request_with_random_ua
+import psycopg2,time
 
 class SpringSpider(JournalSpider):
     '''
@@ -46,7 +47,12 @@ class SpringSpider(JournalSpider):
             for sec in SpringParser(
                 html_source=request_with_random_ua(page_url).text
             ).secs:
-                SpringArticle(sec,self.JournalObj).save_to_db()
+                while(1):
+                    try:
+                        SpringArticle(sec,self.JournalObj).save_to_db()
+                    except psycopg2.OperationalError:
+                        print('db error,again')
+                        time.sleep(2)
         self.mark_journal_ok()
 
 
