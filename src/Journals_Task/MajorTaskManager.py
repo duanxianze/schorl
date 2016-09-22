@@ -9,6 +9,15 @@
 @description:
             特定领域下的杂志爬虫任务启动模块，调度数据库和爬虫
 """
+import sys,os
+up_level_N = 1
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
+
 from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
 from Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
@@ -48,6 +57,7 @@ class MajorTaskManager:
         JournalObj.area_relation_cot = db_journal_item[3]
         JournalObj.category_relation_cot = db_journal_item[4]
         JournalObj.publisher = db_journal_item[5]
+        JournalObj.volume_links_got = db_journal_item[6]
         #print(journal_name,journal_sjr_id,journal_url)
         spider_item = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
         #print(spider_item,'spider_item')

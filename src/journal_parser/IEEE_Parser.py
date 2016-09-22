@@ -188,7 +188,7 @@ class IEEE_Article(JournalArticle):
 
 
 if __name__=="__main__":
-    from src.Journals_Task.JournalClass import Journal
+    from Journals_Task.JournalClass import Journal
     parser = IEEE_AllItemsPageParser(from_web=False)
     JournalObj=Journal()
     JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
