@@ -46,11 +46,12 @@ class SpringSpider(JournalSpider):
             for sec in SpringParser(
                 html_source=request_with_random_ua(page_url).text
             ).secs:
-                SpringArticle(sec,self.JournalObj).show_in_cmd()
+                SpringArticle(sec,self.JournalObj).save_to_db()
+        self.mark_journal_ok()
 
 
 if __name__=="__main__":
-    from src.Journals_Task.JournalClass import Journal
+    from Journals_Task.JournalClass import Journal
     JournalObj=Journal()
     JournalObj.site_source = 'http://www.springer.com/computer+science/image+processing/journal/10055'
     SpringSpider(

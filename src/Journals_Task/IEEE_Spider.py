@@ -43,12 +43,13 @@ class IEEE_Spider(JournalSpider):
                 article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
                 if article.title_text_span==None:
                     continue
-                article.show_in_cmd()
+                article.save_to_db()
+        self.mark_journal_ok()
 
 
 if __name__=="__main__":
-    from src.Journals_Task.JournalClass import Journal
-    from src.crawl_tools.DriversPool import Driver
+    from Journals_Task.JournalClass import Journal
+    from crawl_tools.DriversPool import Driver
     JournalObj=Journal()
     JournalObj.site_source = 'http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83'
     JournalObj.sjr_id = 123

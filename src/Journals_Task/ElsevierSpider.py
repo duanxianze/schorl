@@ -92,17 +92,14 @@ class ElsevierSpider(JournalSpider):
                         year = parser.volume_year
                     )
                     if article.type:
-                        article.show_in_cmd()
+                        article.save_to_db()
                         #print(article.title)
-                        #article.save_to_db()
-                    print('----------')
-            print('===================')
-        #self.mark_journal_ok()
+        self.mark_journal_ok()
 
 
 if __name__=="__main__":
-    from src.Journals_Task.JournalClass import Journal
-    from src.crawl_tools.DriversPool import Driver
+    from Journals_Task.JournalClass import Journal
+    from crawl_tools.DriversPool import Driver
     JournalObj=Journal()
     JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
     JournalObj.sjr_id = 123

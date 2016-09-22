@@ -201,7 +201,7 @@ class Article:
 
 
 if __name__=='__main__':
-    from src.db_config import new_db_cursor
+    from db_config import new_db_cursor
     cur = new_db_cursor()
     for sec in ParseHTML(from_web=False,file_name='scholar_articles.htm').sections():
         Article(sec).save_to_db(cur)

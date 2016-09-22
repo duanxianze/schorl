@@ -9,7 +9,7 @@
 @description:
             特定领域下的杂志爬虫任务启动模块，调度数据库和爬虫
 """
-from Journals_Task.ExistedSpiders import *
+from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
 from Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
 from Journals_Task.JournalClass import Journal
@@ -93,7 +93,7 @@ class MajorTaskManager:
 
 if __name__=="__main__":
     #为使远程数据库传输压力变小，建议选择比较精细的领域关键词
-    from src.crawl_tools.WatchDog import close_procs_by_keyword
+    from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
     MajorTaskManager(majorKeyword = 'Artificial').run(
@@ -101,5 +101,5 @@ if __name__=="__main__":
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
         drvier_is_visual=False,
-        thread_cot = 4
+        thread_cot = 16
     )

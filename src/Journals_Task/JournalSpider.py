@@ -33,3 +33,4 @@ class JournalSpider:
 
     def handle_db_url(self):
         pass
+
