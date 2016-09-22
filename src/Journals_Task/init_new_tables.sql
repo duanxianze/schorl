@@ -74,3 +74,13 @@ CREATE TABLE Scholar_Article(
   article_id int NOT NULL,
   CONSTRAINT SA_pk PRIMARY KEY(id)
 );
+
+
+CREATE TABLE journal_volume(
+    id serial,
+    link text not null,
+    journal_sjr_id int not null,
+    is_crawled boolean default false,
+    CONSTRAINT link_unique UNIQUE(link),
+    CONSTRAINT JV_pk PRIMARY KEY(link)
+);
