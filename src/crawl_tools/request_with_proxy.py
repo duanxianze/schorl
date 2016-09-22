@@ -88,7 +88,12 @@ def request_with_proxy(url, timeout=14, use_ss=False,
         return requests.get(url, proxies=proxies, timeout=timeout, headers=headers,verify=False)
 
 def request_with_random_ua(url):
-    return requests.get(
-        url=url,
-        headers = {'User-Agent': get_one_random_ua()}
-    )
+    for i in range(10):
+        try:
+            return requests.get(
+                url = url,
+                headers = {'User-Agent': get_one_random_ua()}
+            )
+        except:
+            time.sleep(2)
+    return None
