@@ -22,7 +22,8 @@ class JournalArticle:
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.journal_id = JournalObj.sjr_id
-        #self.cur = new_db_cursor()
+        self.cur = new_db_cursor()
+        self.category_id = None
         self.title = None
         self.abstract = None
         self.pdf_url = None
@@ -52,6 +53,12 @@ class JournalArticle:
     def generate_id_by_journal(self):
         pass
 
+    def generate_category_id(self):
+        if self.JournalObj.category_relation_cot == 1:
+            self.category_id = self.get_category_ids_by_journal_id(
+                journal_id=self.journal_id
+            )[0][0]
+
     def generate_all_method(self):
         self.generate_pdf_url()
         self.generate_link()
@@ -60,6 +67,7 @@ class JournalArticle:
         self.generate_id_by_journal()
         self.generate_title()
         self.generate_year()
+        self.generate_category_id()
 
     @property
     def resource_type(self):
@@ -67,21 +75,22 @@ class JournalArticle:
             return 'PDF'
 
     def save_to_db(self):
-        print('save_to_db{}'.format(self.title))
-        '''
         self.save_article()
-        self.save_scholar()
-        self.save_scholar_article_realtion()
-        if self.JournalObj.category_relation_cot==1:
-            self.save_scholar_category_realtion()
-            #假若该杂志社属于仅一个category，则存学者与category关系表
-        if self.JournalObj.area_relation_cot==1:
-            self.save_scholar_article_realtion()
-            #假若该杂志社属于仅一个area，则存学者与category关系表
-            #前期检索出的都是一个area的杂志社，此处必会经过
-        '''
+        for author_db_id in self.save_scholar_and_return_db_ids():
+            self.save_scholar_article_realtion(author_db_id)
+            if self.JournalObj.category_relation_cot==1:
+                self.save_scholar_category_realtion(author_db_id)
+                #假若该杂志社属于仅一个category，则存学者与category关系表
+            if self.JournalObj.area_relation_cot==1:
+                self.save_scholar_article_realtion(author_db_id)
+                #假若该杂志社属于仅一个area，则存学者与category关系表
+                #前期检索出的都是一个area的杂志社，此处必会经过
 
     def save_article(self):
+        if self.is_saved:
+            print('[Error] in JournalArticle:save_article():\n\t<{}> already saved before'\
+                  .format(self.title))
+            return
         try:
             self.cur.execute(
                 'insert into articles(title,year,link,\
@@ -90,37 +99,48 @@ class JournalArticle:
                 (self.title,self.year,self.link,self.resource_type,\
                     self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
             )
-            print('save article ok!')
-            return True
+            self.show_in_cmd()
         except Exception as e:
             print('[Error] in JournalArticle:save_article():\n{}'.format(str(e)))
-        return False
+
+    @property
+    def is_saved(self):
+        cur = new_db_cursor()
+        cur.execute(
+            "select count(*) from articles where id_by_journal='{}'"\
+                .format(self.id_by_journal)
+        )
+        data = cur.fetchall()[0][0]
+        cur.close()
+        return data
 
     def save_scholar(self,scholar_name):
+        if self.get_scholar_db_id(scholar_name):
+            print('[Error] in JournalArticle:save_scholar():\n\tThe author: <{}> has been saved'\
+                  .format(scholar_name))
+            return
         try:
             self.cur.execute(
                 'insert into temp_scholar(name)'
                 'values(%s)',
-                (scholar_name)
+                (scholar_name,)
             )
-            print('save scholar ok!')
-            return True
+            print('[Success] Save scholar "{}" ok!'.format(scholar_name))
         except Exception as e:
-            print('[Error] in JournalArticle:save_scholar():\n{}'.format(str(e)))
-        return False
+            print('[Error] in JournalArticle:save_scholar():\n\t{}'.format(str(e)))
 
     def get_scholar_db_id(self,scholar_name):
         self.cur.execute(
             "select id from temp_scholar where name = '{}'"\
                 .format(scholar_name)
         )
-        return self.cur.fetchall()[0][0]
+        return self.cur.fetchall()
 
     def save_scholar_and_return_db_ids(self):
         scholar_db_ids = []
         for author_name in self.authors:
             self.save_scholar(author_name)
-            scholar_db_id = self.get_scholar_db_id(author_name)
+            scholar_db_id = self.get_scholar_db_id(author_name)[0][0]
             scholar_db_ids.append(scholar_db_id)
         return scholar_db_ids
 
@@ -134,29 +154,39 @@ class JournalArticle:
         cur.close()
         return data
 
-    def save_scholar_category_realtion(self,temp_scholar_id,category_id):
+    def save_scholar_category_realtion(self,temp_scholar_id):
+        if not self.category_id:
+            print('SC Realtion saved error:\n\t Category_id cant be null')
+        if self.scholar_category_relation_is_saved(
+                temp_scholar_id,self.category_id):
+            print('The SC relation:[{},{}] has been saved'\
+                  .format(temp_scholar_id,self.category_id))
         try:
             self.cur.execute(
                 'insert into temp_scholar_category(temp_scholar_id,category_id)'
                 'values(%s,%s)',
-                (temp_scholar_id,category_id)
+                (temp_scholar_id,self.category_id)
             )
             return True
         except Exception as e:
-            print('[Error] in JournalArticle:save_scholar_category_realtion():\n{}'.format(str(e)))
+            print('[Error] in JournalArticle:save_scholar_category_realtion():\n\t{}'.format(str(e)))
         return False
 
     def save_scholar_article_realtion(self,temp_scholar_id):
+        if self.scholar_article_relation_is_saved(temp_scholar_id):
+            print('[Error]The SA relation:[{},{}] has been saved'\
+                  .format(temp_scholar_id,self.id_by_journal))
+            return
         try:
             self.cur.execute(
                 'insert into temp_scholar_article(temp_scholar_id,article_id)'
                 'values(%s,%s)',
                 (temp_scholar_id,self.id_by_journal)
             )
-            return True
+            print('[Success] Save SA relation[{},{}] ok'\
+                  .format(temp_scholar_id,self.id_by_journal))
         except Exception as e:
-            print('[Error] in JournalArticle:save_scholar_article_realtion():\n{}'.format(str(e)))
-        return False
+            print('[Error] in JournalArticle:save_scholar_article_realtion():\n\t{}'.format(str(e)))
 
     def scholar_category_relation_is_saved(self,temp_scholar_id,category_id):
         cur = new_db_cursor()
@@ -165,30 +195,57 @@ class JournalArticle:
             where temp_scholar_id={} and category_id={}'\
                 .format(temp_scholar_id,category_id)
         )
-        data = cur.fetchall[0][0]
-        print('SC amount',data)
+        data = cur.fetchall()[0][0]
+        #print('SC amount',data)
         cur.close()
         return data
 
     def scholar_article_relation_is_saved(self,temp_scholar_id):
         cur = new_db_cursor()
         cur.execute(
-            'select count(*) from temp_scholar_article\
-            where temp_scholar_id={} and category_id={}'\
+            "select count(*) from temp_scholar_article\
+            where temp_scholar_id={} and article_id='{}'"\
                 .format(temp_scholar_id,self.id_by_journal)
         )
-        data = cur.fetchall[0][0]
-        print('SA amount',data)
+        data = cur.fetchall()[0][0]
+        #print('SA amount',data)
         cur.close()
         return data
 
     def show_in_cmd(self):
         print('\n*********New article of <{}>***********'.format(self.JournalObj.publisher))
         print('title:\t\t{}'.format(self.title))
-        print('abstract:\t\t{}'.format(self.abstract))
-        print('pdf_url:\t{}'.format(self.pdf_url))
         print('authors:\t{}'.format(self.authors))
+        print('pdf_url:\t{}'.format(self.pdf_url))
         print('link:\t\t{}'.format(self.link))
         print('id_by_journal:\t{}'.format(self.id_by_journal))
         print('year:\t\t{}'.format(self.year))
+        print('category_id:\t\t{}'.format(self.category_id))
+        print('abstract:\t\t{}'.format(self.abstract))
         print('*********New article of <{}>***********'.format(self.JournalObj.publisher))
+
+
+if __name__=="__main__":
+    #  Test
+    from Journals_Task.JournalClass import Journal
+    journalObj = Journal()
+    article = JournalArticle(journalObj)
+    article.authors = ['gelin','sbxgl']
+    article.id_by_journal = 'xxx'
+    article.category_id = 1
+    article.title = 'woshishabiha'
+    article.pdf_url = 'xxxx.pdf'
+    article.link = 'www.dsdsd.com'
+    article.year = 20111
+    article.save_to_db()
+    '''
+    scholar_id = article.get_scholar_db_id('tony')
+    print(scholar_id)
+    article.save_scholar(scholar_name='luyang')
+    ids = article.save_scholar_and_return_db_ids()
+    print(ids)
+    article.save_scholar_article_realtion(temp_scholar_id=2)
+    article.scholar_category_relation_is_saved(temp_scholar_id=2,category_id=1)
+    article.save_scholar_category_realtion(temp_scholar_id=2)
+    article.get_category_ids_by_journal_id()
+    '''
