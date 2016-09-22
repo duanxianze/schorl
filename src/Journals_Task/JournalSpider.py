@@ -31,6 +31,43 @@ class JournalSpider:
         )
         cur.close()
 
+    def get_db_volume_item(self,volume_link):
+        cur = new_db_cursor()
+        cur.execute(
+            "select is_crawled from journal_volume \
+                where link = '{}' ".format(volume_link)
+        )
+        data = cur.fetchall()
+        cur.close()
+        return data
+
+    def create_volume(self,volume_link):
+        cur = new_db_cursor()
+        cur.execute(
+            "insert into journal_volume(link,journal_sjr_id,is_crawled)"
+            "values(%s,%s,%s)",
+            (volume_link,self.JournalObj.sjr_id,False)
+        )
+        print('save {} ok!'.format(volume_link))
+        cur.close()
+
+    def mark_volume_ok(self,volume_link):
+        cur = new_db_cursor()
+        sql = "update journal_volume set is_crawled=true \
+                where link='{}'".format(volume_link)
+        #print(sql)
+        cur.execute(sql)
+        print('mark {} ok!'.format(volume_link))
+
     def handle_db_url(self):
         pass
 
+
+if __name__=="__main__":
+    from Journals_Task.JournalClass import Journal
+    JournalObj=Journal()
+    JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
+    JournalObj.sjr_id = 1
+    js = JournalSpider(JournalObj)
+    js.mark_volume_ok('www.xxxx.com')
+    #js.create_volume(volume_link='www.xxxx.com')
