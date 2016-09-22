@@ -72,5 +72,5 @@ if __name__=='__main__':
         thread_counts=8,
         visual=visual,
         limit=1000000,
-        length=100000
+        length=10000
     )
