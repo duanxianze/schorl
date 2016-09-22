@@ -80,10 +80,9 @@ class MajorEntrance:
             )
         '''
             journal_dict is like:{
-                'major name 1':{'length':n,'db_items':[x,y,z]},
-                'major name 2':{'length':n,'db_items':[w,m,n]},
+                'major name 1': db_items1,
+                'major name 2': db_items2,
              }
-             建议迭代时用for key in journal_dict.keys():   pass
         '''
         return journal_dict
 
@@ -105,69 +104,53 @@ def categories_of_specific_area(area_sjr_id):
     )
     return cur.fetchall()
 
-def journals_of_specific_category(category_sjr_id,single_area_relation):
-    #假如多于十个则按h_index排出前十
+def journals_of_specific_index(index_sjr_id,single_area_relation,index_name):
     if single_area_relation:
         single_area_relation_word = ' area_relation_cot=1 and '
     else:
         single_area_relation_word = ''
     cur = new_db_cursor()
-    cur.execute(
-        'select name,open_access,sjr_id,h_index,site_source from journal \
-          WHERE{}sjr_id IN(\
-            select journal_id from journal_category \
-            WHERE site_source is not null and category_id={}\
-              and is_crawled_all_article=FALSE \
+    sql =  'select name,sjr_id,site_source,area_relation_cot,\
+                category_relation_cot,publisher from journal \
+          WHERE{}site_source is not null \
+          and is_crawled_all_article=FALSE and \
+          sjr_id IN(\
+            select journal_id from journal_{} \
+            WHERE {}_id={} \
         ) ORDER by h_index desc limit 10'.format(
-            single_area_relation_word,category_sjr_id
+            single_area_relation_word,index_name,index_name,index_sjr_id
         )
-    )
+    #print(sql)
+    cur.execute(sql)
     return cur.fetchall()
 
+def journals_of_specific_category(category_sjr_id,single_area_relation):
+    #假如多于十个则按h_index排出前十
+    return journals_of_specific_index(category_sjr_id,single_area_relation,'category')
+
 def journals_of_specific_area(area_sjr_id,single_area_relation):
-    if single_area_relation:
-        single_area_relation_word = ' area_relation_cot=1 and '
-    else:
-        single_area_relation_word = ''
-    cur = new_db_cursor()
-    cur.execute(
-        'select name,open_access,sjr_id,h_index,site_source from journal \
-          WHERE{}sjr_id IN(\
-            select journal_id from journal_area \
-            WHERE site_source is not null and area_id={}\
-              and is_crawled_all_article=FALSE \
-        ) ORDER by h_index desc limit 50'.format(
-            single_area_relation_word,area_sjr_id
-        )
-    )
-    return cur.fetchall()
+    return journals_of_specific_index((area_sjr_id,single_area_relation,'area'))
 
 def journals_of_specific_major(
     possible_db_items,journals_of_specific_func,tag_info,
     single_area_relation = True
 ):
     journal_dict = {}
+    index = 1
+    print('\n{} amount:\t{}\nFollwing of them:\n'\
+      .format(tag_info,len(possible_db_items)))
     for db_item in possible_db_items:
         item_sjr_id = db_item[1]
         item_name = db_item[0]
         journal_items = journals_of_specific_func(item_sjr_id,single_area_relation)
-        journal_dict[item_name] = {
-            'db_items':journal_items,
-            'length':len(journal_items)
-        }
-    print('\n{} amount:\t{}\nFollwing of them:\n'\
-          .format(tag_info,len(possible_db_items)))
-    index = 1
-    for key in (journal_dict.keys()):
-        key_journals = journal_dict[key]
+        journal_dict[item_name] = journal_items
         print('{}.{}({}):'\
-            .format(index,key,key_journals['length']))
-        for item in key_journals['db_items']:
+            .format(index,item_name,len(journal_items)))
+        for item in journal_items:
             print(item)
         index += 1
         print('\n')
     return journal_dict
-
 
 
 if __name__=="__main__":

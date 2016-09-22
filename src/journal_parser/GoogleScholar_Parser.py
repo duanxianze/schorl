@@ -116,6 +116,7 @@ class Article:
     def index(self):
         return self.sec.select('.gs_nph > a')[0]['onclick'].split('(')[-1].split(',')[1][1:-2]
 
+    '''
     @property
     @except_or_none
     def journal_temp_info(self):
@@ -123,6 +124,7 @@ class Article:
         # 之前考虑数据不冗余，所以没把bibtex中重复的信息单独作为一项
         # 本属性也只属于articles表临时列，成品可删除
         return self.sec.select('.gs_a')[0].text.split('-')[-1]
+    '''
 
     def is_saved(self,cur):
         cur.execute(
@@ -132,7 +134,7 @@ class Article:
 
     def db_item_values(self,cur):
         cur.execute(
-            "select journal_temp_info,citations_count from articles where google_id = '{}'".format(self.google_id)
+            "select citations_count from articles where google_id = '{}'".format(self.google_id)
         )
         return cur.fetchall()[0]
 
@@ -145,13 +147,13 @@ class Article:
             if None in self.db_item_values(cur):
                 #假如数据库中该item存在空项，则更新
                 print('Somthing is null in db,Updating...')
-                if self.journal_temp_info and self.citations_count is not None:
+                if self.citations_count is not None:
                     #假如爬虫数据获取正常
                     cur.execute(
-                        "update articles set journal_temp_info = '{}' ,\
+                        "update articles set \
                          citations_count = {},citations_link='{}' \
                          where google_id = '{}'".format(
-                            self.journal_temp_info,self.citations_count,\
+                            self.citations_count,\
                             self.citations_link,self.google_id
                         )
                     )
@@ -161,13 +163,13 @@ class Article:
                     return False
             return True
         try:
-            if self.title and self.year and self.google_id and self.journal_temp_info:
+            if self.title and self.year and self.google_id:
                 cur.execute(
                     "insert into articles (title, year, citations_count, citations_link, link, \
-                    resource_type, resource_link, summary, google_id,journal_temp_info) "
+                    resource_type, resource_link, summary, google_id) "
                     "values (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) on conflict do nothing",
                     (self.title, self.year, self.citations_count, self.citations_link, self.link, \
-                     self.resource_type, self.resource_link, self.summary, self.google_id,self.journal_temp_info)
+                     self.resource_type, self.resource_link, self.summary, self.google_id)
                 )
                 print('**************New Article Info******************')
                 self.show_in_cmd()
@@ -195,12 +197,12 @@ class Article:
         print('citations_link:\t{}'.format(self.citations_link))
         print('link:\t\t\t{}'.format(self.link))
         print('summary:\t\t{}'.format(self.summary))
-        print('journal_temp_info:\t\t{}'.format(self.journal_temp_info))
 
 
 
 if __name__=='__main__':
-    from db_config import cur
+    from src.db_config import new_db_cursor
+    cur = new_db_cursor()
     for sec in ParseHTML(from_web=False,file_name='scholar_articles.htm').sections():
         Article(sec).save_to_db(cur)
         #print(Article(sec).db_item_values(cur))

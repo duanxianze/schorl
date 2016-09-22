@@ -17,9 +17,11 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-from db_config import cur
-from pdf_download import PdfDownloader,DOWNLOAD_FOLDER
+from src.db_config import new_db_cursor
+from src.pdf_download import PdfDownloader,DOWNLOAD_FOLDER
 from multiprocessing.dummy import Pool as ThreadPool
+
+cur = new_db_cursor()
 
 class GooglePatent_PDF_Downloader:
     def __init__(self):
@@ -27,7 +29,7 @@ class GooglePatent_PDF_Downloader:
 
     def get_unfinished_items(self,limit=100000000):
         cur.execute(
-            "select link,google_id from articles where journal_temp_info like '%Patents%' and resource_link is null limit {}".format(limit)
+            "select link,google_id from articles where link like '%google.com/patents%' and resource_link is null limit {}".format(limit)
         )
         data = cur.fetchall()
         print('Loading {} items'.format(len(data)))

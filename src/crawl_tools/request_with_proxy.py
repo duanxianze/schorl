@@ -4,7 +4,7 @@
 '''
 
 import time
-from crawl_tools.ua_pool import get_one_random_ua
+from src.crawl_tools.ua_pool import get_one_random_ua
 import requests
 requests.packages.urllib3.disable_warnings()
 from random import randint
@@ -79,3 +79,9 @@ def request_with_proxy(url, timeout=14, use_ss=False,
             "https": "socks5://127.0.0.1:{}".format(port)
         }
         return requests.get(url, proxies=proxies, timeout=timeout, headers=headers,verify=False)
+
+def request_with_random_ua(url):
+    return requests.get(
+        url=url,
+        headers = {'User-Agent': get_one_random_ua()}
+    )

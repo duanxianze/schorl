@@ -73,10 +73,9 @@ class JournalInfoGenerator:
 
     def get_db_journal_ids(self):
         cur = new_db_cursor()
-        cur.execute(
-            #'select sjr_id from journal WHERE is_crawled=FALSE '
-            'select sjr_id from journal WHERE area_relation_cot=0'
-        )
+        #sql = 'select sjr_id from journal WHERE area_relation_cot=0'
+        sql = 'select sjr_id from journal WHERE is_crawled=FALSE'
+        cur.execute(sql)
         journal_ids = cur.fetchall()
         cur.close()
         return journal_ids
@@ -99,10 +98,48 @@ class JournalInfoGenerator:
         )
         cur.close()
 
+    def category_relation_cot(self,journal_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select count(*) from journal_category WHERE journal_id={}'.format(journal_id)
+        )
+        amount = cur.fetchall()[0][0]
+        cur.close()
+        return amount
+
+    def update_category_relation_cot(self,journal_id):
+        try:
+            amount = self.category_relation_cot(journal_id)
+            print(amount,journal_id)
+            cur = new_db_cursor()
+            cur.execute(
+                'update journal set category_relation_cot={} where sjr_id={}'.format(amount,journal_id)
+            )
+            cur.close()
+            new_db_cursor().execute(
+                    'update journal set is_crawled = true where sjr_id = {}'\
+                        .format(journal_id)
+                )
+            print('update {}ok'.format(journal_id))
+        except Exception as e:
+            print(str(e))
+
     def get_detail_journal_info(self,db_item):
-        journal_sjr_id=db_item[0]
+        try:
+            journal_sjr_id=db_item[0]
+            result = JournalDetailPageParser(journal_sjr_id)\
+                .save_journal_category()
+            if result:
+                new_db_cursor().execute(
+                    'update journal set is_crawled = true where sjr_id = {}'\
+                        .format(journal_sjr_id)
+                )
+                print('update {}ok'.format(journal_sjr_id))
+        except Exception as e:
+            print(str(e))
         '''
         self.update_area_relation_cot(journal_sjr_id)
+        '''
         '''
         if self.is_crawled_in_detail_page(journal_sjr_id):
             print('[Relations crawled] {}'\
@@ -110,6 +147,8 @@ class JournalInfoGenerator:
             return
         JournalDetailPageParser(journal_sjr_id)\
             .save_journal_area()
+        '''
+
 
     def run(self,mode,drivers_cot=8,thread_cot=8):
         self.thread_pool = ThreadPool(thread_cot)
@@ -136,6 +175,14 @@ class JournalInfoGenerator:
                 func = self.get_detail_journal_info,
                 iterable = self.get_db_journal_ids()
             )
+        elif mode==3:
+            #初始化所有journal的category条目数量
+            joutnal_ids = list(map(lambda x:x[0],self.get_db_journal_ids()))
+            print(joutnal_ids)
+            self.thread_pool.map(
+                func = self.update_category_relation_cot,
+                iterable = joutnal_ids
+            )
         else:
             pass
 
@@ -144,5 +191,5 @@ if __name__=="__main__":
     close_procs_by_keyword('phantom')
     ge = JournalInfoGenerator()
     #ge.is_crawled_in_rank_page(category_id=3403)
-    ge.run(mode=2,drivers_cot=0,thread_cot=16)
+    ge.run(mode=3,drivers_cot=0,thread_cot=32)
 

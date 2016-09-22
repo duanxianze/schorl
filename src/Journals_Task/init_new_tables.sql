@@ -53,3 +53,24 @@ CREATE TABLE Journal_Area(
 );
 
 
+
+CREATE TABLE Temp_Scholar(
+  id SERIAL,
+  name VARCHAR(100) NOT NULL,
+  CONSTRAINT TS_pk PRIMARY KEY(id),
+  CONSTRAINT name_unique UNIQUE(name),
+);
+
+CREATE TABLE Scholar_Category(
+  id SERIAL,
+  temp_scholar_id int NOT NULL,
+  category_id int NOT NULL,
+  CONSTRAINT SC_pk PRIMARY KEY(id)
+);
+
+CREATE TABLE Scholar_Article(
+  id SERIAL,
+  temp_scholar_id int NOT NULL,
+  article_id int NOT NULL,
+  CONSTRAINT SA_pk PRIMARY KEY(id)
+);
