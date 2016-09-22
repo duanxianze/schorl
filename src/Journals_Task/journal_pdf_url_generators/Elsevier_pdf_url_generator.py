@@ -18,12 +18,12 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-from journal_parser.Elsevier_Parser import Elsevier_Parser
+from journal_parser.Elsevier_Parser import ElsevierDetailPageParser
 from PdfUrlGenerator import *
 
 def get_elsevier_pdf_url_func(driver,unfinished_item):
     #print('url:{}'.format(unfinished_item[0]))
-    return Elsevier_Parser(
+    return ElsevierDetailPageParser(
         article_page_url = unfinished_item[0],
         driver = driver
     ).pdf_url
@@ -38,7 +38,7 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
             query_sql = self.query_sql,
             max_id_where_sqls=[
                 ['resource_link','is','null'],
-                ['journal_temp_info','like','%Elsevier%']
+                ['link','like','%sciencedirect%']
             ],
             length = length
         )
@@ -53,7 +53,7 @@ class Elsevier_pdf_url_generator(PdfUrlGenerator):
         self.query_limit = limit
         self._run(thread_counts,visual)
         self.query_sql = "select link,google_id from articles where resource_link is null \
-                  and journal_temp_info like '%Elsevier%' limit {}".format(limit)
+                  and link like '%sciencedirect%' limit {}".format(limit)
         self._task_thread_pool.map(self.generate,self.get_unfinished_items(length))
         self._close()
 

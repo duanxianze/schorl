@@ -87,7 +87,7 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
         self.query_limit = limit
         self._run(thread_counts,visual)
         self.query_sql = "select title,google_id,pdf_temp_url from articles where resource_link is null\
-                    and journal_temp_info like '%ieee%' ORDER by id desc limit {}".format(limit)
+                    and link like '%ieee%' ORDER by id desc limit {}".format(limit)
         self._task_thread_pool.map(self.generate,self.get_unfinished_items())
         self._close()
 
