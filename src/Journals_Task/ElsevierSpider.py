@@ -92,7 +92,10 @@ class ElsevierSpider(JournalSpider):
                 html_source = request_with_random_ua(volume_link).text
             )
             for sec in parser.secs:
-                article = ElsevierAricle(sec,JournalObj,parser.volume_year)
+                try:
+                    article = ElsevierAricle(sec,JournalObj,parser.volume_year)
+                except Exception as e:
+                    continue
                 if article.type:
                     while(1):
                         try:

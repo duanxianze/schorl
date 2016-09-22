@@ -100,7 +100,6 @@ class MajorTaskManager:
             thread_pool.map(self.launch_journal_spider,journal_items)
 
 
-
 if __name__=="__main__":
     #为使远程数据库传输压力变小，建议选择比较精细的领域关键词
     from crawl_tools.WatchDog import close_procs_by_keyword

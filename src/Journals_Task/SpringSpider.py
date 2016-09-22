@@ -57,9 +57,13 @@ class SpringSpider(JournalSpider):
                 html_source=request_with_random_ua(volume_link).text
             ).secs
             for sec in secs:
+                try:
+                    article = SpringArticle(sec,self.JournalObj)
+                except:
+                    continue
                 while(1):
                     try:
-                        SpringArticle(sec,self.JournalObj).save_to_db()
+                        article.save_to_db()
                         break
                     except psycopg2.OperationalError:
                         print('db error,again')

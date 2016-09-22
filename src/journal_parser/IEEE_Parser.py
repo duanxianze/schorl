@@ -161,6 +161,7 @@ class IEEE_Article(JournalArticle):
         self.title_parent_a_tag = self.title_text_span.parent
         self.generate_all_method()
 
+
     def generate_title(self):
         self.title = self.title_text_span.text
 

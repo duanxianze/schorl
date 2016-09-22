@@ -48,7 +48,10 @@ class IEEE_Spider(JournalSpider):
                 html_source = request_with_random_ua(volume_link).text
             )
             for sec in parser.sections:
-                article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
+                try:
+                    article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
+                except:
+                    continue
                 if article.title_text_span==None:
                     continue
                 while(1):
