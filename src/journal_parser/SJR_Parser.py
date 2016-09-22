@@ -11,9 +11,9 @@
         该文件对某领域的杂志社排名页，以及杂志社详情页做解析
 """
 import time,requests
-from src.db_config import new_db_cursor
+from db_config import new_db_cursor
 from bs4 import BeautifulSoup
-from src.crawl_tools.ua_pool import get_one_random_ua
+from crawl_tools.ua_pool import get_one_random_ua
 
 class JournalRankPageParser:
     def __init__(self,area_id,category_id,driver):

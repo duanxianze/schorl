@@ -9,7 +9,15 @@
 @description:
             The basic class of journal spider which contains public methods.
 """
-from src.db_config import new_db_cursor
+import sys,os
+up_level_N = 1
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
+from db_config import new_db_cursor
 
 class JournalSpider:
     def __init__(self,JournalObj):

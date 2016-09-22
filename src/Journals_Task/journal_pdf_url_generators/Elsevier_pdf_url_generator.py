@@ -19,7 +19,7 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 from journal_parser.Elsevier_Parser import ElsevierDetailPageParser
-from PdfUrlGenerator import *
+from Journals_Task.journal_pdf_url_generators.PdfUrlGenerator import *
 
 def get_elsevier_pdf_url_func(driver,unfinished_item):
     #print('url:{}'.format(unfinished_item[0]))

@@ -18,6 +18,9 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 from crawl_tools.WatchDog import WatchDog
+from db_config import new_db_cursor
+import time
+cur = new_db_cursor()
 
 class IEEE_Generator_Watchdog(WatchDog):
     def __init__(self,self_cmd_line,proc_cmd_line,pid=None):

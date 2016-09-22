@@ -10,10 +10,10 @@
             获取所有SJRD的journal信息
 """
 
-from src.journal_parser.SJR_Parser import *
-from src.crawl_tools.DriversPool import DriversPool
+from journal_parser.SJR_Parser import *
+from crawl_tools.DriversPool import DriversPool
 from multiprocessing.dummy import Pool as ThreadPool
-from src.db_config import new_db_cursor
+from db_config import new_db_cursor
 import random
 
 class JournalInfoGenerator:

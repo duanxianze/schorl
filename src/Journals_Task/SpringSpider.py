@@ -9,10 +9,17 @@
 @description:
             ??
 """
+import sys,os
+up_level_N = 1
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
 
-from src.journal_parser.Spring_Parser import SpringArticle,SpringParser
-from src.Journals_Task.JournalSpider import JournalSpider
-from src.crawl_tools.request_with_proxy import request_with_random_ua
+from journal_parser.Spring_Parser import SpringArticle,SpringParser
+from Journals_Task.JournalSpider import JournalSpider
+from crawl_tools.request_with_proxy import request_with_random_ua
 
 class SpringSpider(JournalSpider):
     '''

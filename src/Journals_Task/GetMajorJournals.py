@@ -15,7 +15,7 @@
         （杂志社的分布情况，专业分支交叉情况）来微调参数。
 """
 
-from src.db_config import new_db_cursor
+from db_config import new_db_cursor
 
 class MajorEntrance:
     '''

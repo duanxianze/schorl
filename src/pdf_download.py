@@ -10,7 +10,7 @@ import requests,os,random
 requests.packages.urllib3.disable_warnings()
 from multiprocessing.dummy import Pool as ThreadPool
 from crawl_tools.ua_pool import get_one_random_ua
-from src.db_config import new_db_cursor
+from db_config import new_db_cursor
 
 cur =new_db_cursor()
 

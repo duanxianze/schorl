@@ -18,7 +18,7 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 from crawl_tools.WatchDog import WatchDog
-from Elsevier_pdf_url_generator import *
+from Journals_Task.journal_pdf_url_generators.Elsevier_pdf_url_generator import *
 import time
 
 class Elsevier_Generator_Watchdog(WatchDog):

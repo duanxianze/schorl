@@ -19,7 +19,7 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from journal_parser.GoogleScholar_Parser import *
-from src.db_config import new_db_cursor
+from db_config import new_db_cursor
 cur = new_db_cursor()
 
 

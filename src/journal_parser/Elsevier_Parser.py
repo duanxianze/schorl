@@ -17,7 +17,7 @@ root_dir = SCRIPT_DIR
 for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
-from src.journal_parser.JournalArticle import JournalArticle
+from journal_parser.JournalArticle import JournalArticle
 from crawl_tools.request_with_proxy import request_with_random_ua
 from bs4 import BeautifulSoup
 

@@ -9,11 +9,11 @@
 @description:
             特定领域下的杂志爬虫任务启动模块，调度数据库和爬虫
 """
-from src.Journals_Task.ExistedSpiders import *
-from src.Journals_Task.GetMajorJournals import MajorEntrance
+from Journals_Task.ExistedSpiders import *
+from Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
-from src.Journals_Task.JournalClass import Journal
-from src.crawl_tools.DriversPool import DriversPool
+from Journals_Task.JournalClass import Journal
+from crawl_tools.DriversPool import DriversPool
 
 
 class MajorTaskManager:

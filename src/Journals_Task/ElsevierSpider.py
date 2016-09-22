@@ -10,10 +10,18 @@
             Elsevier针对某特定journal获取其古往今来的所有文章的爬虫
             上级模块有多线程分配，故此处用单线程写
 """
+import sys,os
+up_level_N = 1
+SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
+root_dir = SCRIPT_DIR
+for i in range(up_level_N):
+    root_dir = os.path.normpath(os.path.join(root_dir, '..'))
+sys.path.append(root_dir)
+
 from bs4 import BeautifulSoup
-from src.Journals_Task.JournalSpider import JournalSpider
-from src.crawl_tools.request_with_proxy import request_with_random_ua
-from src.journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
+from Journals_Task.JournalSpider import JournalSpider
+from crawl_tools.request_with_proxy import request_with_random_ua
+from journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
 import time
 
 

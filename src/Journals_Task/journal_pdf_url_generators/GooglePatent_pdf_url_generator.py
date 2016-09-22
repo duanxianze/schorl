@@ -17,8 +17,8 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-from src.db_config import new_db_cursor
-from src.pdf_download import PdfDownloader,DOWNLOAD_FOLDER
+from db_config import new_db_cursor
+from pdf_download import PdfDownloader,DOWNLOAD_FOLDER
 from multiprocessing.dummy import Pool as ThreadPool
 
 cur = new_db_cursor()
