@@ -77,7 +77,7 @@ class ElsevierSpider(JournalSpider):
             html_source = request_with_random_ua(self.url).text
         ).volume_area_links:
             #先分volume年份区间（十年）
-            print('Elsevier Volume Area link:%s'%volume_area_link)
+            #print('Elsevier Volume Area link:%s'%volume_area_link)
             area_volume_links = ElsevierAllItemsPageParser(
                 html_source = request_with_random_ua(volume_area_link).text
             ).volume_links

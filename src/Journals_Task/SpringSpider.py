@@ -37,7 +37,7 @@ class SpringSpider(JournalSpider):
         if 'www.springer.com' in self.url:
             self.spring_journal_id = self.url.split('/')[-1]
             self.url = 'http://link.springer.com/search?sortOrder=newestFirst&showAll=true&facet-content-type=Article&facet-journal-id='+self.spring_journal_id
-        print(self.url)
+        #print(self.url)
 
     def generate_volume_links(self):
         if self.JournalObj.volume_links_got:

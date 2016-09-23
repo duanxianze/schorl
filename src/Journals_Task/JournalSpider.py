@@ -27,7 +27,6 @@ class JournalSpider:
         self.volume_links = []
 
     def crawl_volume_page(self,volume_link,AllItemsPageParser,JournalArticle):
-        print(volume_link)
         parser = AllItemsPageParser(
             html_source = request_with_random_ua(volume_link).text
         )
@@ -35,6 +34,7 @@ class JournalSpider:
             volume_year = parser.volume_year
         except:
             volume_year = None
+        print('\nPage Url: %s '%volume_link)
         for sec in parser.sections:
             if volume_year:
                 try:
@@ -44,15 +44,11 @@ class JournalSpider:
                     print(str(e))
                     print('Page invalid')
                     return
-                except TypeError as e:
-                    #文章类型不对，下面的不一定不对
-                    print(str(e))
-                    continue
             else:
                 try:
                     article = JournalArticle(sec,self.JournalObj)
                 except Exception as e:
-                    print(str(e))
+                    print('[Error]JournalSpider:crawl_volume_page:%s'%str(e))
                     return
             while(1):
                 try:
@@ -100,11 +96,11 @@ class JournalSpider:
                 "values(%s,%s,%s)",
                 (volume_link,self.JournalObj.sjr_id,False)
             )
-            print('Save ok volume_link: {} !'.format(volume_link))
+            print('[Success]Save ok volume_link: {} !'.format(volume_link))
         except psycopg2.IntegrityError as e:
             print('[Error] in volume_link create:\n{} '.format(str(e)))
         except psycopg2.OperationalError as e:
-            print('ERROR in volume_link create:\nserver conn error{}'.format(str(e)))
+            print('[Error] in volume_link create:\nserver conn error{}'.format(str(e)))
         cur.close()
 
     @property

@@ -135,7 +135,10 @@ class ElsevierAricle(JournalArticle):
             # print('[ERROR] in Elsevier Parser:abstract():\n{}'.format(str(e)))
 
     def generate_pdf_url(self):
-        url = self.sec.select_one('.extLinkBlock').select_one('.cLink')['href']
+        try:
+            url = self.sec.select_one('.extLinkBlock').select_one('.cLink')['href']
+        except:
+            return
         if '.pdf' in url:
             self.pdf_url = url
         else:

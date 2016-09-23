@@ -36,7 +36,7 @@ class Artciles_Spider_WatchDog(WatchDog):
             '/usr/bin/python2.7 ~/scholar_articles/src/emailClass.py'
         )
 
-    def run(self):
+    def _run(self):
         prev_amount = 0
         initial = True
         delta_zero_cot = 0
@@ -45,7 +45,6 @@ class Artciles_Spider_WatchDog(WatchDog):
             amount = self.articles_amount
             local_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
             delta = amount - prev_amount
-            current_status = self.task_proc_status
             if delta==0:
                 delta_zero_cot += 1
             else:
@@ -65,26 +64,29 @@ class Artciles_Spider_WatchDog(WatchDog):
             #update_csv()# operation not in server
             tf = open('amount_log.txt','a+')
             prev_amount = amount
-            for i in range(1,60):
-                print('WatchDog:\n\t{},\t{},\t{}'.format(
-                        self.articles_amount,
-                        self.get_journal_temp_amount,
-                        current_status,
-                        time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
-                    )
+            self.print_log()
+
+
+    def print_log(self):
+        for i in range(1,60):
+            print('WatchDog:\n\t{},\t{},\t{}'.format(
+                    self.articles_amount,
+                    self.task_proc_status,
+                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
                 )
-                time.sleep(10)
+            )
+            time.sleep(10)
 
 
 if __name__=='__main__':
     if os.name is 'nt':
-        proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/ArticlesSpider.py']
-        self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/articles_watchdog.py']
+        proc_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/GoogleTask/ArticlesSpider.py']
+        self_cmd_line = ['C:\\Python27\\python.exe','F:/scholar_articles/src/GoogleTask/articles_watchdog.py']
     else:
         #os.system('source ~/scholar_articles/py3env/bin/activate')
         proc_cmd_line = ['python3', 'ArticlesSpider.py']
         self_cmd_line = ['python3','articles_watchdog.py']
 
-    Artciles_Spider_WatchDog(self_cmd_line,proc_cmd_line).run()
+    Artciles_Spider_WatchDog(self_cmd_line,proc_cmd_line)._run()
 
 
