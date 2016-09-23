@@ -84,3 +84,31 @@ CREATE TABLE journal_volume(
     CONSTRAINT link_unique UNIQUE(link),
     CONSTRAINT JV_pk PRIMARY KEY(link)
 );
+
+CREATE TABLE Temp_Scholar_Area(
+  id SERIAL,
+  temp_scholar_id int NOT NULL,
+  area_id int NOT NULL,
+  CONSTRAINT ScArea_pk PRIMARY KEY(id)
+);
+
+
+delete from temp_scholar_category
+where id in (
+    select temp_scholar_category.id
+    from articles,temp_scholar_category,temp_scholar_article
+    where articles.journal_id=22382
+    and temp_scholar_article.article_id = articles.id_by_journal
+    and temp_scholar_category.temp_scholar_id = temp_scholar_article.temp_scholar_id
+);
+
+
+
+delete from temp_scholar_area
+where id in (
+    select temp_scholar_category.id
+    from articles,temp_scholar_category,temp_scholar_article
+    where articles.journal_id=22382
+    and temp_scholar_article.article_id = articles.id_by_journal
+    and temp_scholar_category.temp_scholar_id = temp_scholar_article.temp_scholar_id
+);
