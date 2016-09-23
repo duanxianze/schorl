@@ -68,9 +68,15 @@ class MajorTaskManager:
                   format(Spider.__name__,JournalObj.name,JournalObj.site_source))
             if need_webdriver:
                 driverObj = self.drviers_pool.get_one_free_driver()
-                Spider(JournalObj,driverObj).run()
+                try:
+                    Spider(JournalObj,driverObj).run()
+                except IndexError:
+                    return
             else:
-                Spider(JournalObj).run()
+                try:
+                    Spider(JournalObj).run()
+                except IndexError:
+                    return
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
                   .format(JournalObj.name,JournalObj.site_source))
@@ -80,7 +86,8 @@ class MajorTaskManager:
             journal_need_index_by_area = False,
             journal_need_index_by_category = True,
             drvier_is_visual = False,
-            thread_cot = 16
+            thread_cot = 16,
+            driver_pool_size = 4
         ):
         journals_info_dict = self.get_journals_info_dict(
             single_area_relation = journal_need_single_area_relation,
@@ -89,15 +96,16 @@ class MajorTaskManager:
         )
         thread_pool = ThreadPool(thread_cot)
         self.drviers_pool = DriversPool(
-            size = int(thread_cot/2),
+            size = driver_pool_size,
             visual = drvier_is_visual,
             launch_with_thread_pool=thread_pool
         )
+        journal_items = []
         for key in journals_info_dict.keys():
             category_name = key
-            journal_items = journals_info_dict[key]
-            print(category_name,journal_items)
-            thread_pool.map(self.launch_journal_spider,journal_items)
+            journal_items.extend(journals_info_dict[key])
+            print(category_name,journals_info_dict[key])
+        thread_pool.map(self.launch_journal_spider,journal_items)
 
 
 if __name__=="__main__":
@@ -105,10 +113,11 @@ if __name__=="__main__":
     from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
-    MajorTaskManager(majorKeyword = 'Computer Science Applications').run(
+    MajorTaskManager(majorKeyword = 'physics').run(
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
         drvier_is_visual=False,
-        thread_cot = 16
+        thread_cot = 16,
+        driver_pool_size = 0
     )

@@ -32,7 +32,7 @@ class SpringParser:
         return int(self.soup.select_one('.number-of-pages').text)
 
     @property
-    def secs(self):
+    def sections(self):
         return self.soup.select_one('#results-list').select('li')
 
 

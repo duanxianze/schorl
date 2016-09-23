@@ -50,7 +50,8 @@ class IEEE_Spider(JournalSpider):
             for sec in parser.sections:
                 try:
                     article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
-                except:
+                except Exception as e:
+                    print('ieee article :%s'%str(e))
                     continue
                 if article.title_text_span==None:
                     continue
