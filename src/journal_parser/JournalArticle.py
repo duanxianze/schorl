@@ -87,6 +87,7 @@ class JournalArticle:
         for author_db_id in self.save_scholar_and_return_db_ids():
             self.save_scholar_article_realtion(author_db_id)
             if self.JournalObj.category_relation_cot==1:
+                self.update_article_category_id()
                 self.save_scholar_category_realtion(author_db_id)
                 #假若该杂志社属于仅一个category，则存学者与category关系表
             if self.JournalObj.area_relation_cot==1:
@@ -94,9 +95,18 @@ class JournalArticle:
                 #假若该杂志社属于仅一个area，则存学者与category关系表
                 #前期检索出的都是一个area的杂志社，此处必会经过
 
+    def update_article_category_id(self):
+        try:
+            self.cur.execute(
+                "update articles set category_id={} where id_by_journal='{}' "\
+                    .format(self.category_id,self.id_by_journal)
+            )
+        except Exception as e:
+            print('[Error] Article category_id Update:{}'.format(str(e)))
+
     def save_article(self):
         if self.is_saved:
-            print('Article <{}> already saved before'\
+            print('[Error] Article <{}> already saved before'\
                   .format(self.title))
             return
         try:
@@ -124,7 +134,7 @@ class JournalArticle:
 
     def save_scholar(self,scholar_name):
         if self.get_scholar_db_id(scholar_name):
-            print('[Error]The author: <{}> has been saved'\
+            print('[Error] The author: <{}> has been saved'\
                   .format(scholar_name))
             return
         try:
@@ -175,10 +185,10 @@ class JournalArticle:
 
     def save_scholar_category_realtion(self,temp_scholar_id):
         if not self.category_id:
-            print('SC Realtion saved error:\n\t Category_id cant be null')
+            print('[Error] SC Realtion saved error:\n\t Category_id cant be null')
         if self.scholar_category_relation_is_saved(
                 temp_scholar_id,self.category_id):
-            print('The SC relation:[{},{}] has been saved'\
+            print('[Error] The SC relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,self.category_id))
         try:
             self.cur.execute(
@@ -193,10 +203,10 @@ class JournalArticle:
 
     def save_scholar_area_relation(self,temp_scholar_id):
         if not self.area_id:
-            print('SchArea Realtion saved error:\n\t Area_id cant be null')
+            print('[Error] SchArea Realtion saved error:\n\t Area_id cant be null')
         if self.scholar_area_relation_is_saved(
                 temp_scholar_id,self.area_id):
-            print('The ScArea relation:[{},{}] has been saved'\
+            print('[Error] The ScArea relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,self.area_id))
         try:
             self.cur.execute(
@@ -211,7 +221,7 @@ class JournalArticle:
 
     def save_scholar_article_realtion(self,temp_scholar_id):
         if self.scholar_article_relation_is_saved(temp_scholar_id):
-            print('The ScArticle relation:[{},{}] has been saved'\
+            print('[Error] The ScArticle relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,self.id_by_journal))
             return
         try:
@@ -267,8 +277,9 @@ class JournalArticle:
         print('pdf_url:\t{}'.format(self.pdf_url))
         print('link:\t\t{}'.format(self.link))
         print('id_by_journal:\t{}'.format(self.id_by_journal))
-        print('year:\t\t{}'.format(self.year))
+        print('year:\t\t\t{}'.format(self.year))
         print('category_id:\t\t{}'.format(self.category_id))
+        print('area_id:\t\t{}'.format(self.area_id))
         print('abstract:\t\t{}'.format(self.abstract))
         print('*********New article of <{}>***********'.format(self.JournalObj.name))
 

@@ -118,6 +118,6 @@ if __name__=="__main__":
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
         drvier_is_visual=False,
-        thread_cot = 16,
+        thread_cot = 32,
         driver_pool_size = 0
     )
