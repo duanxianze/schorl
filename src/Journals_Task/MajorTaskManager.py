@@ -17,7 +17,7 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-
+import random
 from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
 from Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
@@ -105,6 +105,7 @@ class MajorTaskManager:
             category_name = key
             journal_items.extend(journals_info_dict[key])
             print(category_name,journals_info_dict[key])
+        random.shuffle(journal_items)
         thread_pool.map(self.launch_journal_spider,journal_items)
 
 
@@ -113,7 +114,7 @@ if __name__=="__main__":
     from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
-    MajorTaskManager(majorKeyword = 'physics').run(
+    MajorTaskManager(majorKeyword = 'Computer Science').run(
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
