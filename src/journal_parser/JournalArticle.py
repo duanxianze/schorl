@@ -24,6 +24,7 @@ class JournalArticle:
         self.journal_id = JournalObj.sjr_id
         self.cur = new_db_cursor()
         self.category_id = None
+        self.area_id = None
         self.title = None
         self.abstract = None
         self.pdf_url = None
@@ -59,6 +60,12 @@ class JournalArticle:
                 journal_id=self.journal_id
             )[0][0]
 
+    def generate_area_id(self):
+        if self.JournalObj.area_relation_cot == 1:
+            self.area_id = self.get_area_ids_by_journal_id(
+                journal_id=self.journal_id
+            )[0][0]
+
     def generate_all_method(self):
         self.generate_pdf_url()
         self.generate_link()
@@ -68,6 +75,7 @@ class JournalArticle:
         self.generate_title()
         self.generate_year()
         self.generate_category_id()
+        self.generate_area_id()
 
     @property
     def resource_type(self):
@@ -82,7 +90,7 @@ class JournalArticle:
                 self.save_scholar_category_realtion(author_db_id)
                 #假若该杂志社属于仅一个category，则存学者与category关系表
             if self.JournalObj.area_relation_cot==1:
-                self.save_scholar_article_realtion(author_db_id)
+                self.save_scholar_area_relation(author_db_id)
                 #假若该杂志社属于仅一个area，则存学者与category关系表
                 #前期检索出的都是一个area的杂志社，此处必会经过
 
@@ -155,6 +163,16 @@ class JournalArticle:
         cur.close()
         return data
 
+    def get_area_ids_by_journal_id(self,journal_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select area_id from journal_area \
+            where journal_id={}'.format(journal_id)
+        )
+        data = cur.fetchall()
+        cur.close()
+        return data
+
     def save_scholar_category_realtion(self,temp_scholar_id):
         if not self.category_id:
             print('SC Realtion saved error:\n\t Category_id cant be null')
@@ -173,9 +191,27 @@ class JournalArticle:
             print('[Error] in JournalArticle:save_scholar_category_realtion():\n\t{}'.format(str(e)))
         return False
 
+    def save_scholar_area_relation(self,temp_scholar_id):
+        if not self.area_id:
+            print('SchArea Realtion saved error:\n\t Area_id cant be null')
+        if self.scholar_area_relation_is_saved(
+                temp_scholar_id,self.area_id):
+            print('The ScArea relation:[{},{}] has been saved'\
+                  .format(temp_scholar_id,self.area_id))
+        try:
+            self.cur.execute(
+                'insert into temp_scholar_area(temp_scholar_id,area_id)'
+                'values(%s,%s)',
+                (temp_scholar_id,self.area_id)
+            )
+            return True
+        except Exception as e:
+            print('[Error] in JournalArticle:save_scholar_area_realtion():\n\t{}'.format(str(e)))
+        return False
+
     def save_scholar_article_realtion(self,temp_scholar_id):
         if self.scholar_article_relation_is_saved(temp_scholar_id):
-            print('[Error]The SA relation:[{},{}] has been saved'\
+            print('The ScArticle relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,self.id_by_journal))
             return
         try:
@@ -184,7 +220,7 @@ class JournalArticle:
                 'values(%s,%s)',
                 (temp_scholar_id,self.id_by_journal)
             )
-            print('[Success] Save SA relation[{},{}] ok'\
+            print('[Success] Save ScArticle relation[{},{}] ok'\
                   .format(temp_scholar_id,self.id_by_journal))
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar_article_realtion():\n\t{}'.format(str(e)))
@@ -201,6 +237,17 @@ class JournalArticle:
         cur.close()
         return data
 
+    def scholar_area_relation_is_saved(self,temp_scholar_id,area_id):
+        cur = new_db_cursor()
+        cur.execute(
+            'select count(*) from temp_scholar_area\
+            where temp_scholar_id={} and area_id={}'\
+                .format(temp_scholar_id,area_id)
+        )
+        data = cur.fetchall()[0][0]
+        cur.close()
+        return data
+
     def scholar_article_relation_is_saved(self,temp_scholar_id):
         cur = new_db_cursor()
         cur.execute(
@@ -214,7 +261,7 @@ class JournalArticle:
         return data
 
     def show_in_cmd(self):
-        print('\n*********New article of <{}>***********'.format(self.JournalObj.publisher))
+        print('\n*********New article of <{}>***********'.format(self.JournalObj.name))
         print('title:\t\t{}'.format(self.title))
         print('authors:\t{}'.format(self.authors))
         print('pdf_url:\t{}'.format(self.pdf_url))
@@ -223,7 +270,7 @@ class JournalArticle:
         print('year:\t\t{}'.format(self.year))
         print('category_id:\t\t{}'.format(self.category_id))
         print('abstract:\t\t{}'.format(self.abstract))
-        print('*********New article of <{}>***********'.format(self.JournalObj.publisher))
+        print('*********New article of <{}>***********'.format(self.JournalObj.name))
 
 
 if __name__=="__main__":
