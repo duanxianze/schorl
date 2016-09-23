@@ -70,7 +70,7 @@ class ElsevierAllItemsPageParser:
         self.nav = self.soup.select_one('#volumeIssueData')
 
     @property
-    def secs(self):
+    def sections(self):
         return self.soup.select_one('.articleList').select('.detail')
 
     @property
@@ -95,6 +95,10 @@ class ElsevierAllItemsPageParser:
 class ElsevierAricle(JournalArticle):
     def __init__(self,sec,JournalObj,year):
         self.sec = sec
+        bad_type_keywords = []
+        for bad_type_keyword in bad_type_keywords:
+            if bad_type_keyword in self.title:
+                raise TypeError('Elsevier Article Type Error')
         JournalArticle.__init__(self,JournalObj)
         self.year = year
         self.generate_all_method()
