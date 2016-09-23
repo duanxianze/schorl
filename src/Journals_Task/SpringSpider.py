@@ -51,28 +51,10 @@ class SpringSpider(JournalSpider):
             self.volume_links.append(page_url)
 
     def run(self):
-        unfinished_links = self.get_unfinished_volume_links()
-        for volume_link in unfinished_links:
-            secs = SpringParser(
-                html_source=request_with_random_ua(volume_link).text
-            ).secs
-            for sec in secs:
-                try:
-                    article = SpringArticle(sec,self.JournalObj)
-                except:
-                    continue
-                while(1):
-                    try:
-                        article.save_to_db()
-                        break
-                    except psycopg2.OperationalError:
-                        print('db error,again')
-                        time.sleep(2)
-            print('xxxxxxxxxxxxxxxxxx')
-            if len(secs)>0:
-                self.mark_volume_ok(volume_link)
-        if len(unfinished_links)>0:
-            self.mark_journal_ok()
+        self._run(
+            AllItemsPageParser = SpringParser,
+            JournalArticle = SpringArticle
+        )
 
 
 if __name__=="__main__":
