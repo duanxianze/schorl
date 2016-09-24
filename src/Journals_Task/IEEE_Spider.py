@@ -41,32 +41,10 @@ class IEEE_Spider(JournalSpider):
         ).volume_links
 
     def run(self):
-        unfinished_links = self.get_unfinished_volume_links()
-        for volume_link in unfinished_links:
-            print(volume_link)
-            parser = IEEE_AllItemsPageParser(
-                html_source = request_with_random_ua(volume_link).text
-            )
-            for sec in parser.sections:
-                try:
-                    article = IEEE_Article(sec,self.JournalObj,parser.volume_year)
-                except Exception as e:
-                    print('ieee article :%s'%str(e))
-                    continue
-                if article.title_text_span==None:
-                    continue
-                while(1):
-                    try:
-                        article.save_to_db()
-                        break
-                    except psycopg2.OperationalError:
-                        print('db error,again')
-                        time.sleep(2)
-            print('xxxxxxxxxxxxxxxxxx')
-            if len(parser.sections)>0:
-                self.mark_volume_ok(volume_link)
-        if len(unfinished_links)>0:
-            self.mark_journal_ok()
+        self._run(
+            AllItemsPageParser = IEEE_AllItemsPageParser,
+            JournalArticle = IEEE_Article
+        )
 
 if __name__=="__main__":
     from Journals_Task.JournalClass import Journal

@@ -137,7 +137,7 @@ class IEEE_AllItemsPageParser:
     @property
     def volume_links(self):
         return list(map(
-            lambda x:'http://ieeexplore.ieee.org/'+x['href'],
+            lambda x:'http://ieeexplore.ieee.org'+x['href'],
             self.soup.select_one('.volumes').select('a')))
 
     @property
@@ -155,7 +155,7 @@ class IEEE_Article(JournalArticle):
             id = re.compile("art-abs-title-[0-9]+")
         )
         if not self.title_text_span:
-            return
+            raise Exception('IEEE article type Error')
         JournalArticle.__init__(self,JournalObj)
         self.year = year
         self.title_parent_a_tag = self.title_text_span.parent

@@ -88,7 +88,7 @@ class ElsevierSpider(JournalSpider):
     def run(self):
         self._run(
             AllItemsPageParser = ElsevierAllItemsPageParser,
-            JournalArticle = ElsevierAricle,
+            JournalArticle = ElsevierAricle
         )
 
 

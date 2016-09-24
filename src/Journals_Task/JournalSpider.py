@@ -32,7 +32,7 @@ class JournalSpider:
         )
         try:
             sections = parser.sections
-        except Exception as e:
+        except:
             print('[Error] Page Invalid.{}'.format(volume_link))
             return
         try:
