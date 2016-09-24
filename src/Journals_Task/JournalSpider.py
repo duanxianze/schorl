@@ -18,7 +18,7 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 from crawl_tools.request_with_proxy import request_with_random_ua
-from db_config import new_db_cursor
+from db_config import DB_CONNS_POOL
 import psycopg2,time,random
 
 class JournalSpider:
@@ -31,12 +31,17 @@ class JournalSpider:
             html_source = request_with_random_ua(volume_link).text
         )
         try:
+            sections = parser.sections
+        except Exception as e:
+            print('[Error] Page Invalid')
+            return
+        try:
             volume_year = parser.volume_year
             #print('volume_year:{}'.format(volume_year))
         except:
             volume_year = None
         print('\nPage Url: %s '%volume_link)
-        for sec in parser.sections:
+        for sec in sections:
             if volume_year:
                 try:
                     article = JournalArticle(sec,self.JournalObj,volume_year)
@@ -78,7 +83,7 @@ class JournalSpider:
 
 
     def mark_journal_ok(self):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'update journal set is_crawled_all_article = true\
              where sjr_id = {}'.format(self.JournalObj.sjr_id)
@@ -86,7 +91,7 @@ class JournalSpider:
         cur.close()
 
     def get_db_volume_item(self,volume_link):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             "select is_crawled from journal_volume \
                 where link = '{}' ".format(volume_link)
@@ -96,7 +101,7 @@ class JournalSpider:
         return data
 
     def create_volume(self,volume_link):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         try:
             cur.execute(
                 "insert into journal_volume(link,journal_sjr_id,is_crawled)"
@@ -112,7 +117,7 @@ class JournalSpider:
 
     @property
     def saved_volumes_amount_of_journal(self):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select count(*) from journal_volume \
               where journal_sjr_id={}'.format(self.JournalObj.sjr_id)
@@ -122,7 +127,7 @@ class JournalSpider:
         return data
 
     def mark_volume_ok(self,volume_link):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         sql = "update journal_volume set is_crawled=true \
                 where link='{}'".format(volume_link)
         #print(sql)
@@ -134,7 +139,7 @@ class JournalSpider:
         for volume_link in self.volume_links:
             self.create_volume(volume_link)
         if self.saved_volumes_amount_of_journal>10:
-            cur = new_db_cursor()
+            cur = DB_CONNS_POOL.new_db_cursor()
             cur.execute(
                 'update journal set volume_links_got=TRUE \
                   where sjr_id={}'.format(self.JournalObj.sjr_id)
@@ -146,7 +151,7 @@ class JournalSpider:
             #第一次初始化
             self.create_new_volumes()
             return self.volume_links
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select link from journal_volume \
               where journal_sjr_id={} and is_crawled=FALSE'\

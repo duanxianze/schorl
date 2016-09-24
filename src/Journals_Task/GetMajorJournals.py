@@ -15,7 +15,7 @@
         （杂志社的分布情况，专业分支交叉情况）来微调参数。
 """
 
-from db_config import new_db_cursor
+from db_config import DB_CONNS_POOL
 
 class MajorEntrance:
     '''
@@ -23,7 +23,7 @@ class MajorEntrance:
         匹配h_index（论文质量）较高，且非跨领域（可选）的杂志社
     '''
     def __init__(self,major_keyword):
-        self.cur = new_db_cursor()
+        self.cur = DB_CONNS_POOL.new_db_cursor()
         self.major_keyword = major_keyword
 
     @property
@@ -97,7 +97,7 @@ class MajorEntrance:
     funcs of major index, below
 '''
 def categories_of_specific_area(area_sjr_id):
-    cur = new_db_cursor()
+    cur = DB_CONNS_POOL.new_db_cursor()
     cur.execute(
         'select name,sjr_id from sjr_category \
             WHERE area_id={}'.format(area_sjr_id)
@@ -109,7 +109,7 @@ def journals_of_specific_index(index_sjr_id,single_area_relation,index_name):
         single_area_relation_word = ' area_relation_cot=1 and '
     else:
         single_area_relation_word = ''
-    cur = new_db_cursor()
+    cur = DB_CONNS_POOL.new_db_cursor()
     sql =  'select name,sjr_id,site_source,area_relation_cot,\
                 category_relation_cot,publisher,volume_links_got from journal \
           WHERE{}site_source is not null \

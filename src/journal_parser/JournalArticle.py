@@ -16,13 +16,13 @@ root_dir = SCRIPT_DIR
 for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
-from db_config import new_db_cursor
+from db_config import DB_CONNS_POOL
 
 class JournalArticle:
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.journal_id = JournalObj.sjr_id
-        self.cur = new_db_cursor()
+        self.cur = DB_CONNS_POOL.new_db_cursor()
         self.category_id = None
         self.area_id = None
         self.title = None
@@ -123,7 +123,7 @@ class JournalArticle:
 
     @property
     def is_saved(self):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             "select count(*) from articles where id_by_journal='{}'"\
                 .format(self.id_by_journal)
@@ -148,7 +148,7 @@ class JournalArticle:
             print('[Error] in JournalArticle:save_scholar():\n\t{}'.format(str(e)))
 
     def get_scholar_db_id(self,scholar_name):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             "select id from temp_scholar "
             "where name = %s",
@@ -167,7 +167,7 @@ class JournalArticle:
         return scholar_db_ids
 
     def get_category_ids_by_journal_id(self,journal_id):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select category_id from journal_category \
             where journal_id={}'.format(journal_id)
@@ -177,7 +177,7 @@ class JournalArticle:
         return data
 
     def get_area_ids_by_journal_id(self,journal_id):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select area_id from journal_area \
             where journal_id={}'.format(journal_id)
@@ -239,7 +239,7 @@ class JournalArticle:
             print('[Error] in JournalArticle:save_scholar_article_realtion():\n\t{}'.format(str(e)))
 
     def scholar_category_relation_is_saved(self,temp_scholar_id,category_id):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select count(*) from temp_scholar_category\
             where temp_scholar_id={} and category_id={}'\
@@ -251,7 +251,7 @@ class JournalArticle:
         return data
 
     def scholar_area_relation_is_saved(self,temp_scholar_id,area_id):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select count(*) from temp_scholar_area\
             where temp_scholar_id={} and area_id={}'\
@@ -262,7 +262,7 @@ class JournalArticle:
         return data
 
     def scholar_article_relation_is_saved(self,temp_scholar_id):
-        cur = new_db_cursor()
+        cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
             "select count(*) from temp_scholar_article\
             where temp_scholar_id={} and article_id='{}'"\
