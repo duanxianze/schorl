@@ -33,7 +33,7 @@ class JournalSpider:
         try:
             sections = parser.sections
         except Exception as e:
-            print('[Error] Page Invalid')
+            print('[Error] Page Invalid.{}'.format(volume_link))
             return
         try:
             volume_year = parser.volume_year
@@ -59,6 +59,9 @@ class JournalSpider:
                 except Exception as e:
                     print('[Error]JournalSpider:crawl_volume_page:%s'%str(e))
                     return
+            if not article.authors:
+                print('[Error] No authors in article <{}>'.format(article.title))
+                continue
             while(1):
                 try:
                     article.save_to_db()
