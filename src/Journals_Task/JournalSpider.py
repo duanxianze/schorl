@@ -84,7 +84,6 @@ class JournalSpider:
         if len(volume_links)>0:
             self.mark_journal_ok()
 
-
     def mark_journal_ok(self):
         cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
