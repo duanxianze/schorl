@@ -130,6 +130,6 @@ if __name__=="__main__":
         else:
             pass
     else:
-        self_cmd_line = ['python3', 'MajorTaskManager.py']
-        proc_cmd_line = ['python3','TaskManagerWatchdog.py']
+        self_cmd_line = ['python3', 'TaskManagerWatchdog.py']
+        proc_cmd_line = ['python3','MajorTaskManager.py']
     JournalTaskManagerWatchdog(self_cmd_line,proc_cmd_line).run()
