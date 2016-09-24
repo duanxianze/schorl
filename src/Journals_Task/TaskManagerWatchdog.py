@@ -15,13 +15,29 @@ SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
 from GoogleScholar_Task.articles_watchdog import Artciles_Spider_WatchDog
-from db_config import DB_CONNS_POOL
-import time
+import time,psycopg2
+
+if os.name is 'nt':
+    conn = psycopg2.connect(
+        dbname = "sf_development",
+        user = "lyn",
+        password = "tonylu716",
+        host = '45.32.11.113',
+        port = 5432,
+    )
+else:
+    conn = psycopg2.connect(
+        dbname = "sf_development",
+        user = "lyn",
+        password = "tonylu716",
+    )
+conn.autocommit = True
+cur = conn.cursor()
 
 class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
     def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
         Artciles_Spider_WatchDog.__init__(self,cmd_line,task_proc_cmd_line,pid)
-        self.cur = DB_CONNS_POOL.new_db_cursor()
+        self.cur = cur
 
     @property
     def volumes_amount(self):
@@ -86,16 +102,19 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
             if self.task_proc_status=='dead':
                 print('dead')
                 self.restart_task_proc()
-            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
-                self.articles_amount,
-                self.task_proc_status,
-                self.AC_amount,
-                self.SC_amount,
-                self.SchArea_amount,
-                self.SchArticle_amount,
-                time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+            try:
+                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
+                    self.articles_amount,
+                    self.task_proc_status,
+                    self.AC_amount,
+                    self.SC_amount,
+                    self.SchArea_amount,
+                    self.SchArticle_amount,
+                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                    )
                 )
-            )
+            except Exception as e:
+                print(str(e))
             time.sleep(10)
 
 
@@ -113,5 +132,4 @@ if __name__=="__main__":
     else:
         self_cmd_line = ['python3', 'MajorTaskManager.py']
         proc_cmd_line = ['python3','TaskManagerWatchdog.py']
-
     JournalTaskManagerWatchdog(self_cmd_line,proc_cmd_line).run()
