@@ -29,16 +29,16 @@ EXISTED_SPIDERS = [
         'publisherKeywords':    ['elsevier','sciencedirect'],
         'need_webdriver':       False
     },
+    # {
+    #     'publisherSpiderClass': SpringSpider,
+    #     'publisherKeywords':    ['springer'],
+    #     'need_webdriver':       False
+    # },
     {
-        'publisherSpiderClass': SpringSpider,
-        'publisherKeywords':    ['springer'],
+        'publisherSpiderClass': IEEE_Spider,
+        'publisherKeywords':    ['ieee'],
         'need_webdriver':       False
     }
-    # {
-    #     'publisherSpiderClass': IEEE_Spider,
-    #     'publisherKeywords':    ['ieee'],
-    #     'need_webdriver':       False
-    # }
 ]
 
 
