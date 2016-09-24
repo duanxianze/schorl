@@ -25,6 +25,10 @@ class DB_Connect_Pool:
         self.password = password
         self.init_pool()
 
+    @property
+    def real_size(self):
+        return len(self.pool)
+
     def new_coon(self):
         while(1):
             try:
@@ -39,13 +43,13 @@ class DB_Connect_Pool:
                 break
             except Exception as e:
                 print(str(e))
-                print('Launch DB Connect Error.Again...')
+                print('DB_POOL: Launch DB Connect Error.Again...')
                 time.sleep(2)
         return conn
 
     def add_new_coon_to_pool(self,index):
         self.pool.append(self.new_coon())
-        print('Index {} lanuched ok!'.format(index))
+        print('DB_POOL: Index {} lanuched ok!'.format(index))
 
     def init_pool(self):
         print('DB_POOL: Generating {} database connections...'\
@@ -60,7 +64,22 @@ class DB_Connect_Pool:
         print('DB_POOL: Created All Connects OK')
 
     def get_random_conn(self):
-        return random.choice(self.pool)
+        while(1):
+            conn = random.choice(self.pool)
+            if conn.closed:
+                #若连接断开，则先移除该连接池，再新建一个，维持尺寸
+                print('DB_POOL: Invalid CONN')
+                self.pool.remove(conn)
+                self.add_new_coon_to_pool(index=self.real_size)
+            else:
+                break
+        return conn
 
     def new_db_cursor(self):
-        return self.get_random_conn().cursor()
+        while(1):
+            cur = self.get_random_conn().cursor()
+            if cur.closed:
+                print('DB_POOL: Invalid Cur')
+            else:
+                break
+        return cur

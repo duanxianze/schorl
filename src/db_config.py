@@ -17,3 +17,8 @@ DB_CONNS_POOL = DB_Connect_Pool(
     host = HOST,
     port = PORT
 )
+
+
+if __name__=="__main__":
+    print(DB_CONNS_POOL.new_db_cursor())
+    print(DB_CONNS_POOL.new_coon())
