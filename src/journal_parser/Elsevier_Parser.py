@@ -99,7 +99,7 @@ class ElsevierAricle(JournalArticle):
         self.JournalObj = JournalObj
         JournalArticle.__init__(self,JournalObj)
         self.generate_all_method()
-        bad_type_keywords = ['Editorial Board']
+        bad_type_keywords = ['Editorial Board','Editors-in-Chief']
         for bad_type_keyword in bad_type_keywords:
             if bad_type_keyword in self.title:
                 raise Exception('Elsevier Article Type Error')

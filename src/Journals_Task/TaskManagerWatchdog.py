@@ -111,7 +111,6 @@ if __name__=="__main__":
         else:
             pass
     else:
-        #os.system('source ~/scholar_articles/py3env/bin/activate')
         self_cmd_line = ['python3', 'MajorTaskManager.py']
         proc_cmd_line = ['python3','TaskManagerWatchdog.py']
 
