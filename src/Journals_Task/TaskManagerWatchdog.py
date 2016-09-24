@@ -65,19 +65,21 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
 
     def run(self):
         initial = True
+        prev_amount = 0
         tf = open('../amount_log.txt','a+')
         while(1):
             amount = self.articles_amount
             local_time = time.strftime(
                 "%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+            delta = amount - prev_amount
             if initial:
                 delta = 0
                 initial = False
             tf.write(str(amount)+','+local_time+','+str(delta)+'\n')
             tf.close()
             tf = open('../amount_log.txt','a+')
+            prev_amount = amount
             self.print_log()
-
 
     def print_log(self):
         for i in range(1,60):
@@ -101,16 +103,16 @@ if __name__=="__main__":
     import platform
     if os.name=='nt':
         if platform.processor()=='Intel64 Family 6 Model 69 Stepping 1, GenuineIntel':
-            self_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/MajorTaskManager.py']
-            proc_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/TaskManagerWatchdog.py']
+            self_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/TaskManagerWatchdog.py']
+            proc_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/MajorTaskManager.py']
         elif platform.processor()=='Intel64 Family 6 Model 58 Stepping 9, GenuineIntel':
-            self_cmd_line=['C:\\Python27\\python.exe','E:/scholar_articles/src/Journals_Task/MajorTaskManager.py']
-            proc_cmd_line=['C:\\Python27\\python.exe','E:/scholar_articles/src/Journals_Task/TaskManagerWatchdog.py']
+            self_cmd_line=['D:\\Python33\\python.exe','E:/scholar_articles/src/Journals_Task/TaskManagerWatchdog.py']
+            proc_cmd_line=['D:\\Python33\\python.exe','E:/scholar_articles/src/Journals_Task/MajorTaskManager.py']
         else:
             pass
     else:
         #os.system('source ~/scholar_articles/py3env/bin/activate')
-        proc_cmd_line = ['python3', 'MajorTaskManager.py']
-        self_cmd_line = ['python3','TaskManagerWatchdog.py']
+        self_cmd_line = ['python3', 'MajorTaskManager.py']
+        proc_cmd_line = ['python3','TaskManagerWatchdog.py']
 
     JournalTaskManagerWatchdog(self_cmd_line,proc_cmd_line).run()
