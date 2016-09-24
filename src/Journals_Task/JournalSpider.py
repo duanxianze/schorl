@@ -19,7 +19,7 @@ sys.path.append(root_dir)
 
 from crawl_tools.request_with_proxy import request_with_random_ua
 from db_config import new_db_cursor
-import psycopg2,time
+import psycopg2,time,random
 
 class JournalSpider:
     def __init__(self,JournalObj):
@@ -32,6 +32,7 @@ class JournalSpider:
         )
         try:
             volume_year = parser.volume_year
+            #print('volume_year:{}'.format(volume_year))
         except:
             volume_year = None
         print('\nPage Url: %s '%volume_link)
@@ -42,7 +43,7 @@ class JournalSpider:
                 except IndexError as e:
                     #页面就有问题，直接跳转下一页
                     print(str(e))
-                    print('Page invalid')
+                    print('[Error] Page invalid')
                     return
                 except Exception as e:
                     print(str(e))
@@ -65,7 +66,10 @@ class JournalSpider:
                 self.mark_volume_ok(volume_link)
 
     def _run(self,AllItemsPageParser,JournalArticle):
-        volume_links = self.get_unfinished_volume_links()
+        volume_links = list(set(
+            self.get_unfinished_volume_links()
+        ))
+        random.shuffle(volume_links)
         for volume_link in volume_links:
             self.crawl_volume_page(
                 volume_link,AllItemsPageParser,JournalArticle)

@@ -148,12 +148,15 @@ class JournalArticle:
             print('[Error] in JournalArticle:save_scholar():\n\t{}'.format(str(e)))
 
     def get_scholar_db_id(self,scholar_name):
-        self.cur.execute(
+        cur = new_db_cursor()
+        cur.execute(
             "select id from temp_scholar "
             "where name = %s",
             (scholar_name,)
         )
-        return self.cur.fetchall()
+        data = cur.fetchall()
+        cur.close()
+        return data
 
     def save_scholar_and_return_db_ids(self):
         scholar_db_ids = []
