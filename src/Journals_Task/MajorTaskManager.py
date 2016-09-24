@@ -105,6 +105,7 @@ class MajorTaskManager:
             category_name = key
             journal_items.extend(journals_info_dict[key])
             print(category_name,journals_info_dict[key])
+        journal_items = list(set(journal_items))
         random.shuffle(journal_items)
         thread_pool.map(self.launch_journal_spider,journal_items)
 
