@@ -95,13 +95,14 @@ class ElsevierAllItemsPageParser:
 class ElsevierAricle(JournalArticle):
     def __init__(self,sec,JournalObj,year):
         self.sec = sec
-        bad_type_keywords = []
+        self.year = year
+        self.JournalObj = JournalObj
+        JournalArticle.__init__(self,JournalObj)
+        self.generate_all_method()
+        bad_type_keywords = ['Editorial Board']
         for bad_type_keyword in bad_type_keywords:
             if bad_type_keyword in self.title:
-                raise TypeError('Elsevier Article Type Error')
-        JournalArticle.__init__(self,JournalObj)
-        self.year = year
-        self.generate_all_method()
+                raise Exception('Elsevier Article Type Error')
 
     @property
     def origin_title(self):

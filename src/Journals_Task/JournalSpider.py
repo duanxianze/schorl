@@ -44,6 +44,9 @@ class JournalSpider:
                     print(str(e))
                     print('Page invalid')
                     return
+                except Exception as e:
+                    print(str(e))
+                    continue
             else:
                 try:
                     article = JournalArticle(sec,self.JournalObj)
