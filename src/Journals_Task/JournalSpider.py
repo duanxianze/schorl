@@ -18,7 +18,7 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 from crawl_tools.request_with_proxy import request_with_random_ua
-from db_config import DB_CONNS_POOL
+from db_config import REMOTE_CONNS_POOL
 import psycopg2,time,random
 
 class JournalSpider:
@@ -32,33 +32,38 @@ class JournalSpider:
         )
         try:
             sections = parser.sections
-        except:
-            print('[Error] Page Invalid.{}'.format(volume_link))
+        except Exception as e:
+            print('[Error] Page Invalid in first check{}\nerror_url {}'\
+                  .format(str(e),volume_link))
             return
         try:
             volume_year = parser.volume_year
-            #print('volume_year:{}'.format(volume_year))
-        except:
+            print('volume_year:{}'.format(volume_year))
+        except Exception as e:
+            print('Volume year is none:{}'.format(str(e)))
             volume_year = None
         print('\nPage Url: %s '%volume_link)
+        #print('len(sections)',len(sections))
         for sec in sections:
-            if volume_year:
+            if volume_year is not None:
+                '''
+                article = JournalArticle(sec,self.JournalObj,volume_year)
+                '''
                 try:
                     article = JournalArticle(sec,self.JournalObj,volume_year)
-                except IndexError as e:
-                    #页面就有问题，直接跳转下一页
-                    print(str(e))
-                    print('[Error] Page invalid')
-                    return
                 except Exception as e:
-                    print(str(e))
-                    continue
+                    print('[Error]JournalSpider:crawl_volume_page:%s'%str(e))
+                    return
             else:
+                '''
+                article = JournalArticle(sec,self.JournalObj)
+                '''
                 try:
                     article = JournalArticle(sec,self.JournalObj)
                 except Exception as e:
                     print('[Error]JournalSpider:crawl_volume_page:%s'%str(e))
                     return
+
             if not article.authors:
                 print('[Error] No authors in article <{}>'.format(article.title))
                 continue
@@ -85,7 +90,7 @@ class JournalSpider:
             self.mark_journal_ok()
 
     def mark_journal_ok(self):
-        cur = DB_CONNS_POOL.new_db_cursor()
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'update journal set is_crawled_all_article = true\
              where sjr_id = {}'.format(self.JournalObj.sjr_id)
@@ -93,7 +98,7 @@ class JournalSpider:
         cur.close()
 
     def get_db_volume_item(self,volume_link):
-        cur = DB_CONNS_POOL.new_db_cursor()
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             "select is_crawled from journal_volume \
                 where link = '{}' ".format(volume_link)
@@ -103,7 +108,7 @@ class JournalSpider:
         return data
 
     def create_volume(self,volume_link):
-        cur = DB_CONNS_POOL.new_db_cursor()
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
         try:
             cur.execute(
                 "insert into journal_volume(link,journal_sjr_id,is_crawled)"
@@ -119,7 +124,7 @@ class JournalSpider:
 
     @property
     def saved_volumes_amount_of_journal(self):
-        cur = DB_CONNS_POOL.new_db_cursor()
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select count(*) from journal_volume \
               where journal_sjr_id={}'.format(self.JournalObj.sjr_id)
@@ -129,7 +134,7 @@ class JournalSpider:
         return data
 
     def mark_volume_ok(self,volume_link):
-        cur = DB_CONNS_POOL.new_db_cursor()
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
         sql = "update journal_volume set is_crawled=true \
                 where link='{}'".format(volume_link)
         #print(sql)
@@ -141,7 +146,7 @@ class JournalSpider:
         for volume_link in self.volume_links:
             self.create_volume(volume_link)
         if self.saved_volumes_amount_of_journal>10:
-            cur = DB_CONNS_POOL.new_db_cursor()
+            cur = REMOTE_CONNS_POOL.new_db_cursor()
             cur.execute(
                 'update journal set volume_links_got=TRUE \
                   where sjr_id={}'.format(self.JournalObj.sjr_id)
@@ -153,7 +158,7 @@ class JournalSpider:
             #第一次初始化
             self.create_new_volumes()
             return self.volume_links
-        cur = DB_CONNS_POOL.new_db_cursor()
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select link from journal_volume \
               where journal_sjr_id={} and is_crawled=FALSE'\

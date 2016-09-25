@@ -16,13 +16,14 @@ root_dir = SCRIPT_DIR
 for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
-from db_config import DB_CONNS_POOL
+from db_config import DB_CONNS_POOL,REMOTE_CONNS_POOL
 
 class JournalArticle:
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.journal_id = JournalObj.sjr_id
         self.cur = DB_CONNS_POOL.new_db_cursor()
+        self.remote_cur = REMOTE_CONNS_POOL.new_db_cursor()
         self.category_id = None
         self.area_id = None
         self.title = None
@@ -56,15 +57,19 @@ class JournalArticle:
 
     def generate_category_id(self):
         if self.JournalObj.category_relation_cot == 1:
-            self.category_id = self.get_category_ids_by_journal_id(
+            ids = self.get_category_ids_by_journal_id(
                 journal_id=self.journal_id
-            )[0][0]
+            )
+            #print(ids)
+            self.category_id = ids[0][0]
 
     def generate_area_id(self):
         if self.JournalObj.area_relation_cot == 1:
-            self.area_id = self.get_area_ids_by_journal_id(
+            ids = self.get_area_ids_by_journal_id(
                 journal_id=self.journal_id
-            )[0][0]
+            )
+            #print(ids)
+            self.area_id = ids[0][0]
 
     def generate_all_method(self):
         self.generate_pdf_url()

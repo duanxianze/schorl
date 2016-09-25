@@ -15,7 +15,7 @@
         （杂志社的分布情况，专业分支交叉情况）来微调参数。
 """
 
-from db_config import DB_CONNS_POOL
+from db_config import REMOTE_CONNS_POOL
 
 class MajorEntrance:
     '''
@@ -23,7 +23,7 @@ class MajorEntrance:
         匹配h_index（论文质量）较高，且非跨领域（可选）的杂志社
     '''
     def __init__(self,major_keyword):
-        self.cur = DB_CONNS_POOL.new_db_cursor()
+        self.cur = REMOTE_CONNS_POOL.new_db_cursor()
         self.major_keyword = major_keyword
 
     @property
@@ -97,7 +97,7 @@ class MajorEntrance:
     funcs of major index, below
 '''
 def categories_of_specific_area(area_sjr_id):
-    cur = DB_CONNS_POOL.new_db_cursor()
+    cur = REMOTE_CONNS_POOL.new_db_cursor()
     cur.execute(
         'select name,sjr_id from sjr_category \
             WHERE area_id={}'.format(area_sjr_id)
@@ -109,15 +109,15 @@ def journals_of_specific_index(index_sjr_id,single_area_relation,index_name):
         single_area_relation_word = ' area_relation_cot=1 and '
     else:
         single_area_relation_word = ''
-    cur = DB_CONNS_POOL.new_db_cursor()
-    sql =  'select name,sjr_id,site_source,area_relation_cot,\
+    cur = REMOTE_CONNS_POOL.new_db_cursor()
+    sql =  "select name,sjr_id,site_source,area_relation_cot,\
                 category_relation_cot,publisher,volume_links_got from journal \
-          WHERE{}site_source is not null \
-          and is_crawled_all_article=FALSE and \
+          WHERE{}site_source like '%lsevier%' and\
+          is_crawled_all_article=FALSE and \
           sjr_id IN(\
             select journal_id from journal_{} \
             WHERE {}_id={} \
-        ) ORDER by h_index desc limit 10'.format(
+        ) ORDER by h_index desc".format(
             single_area_relation_word,index_name,index_name,index_sjr_id
         )
     #print(sql)
@@ -154,7 +154,7 @@ def journals_of_specific_major(
 
 
 if __name__=="__main__":
-    major = MajorEntrance(major_keyword='Computer Science')
+    major = MajorEntrance(major_keyword='Science')
     major.show_in_cmd()
     major.get_possible_journals(
         single_area_relation=True,
