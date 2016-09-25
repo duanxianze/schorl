@@ -19,20 +19,11 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from crawl_tools.WatchDog import WatchDog
 import psycopg2,time
 
-if os.name is 'nt':
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "lyn",
-        password = "tonylu716",
-        host = '45.32.11.113',
-        port = 5432,
-    )
-else:
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "lyn",
-        password = "tonylu716",
-    )
+conn = psycopg2.connect(
+    dbname = "sf_development",
+    user = "lyn",
+    password = "tonylu716",
+)
 conn.autocommit = True
 cur = conn.cursor()
 

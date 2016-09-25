@@ -17,20 +17,11 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from GoogleScholar_Task.articles_watchdog import Artciles_Spider_WatchDog
 import time,psycopg2
 
-if os.name is 'nt':
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "lyn",
-        password = "tonylu716",
-        host = '45.32.11.113',
-        port = 5432,
-    )
-else:
-    conn = psycopg2.connect(
-        dbname = "sf_development",
-        user = "lyn",
-        password = "tonylu716",
-    )
+conn = psycopg2.connect(
+    dbname = "sf_development",
+    user = "lyn",
+    password = "tonylu716",
+)
 conn.autocommit = True
 cur = conn.cursor()
 
