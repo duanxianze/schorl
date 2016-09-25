@@ -75,8 +75,12 @@ class ElsevierAllItemsPageParser:
 
     @property
     def volume_year(self):
-        return int(self.soup.select_one('.volumeHeader').find(re.compile("h[0-9]"))\
-            .text.strip().split(' ')[-1][:-1])
+        try:
+            return int(self.soup.select_one('.volumeHeader').find(re.compile("h[0-9]"))\
+                .text.strip().split(' ')[-1][:-1])
+        except:
+            return int(self.soup.select_one('.volumeHeader').find(re.compile("h[0-9]"))\
+                .text.strip().split(' ')[-1][1:-1])
 
     @property
     def volume_area_links(self):
