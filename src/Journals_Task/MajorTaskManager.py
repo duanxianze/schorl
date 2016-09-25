@@ -70,12 +70,26 @@ class MajorTaskManager:
                 driverObj = self.drviers_pool.get_one_free_driver()
                 try:
                     Spider(JournalObj,driverObj).run()
-                except IndexError:
+                except IndexError as e:
+                    print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
+                    return
+                except Exception as e:
+                    print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
                     return
             else:
                 try:
-                    Spider(JournalObj).run()
-                except IndexError:
+                    spider = Spider(JournalObj)
+                except Exception as e:
+                    print('[Error] MajorTaskManager:launch_journal_spider:Spider(JournalObj)\n{}'\
+                          .format(str(e)))
+                    if 'list index' in str(e):
+                        print(JournalObj.site_source)
+                    return
+                try:
+                    spider.run()
+                except Exception as e:
+                    print('[Error] MajorTaskManager:launch_journal_spider:spider.run()\n{}'\
+                          .format(str(e)))
                     return
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
@@ -115,7 +129,7 @@ if __name__=="__main__":
     from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
-    MajorTaskManager(majorKeyword = 'Computer Science').run(
+    MajorTaskManager(majorKeyword = 'Science').run(
         journal_need_single_area_relation = True,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
