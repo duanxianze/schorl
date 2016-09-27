@@ -24,16 +24,16 @@ from Journals_Task.IEEE_Spider import *
 
 
 EXISTED_SPIDERS = [
-    {
-        'publisherSpiderClass': ElsevierSpider,
-        'publisherKeywords':    ['elsevier','sciencedirect'],
-        'need_webdriver':       False
-    },
     # {
-    #     'publisherSpiderClass': SpringSpider,
-    #     'publisherKeywords':    ['springer'],
+    #     'publisherSpiderClass': ElsevierSpider,
+    #     'publisherKeywords':    ['elsevier','sciencedirect'],
     #     'need_webdriver':       False
     # },
+    {
+        'publisherSpiderClass': SpringSpider,
+        'publisherKeywords':    ['springer'],
+        'need_webdriver':       False
+    },
     {
         'publisherSpiderClass': IEEE_Spider,
         'publisherKeywords':    ['ieee'],
