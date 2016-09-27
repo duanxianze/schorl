@@ -180,9 +180,8 @@ class IEEE_Article(JournalArticle):
     def generate_abstract(self):
         self.abstract = self.sec.select_one('.abstract').text.strip()
 
-    def generate_pdf_url(self):
-        self.generate_id_by_journal()
-        self.pdf_url = 'http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber='+self.id_by_journal
+    def generate_pdf_temp_url(self):
+        self.pdf_temp_url = 'http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber='+self.title_parent_a_tag['data-arnumber']
 
     def generate_id_by_journal(self):
         self.id_by_journal = 'IEEE'+self.title_parent_a_tag['data-arnumber']
