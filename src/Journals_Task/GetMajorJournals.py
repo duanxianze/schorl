@@ -54,8 +54,8 @@ class MajorEntrance:
             )
         return cur.fetchall()
 
-    def get_possible_journals(self,index_by_area=True,
-            index_by_category=True,single_area_relation=True):
+    def get_possible_journals(self,index_by_area=True,index_by_category=True,
+            single_area_relation=True,open_access=True):
         '''
             注意此处的几个参数，需要根据领域特性微调
             1.假如领域分支较笼统，建议选index_by_area（通过大类找杂志）,反之则用小类找
@@ -67,7 +67,8 @@ class MajorEntrance:
                 possible_db_items = self.possible_areas,
                 journals_of_specific_func = journals_of_specific_area,
                 tag_info = 'Area',
-                single_area_relation = single_area_relation
+                single_area_relation = single_area_relation,
+                open_access = open_access
             )
             print('--------------------------------')
         if index_by_category:
@@ -76,7 +77,8 @@ class MajorEntrance:
                 possible_db_items = self.possible_categories,
                 journals_of_specific_func = journals_of_specific_category,
                 tag_info = 'Category',
-                single_area_relation = single_area_relation
+                single_area_relation = single_area_relation,
+                open_access = open_access
             )
         '''
             journal_dict is like:{
@@ -104,15 +106,30 @@ def categories_of_specific_area(area_sjr_id):
     )
     return cur.fetchall()
 
-def journals_of_specific_index(index_sjr_id,single_area_relation,index_name):
+def journals_of_specific_index(
+        index_sjr_id,single_area_relation,
+        index_name,open_access
+):
     if single_area_relation:
         single_area_relation_word = ' area_relation_cot=1 and '
     else:
         single_area_relation_word = ''
+    if open_access:
+        open_access_word = ' open_access=true and '
+    else:
+        open_access_word = ''
     cur = REMOTE_CONNS_POOL.new_db_cursor()
     sql =  "select name,sjr_id,site_source,area_relation_cot,\
                 category_relation_cot,publisher,volume_links_got from journal \
-          WHERE{}site_source like '%lsevier%' and\
+          WHERE{}{} is_crawled_all_article=FALSE\
+            and (site_source like '%ieee%' or site_source like '%spring%'\
+          )ORDER by h_index desc limit 100".format(
+            single_area_relation_word,open_access_word
+        )
+    '''
+    sql =  "select name,sjr_id,site_source,area_relation_cot,\
+                category_relation_cot,publisher,volume_links_got from journal \
+          WHERE{}(site_source like '%lsevier%' or site_source like '%ieee%' or site_source like '%springer%')and\
           is_crawled_all_article=FALSE and \
           sjr_id IN(\
             select journal_id from journal_{} \
@@ -120,20 +137,22 @@ def journals_of_specific_index(index_sjr_id,single_area_relation,index_name):
         ) ORDER by h_index desc".format(
             single_area_relation_word,index_name,index_name,index_sjr_id
         )
+    '''
     #print(sql)
     cur.execute(sql)
     return cur.fetchall()
 
-def journals_of_specific_category(category_sjr_id,single_area_relation):
+def journals_of_specific_category(category_sjr_id,single_area_relation,open_access):
     #假如多于十个则按h_index排出前十
-    return journals_of_specific_index(category_sjr_id,single_area_relation,'category')
+    return journals_of_specific_index(category_sjr_id,single_area_relation,'category',open_access)
 
-def journals_of_specific_area(area_sjr_id,single_area_relation):
-    return journals_of_specific_index((area_sjr_id,single_area_relation,'area'))
+def journals_of_specific_area(area_sjr_id,single_area_relation,open_access):
+    return journals_of_specific_index((area_sjr_id,single_area_relation,'area'),open_access)
 
 def journals_of_specific_major(
     possible_db_items,journals_of_specific_func,tag_info,
-    single_area_relation = True
+    single_area_relation = True,
+    open_access = True
 ):
     journal_dict = {}
     index = 1
@@ -142,7 +161,8 @@ def journals_of_specific_major(
     for db_item in possible_db_items:
         item_sjr_id = db_item[1]
         item_name = db_item[0]
-        journal_items = journals_of_specific_func(item_sjr_id,single_area_relation)
+        journal_items = journals_of_specific_func(
+            item_sjr_id,single_area_relation,open_access)
         journal_dict[item_name] = journal_items
         print('{}.{}({}):'\
             .format(index,item_name,len(journal_items)))
@@ -159,7 +179,8 @@ if __name__=="__main__":
     major.get_possible_journals(
         single_area_relation=True,
         index_by_area=False,
-        index_by_category=True
+        index_by_category=True,
+        open_access=True
     )
     # 非跨领域，且从小类分
     # 因为前期目标是定位学者，杂志社领域精度越细越好

@@ -32,14 +32,16 @@ class MajorTaskManager:
     def get_journals_info_dict(self,
         single_area_relation = True,
         index_by_area = False,
-        index_by_category = True
+        index_by_category = True,
+        open_access = True
     ):
         return MajorEntrance(
             major_keyword = self.majorKeyword
         ).get_possible_journals(
             single_area_relation=single_area_relation,
             index_by_area=index_by_area,
-            index_by_category=index_by_category
+            index_by_category=index_by_category,
+            open_access=open_access
         )
 
     def get_task_spider(self,spiders_infos,journal_url):
@@ -70,26 +72,14 @@ class MajorTaskManager:
                 driverObj = self.drviers_pool.get_one_free_driver()
                 try:
                     Spider(JournalObj,driverObj).run()
-                except IndexError as e:
-                    print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
-                    return
                 except Exception as e:
                     print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
                     return
             else:
                 try:
-                    spider = Spider(JournalObj)
+                    Spider(JournalObj).run()
                 except Exception as e:
-                    print('[Error] MajorTaskManager:launch_journal_spider:Spider(JournalObj)\n{}'\
-                          .format(str(e)))
-                    if 'list index' in str(e):
-                        print(JournalObj.site_source)
-                    return
-                try:
-                    spider.run()
-                except Exception as e:
-                    print('[Error] MajorTaskManager:launch_journal_spider:spider.run()\n{}'\
-                          .format(str(e)))
+                    print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
                     return
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
@@ -97,6 +87,7 @@ class MajorTaskManager:
 
     def run(
             self,journal_need_single_area_relation = True,
+            journal_need_open_access = True,
             journal_need_index_by_area = False,
             journal_need_index_by_category = True,
             drvier_is_visual = False,
@@ -106,7 +97,8 @@ class MajorTaskManager:
         journals_info_dict = self.get_journals_info_dict(
             single_area_relation = journal_need_single_area_relation,
             index_by_area = journal_need_index_by_area,
-            index_by_category = journal_need_index_by_category
+            index_by_category = journal_need_index_by_category,
+            open_access = journal_need_open_access
         )
         thread_pool = ThreadPool(thread_cot)
         self.drviers_pool = DriversPool(
@@ -129,8 +121,9 @@ if __name__=="__main__":
     from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
-    MajorTaskManager(majorKeyword = 'Science').run(
-        journal_need_single_area_relation = True,
+    MajorTaskManager(majorKeyword = 'Artificial').run(
+        journal_need_single_area_relation = False,
+        journal_need_open_access = False,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
         drvier_is_visual=False,
