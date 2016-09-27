@@ -16,19 +16,19 @@ root_dir = SCRIPT_DIR
 for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
-from db_config import DB_CONNS_POOL,REMOTE_CONNS_POOL
+from db_config import DB_CONNS_POOL
 
 class JournalArticle:
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.journal_id = JournalObj.sjr_id
         self.cur = DB_CONNS_POOL.new_db_cursor()
-        self.remote_cur = REMOTE_CONNS_POOL.new_db_cursor()
         self.category_id = None
         self.area_id = None
         self.title = None
         self.abstract = None
         self.pdf_url = None
+        self.pdf_temp_url = None
         self.authors = []
         self.link = None
         self.id_by_journal = None
@@ -50,6 +50,9 @@ class JournalArticle:
         pass
 
     def generate_pdf_url(self):
+        pass
+
+    def generate_pdf_temp_url(self):
         pass
 
     def generate_id_by_journal(self):
@@ -81,6 +84,7 @@ class JournalArticle:
         self.generate_year()
         self.generate_category_id()
         self.generate_area_id()
+        self.generate_pdf_temp_url()
 
     @property
     def resource_type(self):
@@ -116,10 +120,10 @@ class JournalArticle:
             return
         try:
             self.cur.execute(
-                'insert into articles(title,year,link,\
+                'insert into articles(title,year,link,pdf_temp_url,\
                     resource_type,resource_link,summary,journal_id,id_by_journal)'
-                'values(%s,%s,%s,%s,%s,%s,%s,%s)',
-                (self.title,self.year,self.link,self.resource_type,\
+                'values(%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                (self.title,self.year,self.link,self.pdf_temp_url,self.resource_type,\
                     self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
             )
             self.show_in_cmd()
@@ -283,6 +287,7 @@ class JournalArticle:
         print('title:\t\t{}'.format(self.title))
         print('authors:\t{}'.format(self.authors))
         print('pdf_url:\t{}'.format(self.pdf_url))
+        print('pdf_temp_url:\t{}'.format(self.pdf_temp_url))
         print('link:\t\t{}'.format(self.link))
         print('id_by_journal:\t{}'.format(self.id_by_journal))
         print('year:\t\t\t{}'.format(self.year))
