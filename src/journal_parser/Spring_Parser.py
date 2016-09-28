@@ -63,7 +63,12 @@ class SpringArticle(JournalArticle):
     def generate_pdf_url(self):
         try:
             self.pdf_url = 'http://link.springer.com'+self.sec.select_one('.pdf-link')['href']
-        except:
+        except Exception as e:
+            print(self.sec)
+            print('________________________________')
+            print('[Error] in generate_pdf_url:%s' % str(e))
+            self.show_in_cmd()
+            print('_______________________________')
             return
 
     def generate_id_by_journal(self):
