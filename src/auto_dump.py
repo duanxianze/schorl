@@ -27,16 +27,28 @@ def auto_dump_sql(date_str):
 
 def auto_dump_sql(date_str):
     dynamic_table_names = [
-        'journal_volume',       'temp_scholar',
+        'sjr_area',
+        '''
+        'jouranl_volume','temp_scholar',
         'temp_scholar_category','temp_scholar_area',
         'temp_scholar_article', 'articles'
+        '''
     ]
-    dir_name = '~/backups/%s' % date_str
-    print('mkdir '+dir_name)
-    os.mkdir(dir_name)
+    if os.name=='nt':
+        dir_name = 'd:\\%s' % date_str
+        grep = '\\'
+    else:
+        dir_name = '~/backups/%s' % date_str
+        grep = '/'
+    try:
+        print('mkdir '+dir_name)
+        os.mkdir(dir_name)
+    except Exception as e:
+        print(str(e))
     for table_name in dynamic_table_names:
         table_file_name = '{}_{}'.format(table_name,date_str)
-        cmd = 'pg_dump --table={} -f {}/{}.sql sf_development'.format(table_name,dir_name,table_file_name)
+        cmd = 'pg_dump --table={} -U lyn -f {}{}{}.sql sf_development'\
+            .format(table_name,dir_name,grep,table_file_name)
         print(cmd)
         os.system(cmd)
     print('dump dynamic tables ok!upload to dropbox...')

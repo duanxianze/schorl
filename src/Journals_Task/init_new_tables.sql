@@ -112,3 +112,36 @@ where id in (
     and temp_scholar_article.article_id = articles.id_by_journal
     and temp_scholar_category.temp_scholar_id = temp_scholar_article.temp_scholar_id
 );
+
+
+create view article_publisher as
+(
+    select count(*) from articles
+)
+
+select count(*) from articles;
+select count(*) from articles where resource_link is not null and is_downloaded=0;
+
+select count(*) from articles
+    where (resource_link is not null or pdf_temp_url is not null) and is_downloaded=0
+    and link like '%ieee%';
+
+select count(*) from articles
+    where (resource_link is null or pdf_temp_url is not null) and is_downloaded=0
+    and link like '%ieee%';
+
+select count(*) from articles
+    where resource_link is not null and is_downloaded=0
+    and link like '%sciencedirect%';
+
+select count(*) from articles
+    where resource_link is null and is_downloaded=0
+    and link like '%sciencedirect%';
+
+select count(*) from articles
+    where resource_link is not null and is_downloaded=0
+    and link like '%springer%';
+
+select count(*) from articles
+    where resource_link is null and is_downloaded=0
+    and link like '%springer%';

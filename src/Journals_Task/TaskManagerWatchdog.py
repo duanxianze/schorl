@@ -89,7 +89,7 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
             self.print_log()
 
     def print_log(self):
-        for i in range(1,60):
+        for i in range(1,10):
             if self.task_proc_status=='dead':
                 print('dead')
                 self.restart_task_proc()
@@ -106,7 +106,7 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
                 )
             except Exception as e:
                 print(str(e))
-            time.sleep(10)
+            time.sleep(60)
 
 
 if __name__=="__main__":
