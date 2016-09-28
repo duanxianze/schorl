@@ -34,11 +34,12 @@ EXISTED_SPIDERS = [
         'publisherKeywords':    ['springer'],
         'need_webdriver':       False
     },
-    {
-        'publisherSpiderClass': IEEE_Spider,
-        'publisherKeywords':    ['ieee'],
-        'need_webdriver':       False
-    }
+    
+    #{
+    #    'publisherSpiderClass': IEEE_Spider,
+    #    'publisherKeywords':    ['ieee'],
+    #    'need_webdriver':       False
+    #}
 ]
 
 
