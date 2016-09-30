@@ -114,6 +114,8 @@ class MajorTaskManager:
         journal_items = list(set(journal_items))
         random.shuffle(journal_items)
         thread_pool.map(self.launch_journal_spider,journal_items)
+        thread_pool.close()
+        thread_pool.join()
 
 
 if __name__=="__main__":

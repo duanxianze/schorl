@@ -90,7 +90,7 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
 
     def print_log(self):
         for i in range(1,10):
-            if self.task_proc_status=='dead':
+            if self.task_proc_status=='dead' or 'zombie':
                 print('dead')
                 self.restart_task_proc()
             try:
