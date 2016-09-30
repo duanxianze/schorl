@@ -38,10 +38,19 @@ class Journal:
         self.category_id = None
 
     def generate_area_category_id(self):
-        if self.area_relation_cot:
+        if self.area_relation_cot==1:
             self.area_id = self.get_area_ids()[0][0]
-        if self.category_relation_cot:
+        if self.category_relation_cot==1:
             self.category_id = self.get_category_ids()[0][0]
+        if self.area_id and self.category_id:
+            if int(self.area_id / 100 ) != int(self.category_id / 100 ):
+                print('__________________________________________________')
+                print('__________________________________________________')
+                print('__________________________________________________')
+                print('__________________________________________________')
+                print(self.sjr_id,self.name)
+                self.area_id = None
+                self.category_id = None
 
     def get_category_ids(self):
         cur = DB_CONNS_POOL.new_db_cursor()

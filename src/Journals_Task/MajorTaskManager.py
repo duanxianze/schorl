@@ -23,7 +23,6 @@ from Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
 from Journals_Task.JournalClass import Journal
 from crawl_tools.DriversPool import DriversPool
-from crawl_tools.WatchDog import close_procs_by_keyword
 
 class MajorTaskManager:
     def __init__(self,majorKeyword):
