@@ -1,20 +1,18 @@
 # scholar_articles
 
-##History
+##`History`
 ### 2016-4开始GoogleScholar方向工作
-接手前articles表中有314037条数据
-最大id为314060
-截止到2016-9-11，大约52w，单机日增量3k-9k
-电磁学的学者从谷歌上检索完成
-大部分条目已存，只爬谷歌最近的增量
+- 接手前articles表中有314037条数据，最大id为314060
+- 截止到2016-9-11，大约52w，单机日增量3k-9k，电磁学的学者从谷歌上检索完成，大部分条目已存，只爬谷歌最近的增量
 ### 2016-9-25起启动杂志社方向爬虫
-截止到2016-10-1，大约200w，单机日增量30w-50w
-publisher进度:
-- IEEE（80家journal，文章总量30w，进度[80/80]）
-- Springer（700家journal，文章总量400w-600w，进度[94/700]）
-- Elsevier（1200家journal，文章总量700w-1000w，进度[76/1200]）
-
-##JournalTask
+- 截止到2016-10-1，大约200w，单机日增量30w-50w
+- publisher进度:
+ IEEE（80家journal，文章总量30w，进度[80/80]）
+ 
+ Springer（700家journal，文章总量400w-600w，进度[94/700]）
+ 
+ Elsevier（1200家journal，文章总量700w-1000w，进度[76/1200]）
+##`JournalTask`
 
 ###数据关系为：
 - `publisher->journal->volume->article`
@@ -39,7 +37,7 @@ publisher进度:
      注意继承`JournalArticle`基类
 
 
-##Google Schloar
+##`Google Schloar`
 
 * title
 * year
