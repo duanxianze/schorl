@@ -7,12 +7,12 @@ if os.name=='nt':
     REMOTE_HOST = '192.168.2.100'
     REMOTE_PORT = 5432
 else:
-    REMOTE_HOST = '192.168.2.100'
-    REMOTE_PORT = 5432
+    REMOTE_HOST = None#'192.168.2.100'
+    REMOTE_PORT = None#5432
 
 
 DB_CONNS_POOL = DB_Connect_Pool(
-    size = 3,
+    size = 30,
     dbname = "sf_development",
     user = "lyn",
     password = "tonylu716",
