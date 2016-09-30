@@ -17,13 +17,13 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-import random
+import random,time
 from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
 from Journals_Task.GetMajorJournals import MajorEntrance
 from multiprocessing.dummy import Pool as ThreadPool
 from Journals_Task.JournalClass import Journal
 from crawl_tools.DriversPool import DriversPool
-
+from crawl_tools.WatchDog import close_procs_by_keyword
 
 class MajorTaskManager:
     def __init__(self,majorKeyword):
@@ -84,6 +84,9 @@ class MajorTaskManager:
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
                   .format(JournalObj.name,JournalObj.site_source))
+    
+    def kill_myself(self):
+        close_procs_by_keyword('Major')
 
     def run(
             self,journal_need_single_area_relation = True,
@@ -116,6 +119,7 @@ class MajorTaskManager:
         thread_pool.map(self.launch_journal_spider,journal_items)
         thread_pool.close()
         thread_pool.join()
+        raise Exception('fuck you . give me feed ok ???')
 
 
 if __name__=="__main__":

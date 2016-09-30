@@ -148,6 +148,7 @@ def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
             if proc.cmdline() == cmd_line \
                 or ( pname is not None and proc.name().lower() == pname.lower() )\
                     or ( grep is not None and grep in proc.name() ):
+                print('proc info search:',proc)
                 procs.append({'proc':proc,'create_time':proc.create_time()})
         except psutil.AccessDenied:
             pass
@@ -157,6 +158,10 @@ def get_prev_procs(cmd_line=None,pname=None,grep=None,sort_by_time=True):
         procs = sorted(procs,
                 key = lambda x:x['create_time']
             )#否则默认按id大小排
+    '''
+    if not procs:
+        print('Process manager: No procs searched...')
+    '''
     try:
         return list(map(lambda x:x['proc'],procs))
     except Exception as e:
@@ -202,4 +207,5 @@ if __name__=="__main__":
         create_time = time.strftime('%Y-%m-%d %H:%M:%S',time_str)
         print create_time
     '''
-    close_procs_by_keyword('chromedriver')
+    close_procs_by_keyword('Major')
+
