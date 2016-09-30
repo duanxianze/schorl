@@ -1,6 +1,45 @@
 # scholar_articles
 
-[Google Schloar](http://scholar.google.com)
+##History
+### 2016-4开始GoogleScholar方向工作
+接手前articles表中有314037条数据
+最大id为314060
+截止到2016-9-11，大约52w，单机日增量3k-9k
+电磁学的学者从谷歌上检索完成
+大部分条目已存，只爬谷歌最近的增量
+### 2016-9-25起启动杂志社方向爬虫
+截止到2016-10-1，大约200w，单机日增量30w-50w
+publisher进度:
+- IEEE（80家journal，文章总量30w，进度[80/80]）
+- Springer（700家journal，文章总量400w-600w，进度[94/700]）
+- Elsevier（1200家journal，文章总量700w-1000w，进度[76/1200]）
+
+##JournalTask
+
+###数据关系为：
+- `publisher->journal->volume->article`
+- `出版社->期刊->卷->文章`
+
+- 一个出版社一个解析器
+
+###解析器包括三层：
+
+- 数据库中保存的journal site_source解析至journal主页
+（少部分直接保存的就是journal主页，大部分需要一些转换）
+
+- journal主页解析得到所有volume_link
+
+- 针对每个volume_link页写解析器，得到该页所有article
+（注意多页的问题，但大部分情况是一页，一个杂志一卷，可能就是一年半载，不会有多少文章，至多几十篇）
+
+- 以上三步是全过程，
+     前两部都写在`JournalTask文件夹`的某某spider里
+     注意继承`JournalSpider`基类
+     第三部写在`journal_parser文件夹`的某某parser里
+     注意继承`JournalArticle`基类
+
+
+##Google Schloar
 
 * title
 * year
@@ -12,28 +51,10 @@
 * summary(abstract)
 * google_id
 
-# 准备工作
 
-## virtualenv
+###条目初步创建
 
-* virtualenv安装: `pip install virtualenv`
-* 创建py3env:`virtualenv -p python3 venv`
-* 启动虚拟环境: `source py3env/source/activate`
-* 安装依赖: `pip install -r requirements.txt`
-
-注意: 在pip install 安装依赖之前，确保启动了虚拟环境，这样才不会把全局依赖和虚拟环境的依赖混淆
-
-#Datebase
-接手前articles表中有314037条数据
-但是最大id为314060
-截止到2016-8-26，大约46w
-截止到2016-9-11，大约52w
-大部分条目已存，目前速率较低，只爬谷歌最近的 增量
-
-#Module
-##条目的初步创建
-
-### ArticleSpider.py
+#### ArticleSpider.py
 包含:
 - 获取搜索结果urls的`ScholarSearch`类
 - 爬虫主控制器`ArticleSpider`类
@@ -42,7 +63,7 @@
 - spider从db中检索出scholar姓名
 - 交予`ScholarSearch`得到url，访问后得到源码交给`HtmlParser`模型
 
-### parse_html.py
+#### parse_html.py
 包含：
 - 解析搜索结果页面的`HtmlParser`类，
 - 逻辑上的`Article`类，包括属性的获取，数据库保存
@@ -51,17 +72,17 @@
 - paser解析出文章元素列表`secs`
 - 分别生成`Article`对象获得所有文章属性，存入数据库
 
-##异步获取细节
-### pdf_download.py
+###异步获取细节
+#### pdf_download.py
 - 仅包含一个`pdf_downloader`类
 - 从远程db中检索出**存在且未下载**的pdf_url条目，存于本地
 - 可脱离于主程序，在宿机器上运行
 
-###**journal_pdf_url_generate.py
+####**journal_pdf_url_generate.py
 -  某些pdf_url谷歌无法拿到，需要版权
 -  针对每一学校购置版权的杂志社，写好parser，由db中的title，去搜索页检索，得到pdf_url，反馈给db
 
-### bibtex.py
+#### bibtex.py
 包含:
 - 爬虫控制器`BibtexSpider`类
 - 逻辑上的`Bibtex`类，包括属性的获取，数据库保存
@@ -71,11 +92,4 @@
 - 根据google_id,规则匹配url，进入中间页，寻找bibtex页面的url
 - 进入bibtex页面，获取完毕
 
-##任务进程监控
-### WacthDog.py&为各项任务定制的**watchdog.py
-- 用到`psutil`，`subprocess`包，获取某项进程的各种状态属性
-- 某项具体的task作为watchdog的**subprocess**运行，启动直接运行watchdog即可
-- watchdog和task并行不阻塞
-- 主类包含**进程级别的task异常**的处理方法，杀进程，重启进程，管理员邮件提示等
-- 子类具体写**task逻辑异常的识别**，如数据量异常等
-- 子类再写一些关键数据的打印，交互性的东西，以及数据的**监控统计**之类
+
