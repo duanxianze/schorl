@@ -35,7 +35,7 @@ class JournalSpider:
         try:
             sections = parser.sections
         except Exception as e:
-            print('[Error] Page Invalid in first check{}\nerror_url {}'\
+            print('[Error] JournalSpider:Page Invalid in first check{}\nerror_url {}'\
                   .format(str(e),volume_link))
             return False
         try:
@@ -55,17 +55,17 @@ class JournalSpider:
                     article = JournalArticle(
                         sec,self.JournalObj,volume_db_id)
             except Exception as e:
-                print('[Error]JournalArticle Init:{}'.format(str(e)))
+                print('[Error] JournalSpider:JournalArticle Init:{}'.format(str(e)))
                 return False
             if not article.authors:
-                print('[Error] No authors in article <{}>'.format(article.title))
+                print('[Error] JournalSpider:No authors in article <{}>'.format(article.title))
                 continue
             while(1):
                 try:
                     article.save_to_db()
                     break
                 except psycopg2.OperationalError:
-                    print('db error,again')
+                    print('JournalSpider: db error,again')
                     time.sleep(2)
         if len(parser.sections)>0:
                 print(len(parser.sections))

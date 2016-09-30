@@ -60,6 +60,7 @@ class MajorTaskManager:
         JournalObj.category_relation_cot = db_journal_item[4]
         JournalObj.publisher = db_journal_item[5]
         JournalObj.volume_links_got = db_journal_item[6]
+        JournalObj.generate_area_category_id()
         #print(journal_name,journal_sjr_id,journal_url)
         spider_item = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
         #print(spider_item,'spider_item')
