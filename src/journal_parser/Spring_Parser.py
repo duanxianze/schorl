@@ -37,9 +37,9 @@ class SpringParser:
 
 
 class SpringArticle(JournalArticle):
-    def __init__(self,sec,JournalObj):
+    def __init__(self,sec,JournalObj,volume_db_id):
         self.sec = sec
-        JournalArticle.__init__(self,JournalObj)
+        JournalArticle.__init__(self,JournalObj,volume_db_id)
         self.generate_all_method()
 
     def generate_title(self):
@@ -64,10 +64,9 @@ class SpringArticle(JournalArticle):
         try:
             self.pdf_url = 'http://link.springer.com'+self.sec.select_one('.pdf-link')['href']
         except Exception as e:
-            print(self.sec)
             print('________________________________')
             print('[Error] in generate_pdf_url:%s' % str(e))
-            self.show_in_cmd()
+            print(self.sec)
             print('_______________________________')
             return
 

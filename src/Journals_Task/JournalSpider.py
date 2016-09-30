@@ -26,7 +26,9 @@ class JournalSpider:
         self.JournalObj = JournalObj
         self.volume_links = []
 
-    def crawl_volume_page(self,volume_link,AllItemsPageParser,JournalArticle):
+    def crawl_volume_page(self,volume_item,AllItemsPageParser,JournalArticle):
+        volume_link = volume_item[0]
+        volume_db_id = volume_item[1]
         parser = AllItemsPageParser(
             html_source = request_with_random_ua(volume_link).text
         )
@@ -35,35 +37,26 @@ class JournalSpider:
         except Exception as e:
             print('[Error] Page Invalid in first check{}\nerror_url {}'\
                   .format(str(e),volume_link))
-            return
+            return False
         try:
             volume_year = parser.volume_year
             print('volume_year:{}'.format(volume_year))
         except Exception as e:
-            print('Volume year is none:{}'.format(str(e)))
+            #print('Volume year is none:{}'.format(str(e)))
             volume_year = None
         print('\nPage Url: %s '%volume_link)
         #print('len(sections)',len(sections))
         for sec in sections:
-            if volume_year is not None:
-                '''
-                article = JournalArticle(sec,self.JournalObj,volume_year)
-                '''
-                try:
-                    article = JournalArticle(sec,self.JournalObj,volume_year)
-                except Exception as e:
-                    print('[Error]JournalSpider:crawl_volume_page:%s'%str(e))
-                    return
-            else:
-                '''
-                article = JournalArticle(sec,self.JournalObj)
-                '''
-                try:
-                    article = JournalArticle(sec,self.JournalObj)
-                except Exception as e:
-                    print('[Error]JournalSpider:crawl_volume_page:%s'%str(e))
-                    return
-
+            try:
+                if volume_year is not None:
+                    article = JournalArticle(
+                        sec,self.JournalObj,volume_db_id,volume_year)
+                else:
+                    article = JournalArticle(
+                        sec,self.JournalObj,volume_db_id)
+            except Exception as e:
+                print('[Error]JournalArticle Init:{}'.format(str(e)))
+                return False
             if not article.authors:
                 print('[Error] No authors in article <{}>'.format(article.title))
                 continue
@@ -77,16 +70,20 @@ class JournalSpider:
         if len(parser.sections)>0:
                 print(len(parser.sections))
                 self.mark_volume_ok(volume_link)
+                return True
+        return False
 
     def _run(self,AllItemsPageParser,JournalArticle):
-        volume_links = list(set(
+        volume_items = list(set(
             self.get_unfinished_volume_links()
         ))
-        random.shuffle(volume_links)
-        for volume_link in volume_links:
-            self.crawl_volume_page(
-                volume_link,AllItemsPageParser,JournalArticle)
-        if len(volume_links)>0:
+        random.shuffle(volume_items)
+        flag = True
+        for volume_item in volume_items:
+            if not self.crawl_volume_page(
+                volume_item,AllItemsPageParser,JournalArticle):
+                flag = False
+        if flag:
             self.mark_journal_ok()
 
     def mark_journal_ok(self):
@@ -160,15 +157,13 @@ class JournalSpider:
             return self.volume_links
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
-            'select link from journal_volume \
+            'select link,id from journal_volume \
               where journal_sjr_id={} and is_crawled=FALSE'\
                 .format(self.JournalObj.sjr_id)
         )
         data = cur.fetchall()
         cur.close()
-        return list(map(
-            lambda x:x[0],data
-        ))
+        return data
 
 if __name__=="__main__":
     from Journals_Task.JournalClass import Journal

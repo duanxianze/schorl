@@ -97,10 +97,10 @@ class ElsevierAllItemsPageParser:
 
 
 class ElsevierAricle(JournalArticle):
-    def __init__(self,sec,JournalObj,year):
+    def __init__(self,sec,JournalObj,volume_db_id,year):
         self.sec = sec
         self.JournalObj = JournalObj
-        JournalArticle.__init__(self,JournalObj)
+        JournalArticle.__init__(self,JournalObj,volume_db_id)
         self.generate_all_method()
         self.year = year
         bad_type_keywords = ['Editor']

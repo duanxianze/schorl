@@ -19,7 +19,8 @@ sys.path.append(root_dir)
 from db_config import DB_CONNS_POOL
 
 class JournalArticle:
-    def __init__(self,JournalObj):
+    def __init__(self,JournalObj,volume_db_id):
+        self.volume_db_id = volume_db_id
         self.JournalObj = JournalObj
         self.journal_id = JournalObj.sjr_id
         self.cur = DB_CONNS_POOL.new_db_cursor()
@@ -120,11 +121,11 @@ class JournalArticle:
             return
         try:
             self.cur.execute(
-                'insert into articles(title,year,link,pdf_temp_url,\
-                    resource_type,resource_link,summary,journal_id,id_by_journal)'
-                'values(%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                'insert into articles(title,year,link,pdf_temp_url,resource_type,\
+                    resource_link,summary,journal_id,id_by_journal,volume_db_id)'
+                'values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
                 (self.title,self.year,self.link,self.pdf_temp_url,self.resource_type,\
-                    self.pdf_url,self.abstract,self.journal_id,self.id_by_journal)
+                    self.pdf_url,self.abstract,self.journal_id,self.id_by_journal,self.volume_db_id)
             )
             self.show_in_cmd()
         except Exception as e:
@@ -294,6 +295,7 @@ class JournalArticle:
         print('category_id:\t\t{}'.format(self.category_id))
         print('area_id:\t\t{}'.format(self.area_id))
         print('abstract:\t\t{}'.format(self.abstract))
+        print('volume_db_id:\t\t{}'.format(self.volume_db_id))
         print('*********New article of <{}>***********'.format(self.JournalObj.name))
 
 

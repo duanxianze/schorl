@@ -149,14 +149,14 @@ class IEEE_AllItemsPageParser:
         return self.soup.select_one('.results').select('li')
 
 class IEEE_Article(JournalArticle):
-    def __init__(self,sec,JournalObj,year):
+    def __init__(self,sec,JournalObj,volume_db_id,year):
         self.sec = sec
         self.title_text_span = self.sec.find(
             id = re.compile("art-abs-title-[0-9]+")
         )
         if not self.title_text_span:
             raise Exception('IEEE article type Error')
-        JournalArticle.__init__(self,JournalObj)
+        JournalArticle.__init__(self,JournalObj,volume_db_id)
         self.year = year
         self.title_parent_a_tag = self.title_text_span.parent
         self.generate_all_method()
