@@ -86,12 +86,14 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
             tf.close()
             tf = open('../amount_log.txt','a+')
             prev_amount = amount
-            self.print_log()
+            self.print_log(tf)
 
-    def print_log(self):
+    def print_log(self,tf):
         for i in range(1,10):
+            local_t = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
             if self.task_proc_status in ['dead','zombie']:
                 print('dead')
+                tf.write('restart,'+local_t+'\n')
                 self.restart_task_proc()
             try:
                 print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
@@ -101,8 +103,9 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
                     self.SC_amount,
                     self.SchArea_amount,
                     self.SchArticle_amount,
-                    time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                    local_t
                     )
+
                 )
             except Exception as e:
                 print(str(e))
