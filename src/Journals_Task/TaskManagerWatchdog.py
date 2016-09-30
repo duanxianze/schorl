@@ -91,7 +91,8 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
     def print_log(self):
         for i in range(1,10):
             if self.task_proc_status in ['dead','zombie']:
-                print('dead')
+                print('task ok or network error')
+                self.restart_network('tonylu716')
                 self.restart_task_proc()
             try:
                 print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
