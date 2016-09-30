@@ -12,6 +12,7 @@
  Springer（700家journal，文章总量400w-600w，进度[94/700]）
  
  Elsevier（1200家journal，文章总量700w-1000w，进度[76/1200]）
+ 
 ##`JournalTask`
 
 ###数据关系为：
