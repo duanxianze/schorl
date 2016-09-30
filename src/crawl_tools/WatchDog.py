@@ -80,6 +80,13 @@ class WatchDog:
         emailAI.send()
         emailAI.close()
 
+    def restart_network(self,sudo_key):
+        if os.name!='nt':
+            cmd = 'sudo service network-manager restart'
+            os.system('echo %s|sudo -S %s' % (sudo_key, cmd))
+        else:
+            pass
+
     def close_task_proc(self):
         print('WatchDog:\n\tKilling process:  {}  ...'.format(self.task_proc.pid))
         if os.name is "nt" :

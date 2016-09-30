@@ -92,8 +92,9 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
         for i in range(1,10):
             local_t = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
             if self.task_proc_status in ['dead','zombie']:
-                print('dead')
                 tf.write('restart,'+local_t+'\n')
+                print('task ok or network error')
+                self.restart_network('tonylu716')
                 self.restart_task_proc()
             try:
                 print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
