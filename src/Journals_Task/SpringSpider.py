@@ -20,7 +20,6 @@ sys.path.append(root_dir)
 from journal_parser.Spring_Parser import SpringArticle,SpringParser
 from Journals_Task.JournalSpider import JournalSpider
 from crawl_tools.request_with_proxy import request_with_random_ua
-import psycopg2,time
 
 class SpringSpider(JournalSpider):
     '''
