@@ -87,7 +87,7 @@ def request_with_proxy(url, timeout=14, use_ss=False,
         return requests.get(url, proxies=proxies, timeout=timeout, headers=headers,verify=False)
 
 def request_with_random_ua(url):
-    for i in range(30):
+    for i in range(3):
         try:
             return requests.get(
                 url = url,
