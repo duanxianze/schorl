@@ -95,7 +95,7 @@ class JournalArticle:
             后期对pdf做文本挖掘，就倚仗这些专业(cateogry_id)精准的article数据,
             作为训练集得到各领域专业术语，才能确定其余article的所属专业
         '''
-        if self.authors==[] or None in [self.title,self.year,self.link,self.id_by_journal]:
+        if None in [self.title,self.year,self.link,self.id_by_journal]:
             print('[Error] in Save Article: Info Not Enough...')
             return
         try:
@@ -119,7 +119,7 @@ class JournalArticle:
                 'values(%s)',
                 (scholar_name,)
             )
-            print('[Success] Save scholar "{}" ok!'.format(scholar_name.strip()))
+            print('[Success] Save scholar "{}" ok!'.format(scholar_name.strip().replace("'",' ')))
         except psycopg2.IntegrityError:
             print('[Error] Scholar <{}> has been saved'.format(scholar_name))
         except Exception as e:
@@ -148,46 +148,46 @@ class JournalArticle:
     '''
 
     def save_scholar_category_realtion(self,temp_scholar_id):
-        category_id = self.JournalObj.category_id
-        if not category_id:
-            print('[Error] SC Realtion saved error:\n\t Category_id cant be null')
+        '''
         if self.scholar_category_relation_is_saved(
                 temp_scholar_id,category_id):
             print('[Error] The SC relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,category_id))
             return
+        '''
         try:
             self.cur.execute(
                 'insert into temp_scholar_category(temp_scholar_id,category_id)'
                 'values(%s,%s)',
-                (temp_scholar_id,category_id)
+                (temp_scholar_id,self.JournalObj.category_id)
             )
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar_category_realtion():{}'.format(str(e)))
 
     def save_scholar_area_relation(self,temp_scholar_id):
-        area_id = self.JournalObj.area_id
-        if not area_id:
-            print('[Error] SchArea Realtion saved error:\n\t Area_id cant be null')
+        '''
         if self.scholar_area_relation_is_saved(
                 temp_scholar_id,area_id):
             print('[Error] The ScArea relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,area_id))
             return
+        '''
         try:
             self.cur.execute(
                 'insert into temp_scholar_area(temp_scholar_id,area_id)'
                 'values(%s,%s)',
-                (temp_scholar_id,area_id)
+                (temp_scholar_id,self.JournalObj.area_id)
             )
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar_area_realtion():{}'.format(str(e)))
 
     def save_scholar_article_realtion(self,temp_scholar_id):
+        '''
         if self.scholar_article_relation_is_saved(temp_scholar_id):
             print('[Error] The ScArticle relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,self.id_by_journal))
             return
+        '''
         try:
             self.cur.execute(
                 'insert into temp_scholar_article(temp_scholar_id,article_id)'
@@ -200,9 +200,11 @@ class JournalArticle:
             print('[Error] in JournalArticle:save_scholar_article_realtion():{}'.format(str(e)))
 
     '''
-        三张关于学者的关系表的独立约束检查，因为数据库没法没法写unique，就交给python来干
+        三张关于学者的关系表的独立约束检查（数据库体积增大后复杂度太高，已取消）
+        关系表重复本身没啥大不了的，检查会导致阻塞的厉害
     '''
 
+    '''
     def scholar_category_relation_is_saved(self,temp_scholar_id,category_id):
         cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
@@ -226,6 +228,7 @@ class JournalArticle:
         cur.close()
         return data
 
+
     def scholar_article_relation_is_saved(self,temp_scholar_id):
         cur = DB_CONNS_POOL.new_db_cursor()
         cur.execute(
@@ -237,6 +240,7 @@ class JournalArticle:
         #print('SA amount',data)
         cur.close()
         return data
+    '''
 
     def show_in_cmd(self):
         print('\n*********New article of <{}>***********'.format(self.JournalObj.name))
