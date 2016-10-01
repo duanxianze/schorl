@@ -123,7 +123,7 @@ def journals_of_specific_index(
                 category_relation_cot,publisher,volume_links_got from journal \
           WHERE{}{} is_crawled_all_article=FALSE\
             and ( site_source like '%spring%'\
-          )ORDER by h_index desc limit 100".format(
+          )ORDER by h_index desc".format(
             single_area_relation_word,open_access_word
         )
     '''
