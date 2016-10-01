@@ -153,6 +153,7 @@ class JournalArticle:
                 temp_scholar_id,category_id):
             print('[Error] The SC relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,category_id))
+            return
         try:
             self.cur.execute(
                 'insert into temp_scholar_category(temp_scholar_id,category_id)'
@@ -170,6 +171,7 @@ class JournalArticle:
                 temp_scholar_id,area_id):
             print('[Error] The ScArea relation:[{},{}] has been saved'\
                   .format(temp_scholar_id,area_id))
+            return
         try:
             self.cur.execute(
                 'insert into temp_scholar_area(temp_scholar_id,area_id)'
