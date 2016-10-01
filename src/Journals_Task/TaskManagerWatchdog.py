@@ -75,18 +75,20 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
         prev_amount = 0
         tf = open('../amount_log.txt','a+')
         while(1):
-            amount = self.articles_amount
-            local_time = time.strftime(
-                "%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
-            delta = amount - prev_amount
-            if initial:
-                delta = 0
-                initial = False
-            tf.write(str(amount)+','+local_time+','+str(delta)+'\n')
-            tf.close()
-            tf = open('../amount_log.txt','a+')
-            prev_amount = amount
-            self.print_log(tf)
+            for i in range(6):
+                amount = self.articles_amount
+                local_time = time.strftime(
+                    "%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
+                delta = amount - prev_amount
+                if initial:
+                    delta = 0
+                    initial = False
+                tf.write(str(amount)+','+local_time+','+str(delta)+'\n')
+                tf.close()
+                tf = open('../amount_log.txt','a+')
+                prev_amount = amount
+                self.print_log(tf)
+            self.restart_task_proc()
 
     def print_log(self,tf):
         for i in range(1,60):
