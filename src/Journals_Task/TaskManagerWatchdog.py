@@ -89,28 +89,28 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
             self.print_log(tf)
 
     def print_log(self,tf):
-        for i in range(1,10):
+        for i in range(1,60):
             local_t = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
             if self.task_proc_status in ['dead','zombie']:
                 tf.write('restart,'+local_t+'\n')
                 print('task ok or network error')
                 self.restart_network('tonylu716')
                 self.restart_task_proc()
-            try:
-                print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
-                    self.articles_amount,
-                    self.task_proc_status,
-                    self.AC_amount,
-                    self.SC_amount,
-                    self.SchArea_amount,
-                    self.SchArticle_amount,
-                    local_t
-                    )
-
+            time.sleep(10)
+        try:
+            print('WatchDog:\n\t{},\t{},\t{},\t{},\t{},\t{},\t{}'.format(
+                self.articles_amount,
+                self.task_proc_status,
+                self.AC_amount,
+                self.SC_amount,
+                self.SchArea_amount,
+                self.SchArticle_amount,
+                local_t
                 )
-            except Exception as e:
-                print(str(e))
-            time.sleep(60)
+
+            )
+        except Exception as e:
+            print(str(e))
 
 
 if __name__=="__main__":
