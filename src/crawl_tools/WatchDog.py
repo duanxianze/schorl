@@ -84,6 +84,7 @@ class WatchDog:
         if os.name!='nt':
             cmd = 'sudo service network-manager restart'
             os.system('echo %s|sudo -S %s' % (sudo_key, cmd))
+            print("network restarting...")
         else:
             pass
 
