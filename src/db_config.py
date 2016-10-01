@@ -1,23 +1,20 @@
 from crawl_tools.DB_Connect_Pool import DB_Connect_Pool
-import os
+import os,platform
 
-#windows机器为主数据库
+IS_MASTER_DB = ( os.name!='nt' and platform.processor()=='Intel64 Family 6 Model 58 Stepping 9, GenuineIntel' )
 
-if os.name=='nt':
-    REMOTE_HOST = '192.168.2.100'
-    REMOTE_PORT = 5432
+if IS_MASTER_DB:
+    REMOTE_HOST = None
+    REMOTE_PORT = None
 else:
-    REMOTE_HOST = None#'192.168.2.100'
-    REMOTE_PORT = None#5432
-
+    REMOTE_HOST = '192.168.2.102'
+    REMOTE_PORT = 5432
 
 DB_CONNS_POOL = DB_Connect_Pool(
     size = 30,
     dbname = "sf_development",
     user = "lyn",
     password = "tonylu716",
-    host = REMOTE_HOST,
-    port = REMOTE_PORT
 )
 
 REMOTE_CONNS_POOL = DB_Connect_Pool(
