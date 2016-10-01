@@ -58,13 +58,16 @@ class JournalSpider:
         except AttributeError:
             volume_year = None
         print('\nPage Url: %s '%volume_link)
-        self.crawl_articles(sections,volume_year,volume_db_id,JournalArticle)
+        if not self.crawl_articles(
+                sections,volume_year,volume_db_id,JournalArticle):
+            return False
         if len(parser.sections)>0:
             self.mark_volume_ok(volume_db_id)
             return True
         return False
 
     def crawl_articles(self,sections,volume_year,volume_db_id,JournalArticle):
+        pdf_url_null_cot = 0
         for sec in sections:
             params = [sec,self.JournalObj,volume_db_id]
             if volume_year:
@@ -74,6 +77,13 @@ class JournalSpider:
             except Exception as e:
                 print('[Error] JournalSpider:\
                     JournalArticle Init:{}'.format(str(e)))
+                return False
+            if not article.pdf_url:
+                pdf_url_null_cot += 1
+                continue
+            else:
+                pdf_url_null_cot = 0
+            if pdf_url_null_cot>3:
                 return False
             if article.authors in ([''],[]):
                 print('[Error] JournalSpider:\
