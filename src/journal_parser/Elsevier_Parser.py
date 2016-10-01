@@ -36,7 +36,7 @@ class ElsevierDetailPageParser:
         try:
             link = self.soup.select_one("#pdfLink")['href']
             if 'ShoppingCartURL' in link:
-                # 被指向支付页面，不是在学校ip里的情况
+                # 被指向支付 页面，不是在学校ip里的情况
                 return None
             else:
                 return link

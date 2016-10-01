@@ -25,13 +25,6 @@ class JournalArticle:
         self.volume_db_id = volume_db_id
         self.JournalObj = JournalObj
         self.cur = DB_CONNS_POOL.new_db_cursor()
-        '''
-            注意，这里的area_id并不存入article表,
-            只为存其作者和area的关系表才作该属性
-            因为对于文章来讲，需要精确定位领域
-            后期对pdf做文本挖掘，就倚仗这些专业(cateogry_id)已确定的article数据,
-            作为训练集得到各领域专业术语的模型，才能确定其余article的所属专业
-        '''
         self.title = None
         self.abstract = None
         self.pdf_url = None
@@ -96,6 +89,15 @@ class JournalArticle:
                 #前期检索出的都是一个area的杂志社，此处必会经过
 
     def save_article(self):
+        '''
+            注意，area_id并不存入article表,
+            因为对于文章来讲，需要精确定位领域
+            后期对pdf做文本挖掘，就倚仗这些专业(cateogry_id)精准的article数据,
+            作为训练集得到各领域专业术语，才能确定其余article的所属专业
+        '''
+        if self.authors==[] or None in [self.title,self.year,self.link,self.id_by_journal]:
+            print('[Error] in Save Article: Info Not Enough...')
+            return
         try:
             self.cur.execute(
                 'insert into articles(title,category_id,year,link,pdf_temp_url,resource_type,\

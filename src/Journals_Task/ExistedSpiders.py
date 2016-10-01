@@ -18,10 +18,10 @@ for i in range(up_level_N):
 sys.path.append(root_dir)
 
 
-from Journals_Task.ElsevierSpider import *
-from Journals_Task.SpringSpider import *
-from Journals_Task.IEEE_Spider import *
-
+from Journals_Task.ElsevierSpider import ElsevierSpider
+from Journals_Task.SpringSpider import SpringSpider
+from Journals_Task.IEEE_Spider import IEEE_Spider
+from Journals_Task.TaylorFrancisSpider import TaylorFrancisSpider
 
 EXISTED_SPIDERS = [
     # {
@@ -34,7 +34,11 @@ EXISTED_SPIDERS = [
         'publisherKeywords':    ['springer'],
         'need_webdriver':       False
     },
-    
+    # {
+    #     'publisherSpiderClass': TaylorFrancisSpider,
+    #     'publisherKeywords':    ['informa'],
+    #     'need_webdriver':       False
+    # },
     #{
     #    'publisherSpiderClass': IEEE_Spider,
     #    'publisherKeywords':    ['ieee'],

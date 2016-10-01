@@ -19,6 +19,9 @@ sys.path.append(root_dir)
 
 from bs4 import BeautifulSoup
 from journal_parser.JournalArticle import JournalArticle
+from crawl_tools.decorators import except_pass
+EP_METHOD = lambda func:except_pass(func,'SpringArticle')
+
 
 class SpringParser:
     def __init__(self,html_source=None,from_web=True):
@@ -42,27 +45,31 @@ class SpringArticle(JournalArticle):
         JournalArticle.__init__(self,JournalObj,volume_db_id)
         self.generate_all_method()
 
+    @EP_METHOD
     def generate_title(self):
         self.title = self.sec.select_one('.title').text
 
+    @EP_METHOD
     def generate_authors(self):
-        try:
-            self.authors = list(map(lambda x:x.text,self.sec.select_one('.authors').select('a')))
-        except:
-            return
+        self.authors = list(map(lambda x:x.text,self.sec.select_one('.authors').select('a')))
 
+    @EP_METHOD
     def generate_link(self):
         self.link = 'http://link.springer.com' + self.sec.select_one('.title')['href']
 
+    @EP_METHOD
     def generate_abstract(self):
         self.abstract = self.sec.select_one('.snippet').text
 
+    @EP_METHOD
     def generate_year(self):
         self.year = int(self.sec.select_one('.year').text[1:-1])
 
+    @EP_METHOD
     def generate_pdf_url(self):
         self.pdf_url = 'http://link.springer.com'+self.sec.select_one('.pdf-link')['href']
 
+    @EP_METHOD
     def generate_id_by_journal(self):
         self.id_by_journal = self.link.split('/')[-1]
 

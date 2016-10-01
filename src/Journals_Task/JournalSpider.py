@@ -35,9 +35,10 @@ class JournalSpider:
         try:
             sections = parser.sections
         except Exception as e:
-            print('[Error] JournalSpider:Page Invalid in first check{}\nerror_url {}'\
-                  .format(str(e),volume_link))
+            print('[Error] JournalSpider:Page Invalid {}\n\
+                error_url {}'.format(str(e),volume_link))
             return False
+        volume_year = parser.volume_year
         try:
             volume_year = parser.volume_year
             print('volume_year:{}'.format(volume_year))
@@ -45,32 +46,27 @@ class JournalSpider:
             #print('Volume year is none:{}'.format(str(e)))
             volume_year = None
         print('\nPage Url: %s '%volume_link)
-        #print('len(sections)',len(sections))
         for sec in sections:
             try:
-                if volume_year is not None:
+                if volume_year:
                     article = JournalArticle(
                         sec,self.JournalObj,volume_db_id,volume_year)
                 else:
                     article = JournalArticle(
                         sec,self.JournalObj,volume_db_id)
             except Exception as e:
-                print('[Error] JournalSpider:JournalArticle Init:{}'.format(str(e)))
+                print('[Error] JournalSpider:\
+                    JournalArticle Init:{}'.format(str(e)))
                 return False
             if not article.authors:
-                print('[Error] JournalSpider:No authors in article <{}>'.format(article.title))
+                print('[Error] JournalSpider:\
+                    No authors in article <{}>'.format(article.title))
                 continue
-            while(1):
-                try:
-                    article.save_to_db()
-                    break
-                except psycopg2.OperationalError:
-                    print('JournalSpider: db error,again')
-                    time.sleep(2)
+            article.save_to_db()
         if len(parser.sections)>0:
-                print(len(parser.sections))
-                self.mark_volume_ok(volume_link)
-                return True
+            print(len(parser.sections))
+            self.mark_volume_ok(volume_link)
+            return True
         return False
 
     def _run(self,AllItemsPageParser,JournalArticle):
@@ -78,12 +74,12 @@ class JournalSpider:
             self.get_unfinished_volume_links()
         ))
         random.shuffle(volume_items)
-        flag = True
+        AllVolumesOK = True
         for volume_item in volume_items:
             if not self.crawl_volume_page(
                 volume_item,AllItemsPageParser,JournalArticle):
-                flag = False
-        if flag:
+                AllVolumesOK = False
+        if AllVolumesOK:
             self.mark_journal_ok()
 
     def mark_journal_ok(self):

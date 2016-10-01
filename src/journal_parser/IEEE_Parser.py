@@ -17,23 +17,15 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-
 import requests,random,re
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from crawl_tools.ua_pool import get_one_random_ua
 from crawl_tools.request_with_proxy import request_with_proxy
 from journal_parser.JournalArticle import JournalArticle
-
-def except_or_none(func):
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args,**kwargs)
-        except Exception as e:
-            print('IEEE_Article_Parser:\n\tError in {}(): {}'\
-                  .format(func.__name__,str(e)))
-            return None
-    return wrapper
+from crawl_tools.decorators import except_pass,except_return_none
+ERN_METHOD = lambda func:except_return_none(func,'IEEE_PARSER')
+EP_METHOD = lambda func:except_pass(func,'IEEE_ARTICLE')
 
 '''
 @except_or_none
@@ -64,6 +56,7 @@ def get_ieee_pdf_link(pdf_page_url,driver):
         print('The url of issue is {}'.format(pdf_page_url))
         return None
 
+
 class IEEE_HTML_Parser:
     '''
         the sample url is: http://ieeexplore.ieee.org/search/searchresult.jsp?queryText=hello&newsearch=true
@@ -72,7 +65,7 @@ class IEEE_HTML_Parser:
         self.driver = driver
 
     @property
-    @except_or_none
+    @ERN_METHOD
     def sections(self):
         return self.driver.find_elements_by_class_name('List-results-items')
 
@@ -103,12 +96,12 @@ class Article:
         return get_ieee_pdf_link(self.pdf_page_url,self.driver)
 
     @property
-    @except_or_none
+    @ERN_METHOD
     def html_url(self):
         pass
 
     @property
-    @except_or_none
+    @ERN_METHOD
     def authors(self):
         pass
 
@@ -161,28 +154,30 @@ class IEEE_Article(JournalArticle):
         self.title_parent_a_tag = self.title_text_span.parent
         self.generate_all_method()
 
-
+    @EP_METHOD
     def generate_title(self):
         self.title = self.title_text_span.text
 
+    @EP_METHOD
     def generate_authors(self):
-        try:
-            self.authors = list(map(
-                lambda x:x['data-author-name'],
-                self.sec.select('#preferredName')
-            ))
-        except Exception as e:
-            print('[ERROR] in IEEE_Article():generate_authors:{}'.format(str(e)))
+        self.authors = list(map(
+            lambda x:x['data-author-name'],
+            self.sec.select('#preferredName')
+        ))
 
+    @EP_METHOD
     def generate_link(self):
         self.link = 'http://ieeexplore.ieee.org'+self.title_parent_a_tag['href']
 
+    @EP_METHOD
     def generate_abstract(self):
         self.abstract = self.sec.select_one('.abstract').text.strip()
 
+    @EP_METHOD
     def generate_pdf_temp_url(self):
         self.pdf_temp_url = 'http://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber='+self.title_parent_a_tag['data-arnumber']
 
+    @EP_METHOD
     def generate_id_by_journal(self):
         self.id_by_journal = 'IEEE'+self.title_parent_a_tag['data-arnumber']
 
