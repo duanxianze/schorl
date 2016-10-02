@@ -130,11 +130,12 @@ class JournalArticle:
 
     def get_scholar_db_ids(self,scholar_names):
         cur = DB_CONNS_POOL.new_db_cursor()
+        scholar_names = list(map(
+            lambda x:x.replace("'"," "),scholar_names
+        ))
         sql = "select id from temp_scholar where name = '{}'"\
             .format(scholar_names[0])
         for scholar_name in scholar_names[1:]:
-            if "'" in scholar_name:
-                continue
             sql += " or name = '{}' ".format(scholar_name)
         cur.execute(sql)
         data = cur.fetchall()
