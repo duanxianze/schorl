@@ -74,7 +74,9 @@ class JournalArticle:
             return 'PDF'
 
     def save_to_db(self):
-        self.save_article()
+        if self.save_article()=='SB':
+            #重复保存
+            return
         self.save_author()
 
     def save_author(self):
@@ -108,16 +110,17 @@ class JournalArticle:
             )
             self.show_in_cmd()
         except psycopg2.IntegrityError:
-            print('[Error] Article <{}> has been saved'.format(self.title))
+            print('[Error] Article has been saved<{}> '.format(self.title))
+            return 'SB'
         except Exception as e:
-            print('[Error] '.format(str(e)))
+            print('[Error] save_article{}'.format(str(e)))
 
     def save_scholar(self,scholar_name):
         try:
             self.cur.execute(
                 'insert into temp_scholar(name)'
                 'values(%s)',
-                (scholar_name,)
+                (scholar_name.strip().replace("'",' '),)
             )
             print('[Success] Save scholar "{}" ok!'.format(scholar_name.strip().replace("'",' ')))
         except psycopg2.IntegrityError:
@@ -244,11 +247,13 @@ class JournalArticle:
 
     def show_in_cmd(self):
         print('\n*********New article of <{}>***********'.format(self.JournalObj.name))
+        '''
         if not self.pdf_url:
             print('________________________________')
             print('________________________________')
             print('________________________________')
             print('________________________________')
+        '''
         print('title:\t\t{}'.format(self.title))
         print('authors:\t{}'.format(self.authors))
         print('pdf_url:\t{}'.format(self.pdf_url))
