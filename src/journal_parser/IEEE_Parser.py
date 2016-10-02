@@ -135,7 +135,9 @@ class IEEE_AllItemsPageParser:
 
     @property
     def volume_year(self):
-        return self.soup.select_one('.heading').text.strip().split(' ')[-1]
+        year_string = self.soup.select_one('.heading')\
+            .select_one('h2').text.strip().split(' ')[-1]
+        return int(year_string)
 
     @property
     def sections(self):

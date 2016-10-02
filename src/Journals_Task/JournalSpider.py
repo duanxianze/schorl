@@ -41,6 +41,7 @@ class JournalSpider:
             self.mark_journal_ok()
 
     def handle_volume_link_for_multi_results(self,volume_link):
+        #对多页的支持，根据不同出版社各自情况，可能需要加一些ajax参数
         return volume_link
 
     def crawl_volume_page(self,volume_item,AllItemsPageParser,JournalArticle):
@@ -61,8 +62,8 @@ class JournalSpider:
         except AttributeError:
             volume_year = None
         print('\nPage Url: %s '%volume_link)
-        if not self.crawl_articles(
-                sections,volume_year,volume_db_id,JournalArticle):
+        if self.crawl_articles(sections,
+                volume_year,volume_db_id,JournalArticle)==False:
             return False
         if len(parser.sections)>0:
             self.mark_volume_ok(volume_db_id)
@@ -81,15 +82,12 @@ class JournalSpider:
                 print('[Error] JournalSpider:JournalArticle Init:{}'\
                       .format(str(e)))
                 continue
-            if not article.pdf_url:
+            if article.pdf_url==None and article.pdf_temp_url==None:
                 pdf_url_null_cot += 1
-                #continue
-                pass
             else:
                 pdf_url_null_cot = 0
             if pdf_url_null_cot>3:
-                #return False
-                pass
+                return False
             if article.authors in ([''],[]):
                 print('[Error] JournalSpider:\
                     No authors in article <{}>'.format(article.title))
