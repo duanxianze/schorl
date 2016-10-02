@@ -40,8 +40,11 @@ class JournalSpider:
         if AllVolumesOK:
             self.mark_journal_ok()
 
+    def handle_volume_link_for_multi_results(self,volume_link):
+        return volume_link
+
     def crawl_volume_page(self,volume_item,AllItemsPageParser,JournalArticle):
-        volume_link = volume_item[0]
+        volume_link = self.handle_volume_link_for_multi_results(volume_item[0])
         volume_db_id = volume_item[1]
         parser = AllItemsPageParser(
             html_source = request_with_random_ua(volume_link).text
@@ -75,16 +78,18 @@ class JournalSpider:
             try:
                 article = JournalArticle(*params)
             except Exception as e:
-                print('[Error] JournalSpider:\
-                    JournalArticle Init:{}'.format(str(e)))
-                return False
+                print('[Error] JournalSpider:JournalArticle Init:{}'\
+                      .format(str(e)))
+                continue
             if not article.pdf_url:
                 pdf_url_null_cot += 1
-                continue
+                #continue
+                pass
             else:
                 pdf_url_null_cot = 0
             if pdf_url_null_cot>3:
-                return False
+                #return False
+                pass
             if article.authors in ([''],[]):
                 print('[Error] JournalSpider:\
                     No authors in article <{}>'.format(article.title))

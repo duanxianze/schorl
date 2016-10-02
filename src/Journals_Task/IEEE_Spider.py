@@ -40,6 +40,9 @@ class IEEE_Spider(JournalSpider):
             html_source = request_with_random_ua(self.url).text
         ).volume_links
 
+    def handle_volume_link_for_multi_results(self,volume_link):
+        return volume_link+'&rowsPerPage=500&pageNumber=1'
+
     def run(self):
         self._run(
             AllItemsPageParser = IEEE_AllItemsPageParser,
