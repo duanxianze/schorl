@@ -22,8 +22,8 @@ from Journals_Task.journal_pdf_url_generators.PdfUrlGenerator import *
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from db_config import new_db_cursor
-cur = new_db_cursor()
+from db_config import DB_CONNS_POOL
+cur = DB_CONNS_POOL.new_db_cursor()
 
 class IEEE_Search_Model:
     def __init__(self,title,google_id,driver):
@@ -67,13 +67,14 @@ def get_ieee_pdf_url_func(driver,unfinished_item):
     pdf_temp_url = unfinished_item[2]
     if pdf_temp_url:
         return get_ieee_pdf_link(pdf_temp_url,driver)
+    '''
     else:
         return IEEE_Search_Model(
             title = unfinished_item[0],
             google_id = unfinished_item[1],
             driver=driver
         ).get_pdf_url()
-
+    '''
 
 class IEEE_pdf_url_generator(PdfUrlGenerator):
     def __init__(self):
@@ -95,7 +96,7 @@ class IEEE_pdf_url_generator(PdfUrlGenerator):
         self.query_limit = limit
         self._run(thread_counts,visual)
         self.query_sql = "select title,google_id,pdf_temp_url from articles where resource_link is null\
-                    and link like '%ieee%' ORDER by id desc limit {}".format(limit)
+                    and link like '%ieee%' and pdf_temp_url is not null ORDER by id desc limit {}".format(limit)
         self._task_thread_pool.map(self.generate,self.get_unfinished_items())
         self._close()
 
