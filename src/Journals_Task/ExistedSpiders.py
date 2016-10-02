@@ -39,11 +39,11 @@ EXISTED_SPIDERS = [
     #     'publisherKeywords':    ['informa'],
     #     'need_webdriver':       False
     # },
-    #{
-    #    'publisherSpiderClass': IEEE_Spider,
-    #    'publisherKeywords':    ['ieee'],
-    #    'need_webdriver':       False
-    #}
+    {
+       'publisherSpiderClass': IEEE_Spider,
+       'publisherKeywords':    ['ieee'],
+       'need_webdriver':       False
+    }
 ]
 
 
