@@ -120,7 +120,7 @@ class JournalArticle:
             self.cur.execute(
                 'insert into temp_scholar(name)'
                 'values(%s)',
-                (scholar_name.strip().replace("'",' '),)
+                (scholar_name.strip().replace("'",' ').replace('  ',' ').replace('  ',' '),)
             )
             print('[Success] Save scholar "{}" ok!'.format(scholar_name.strip().replace("'",' ')))
         except psycopg2.IntegrityError:

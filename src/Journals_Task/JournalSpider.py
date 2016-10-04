@@ -37,7 +37,7 @@ class JournalSpider:
             if not self.crawl_volume_page(
                 volume_item,AllItemsPageParser,JournalArticle):
                 AllVolumesOK = False
-        if AllVolumesOK:
+        if AllVolumesOK and volume_items:
             self.mark_journal_ok()
 
     def handle_volume_link_for_multi_results(self,volume_link):
@@ -112,7 +112,8 @@ class JournalSpider:
 
     def create_volume(self,volume_link):
         try:
-            self.write_cur.execute(
+            cur = REMOTE_CONNS_POOL.new_db_cursor()
+            cur.execute(
                 "insert into journal_volume(link,journal_sjr_id,is_crawled)"
                 "values(%s,%s,%s)",
                 (volume_link,self.JournalObj.sjr_id,False)
@@ -122,6 +123,7 @@ class JournalSpider:
             print('[Error] in volume_link create:\n{} '.format(str(e)))
         except psycopg2.OperationalError as e:
             print('[Error] in volume_link create:\nserver conn error{}'.format(str(e)))
+        cur.close()
 
     def mark_volume_ok(self,volume_db_id):
         sql = "update journal_volume set is_crawled=true \
@@ -132,18 +134,21 @@ class JournalSpider:
 
     def create_new_volumes(self):
         print('Init volume_links of {}...'.format(self.JournalObj.name))
+        if self.volume_links==[]:
+            return
         for volume_link in self.volume_links:
             self.create_volume(volume_link)
         self.write_cur.execute(
             'update journal set volume_links_got=TRUE \
               where sjr_id={}'.format(self.JournalObj.sjr_id)
         )
+        print(' volume links created ok! <{}>'.\
+              format(self,JournalObj.name))
 
     def get_unfinished_volume_links(self):
         if not self.JournalObj.volume_links_got:
             #第一次初始化
             self.create_new_volumes()
-            return self.volume_links
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select link,id from journal_volume \

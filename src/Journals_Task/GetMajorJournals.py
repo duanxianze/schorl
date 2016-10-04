@@ -122,8 +122,8 @@ def journals_of_specific_index(
     sql =  "select name,sjr_id,site_source,area_relation_cot,\
                 category_relation_cot,publisher,volume_links_got from journal \
           WHERE{}{} is_crawled_all_article=FALSE\
-            and ( site_source like '%springer%'\
-          )ORDER by h_index desc".format(
+            and ( site_source like '%elsevier%'\
+          ) limit 100".format(
             single_area_relation_word,open_access_word
         )
     '''

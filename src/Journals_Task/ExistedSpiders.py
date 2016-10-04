@@ -24,21 +24,21 @@ from Journals_Task.IEEE_Spider import IEEE_Spider
 from Journals_Task.TaylorFrancisSpider import TaylorFrancisSpider
 
 EXISTED_SPIDERS = [
-    # {
-    #     'publisherSpiderClass': ElsevierSpider,
-    #     'publisherKeywords':    ['elsevier','sciencedirect'],
-    #     'need_webdriver':       False
-    # },
+    {
+        'publisherSpiderClass': ElsevierSpider,
+        'publisherKeywords':    ['elsevier','sciencedirect'],
+        'need_webdriver':       False
+    },
     {
         'publisherSpiderClass': SpringSpider,
         'publisherKeywords':    ['springer'],
         'need_webdriver':       False
     },
-    # {
-    #     'publisherSpiderClass': TaylorFrancisSpider,
-    #     'publisherKeywords':    ['informa'],
-    #     'need_webdriver':       False
-    # },
+    {
+        'publisherSpiderClass': TaylorFrancisSpider,
+        'publisherKeywords':    ['informa'],
+        'need_webdriver':       False
+    },
     {
        'publisherSpiderClass': IEEE_Spider,
        'publisherKeywords':    ['ieee'],

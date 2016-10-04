@@ -32,7 +32,8 @@ class SpringParser:
 
     @property
     def pages_amount(self):
-        return int(self.soup.select_one('.number-of-pages').text)
+        return int(self.soup.select_one('.number-of-pages')
+                   .text.replace(",",""))
 
     @property
     def sections(self):
