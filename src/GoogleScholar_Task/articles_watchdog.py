@@ -19,10 +19,15 @@ sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 from crawl_tools.WatchDog import WatchDog
 import psycopg2,time
 
+REMOTE_HOST = '45.76.71.26'
+REMOTE_PORT = 5432
+
 conn = psycopg2.connect(
     dbname = "sf_development",
     user = "lyn",
     password = "tonylu716",
+    host = REMOTE_HOST,
+    port = REMOTE_PORT
 )
 conn.autocommit = True
 cur = conn.cursor()
