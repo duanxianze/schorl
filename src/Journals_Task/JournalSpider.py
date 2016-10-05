@@ -17,7 +17,7 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-from crawl_tools.request_with_proxy import request_with_random_ua
+from crawl_tools.request_with_proxy import request_with_random_ua,request_with_proxy
 from db_config import REMOTE_CONNS_POOL
 import psycopg2,time,random
 
@@ -27,7 +27,7 @@ class JournalSpider:
         self.volume_links = []
         self.write_cur = REMOTE_CONNS_POOL.new_db_cursor()
 
-    def _run(self,AllItemsPageParser,JournalArticle):
+    def _run(self,AllItemsPageParser,JournalArticle,use_tor=False):
         volume_items = list(set(
             self.get_unfinished_volume_links()
         ))
@@ -35,7 +35,7 @@ class JournalSpider:
         AllVolumesOK = True
         for volume_item in volume_items:
             if not self.crawl_volume_page(
-                volume_item,AllItemsPageParser,JournalArticle):
+                volume_item,AllItemsPageParser,JournalArticle,use_tor):
                 AllVolumesOK = False
         if AllVolumesOK and volume_items:
             self.mark_journal_ok()
@@ -44,12 +44,16 @@ class JournalSpider:
         #对多页的支持，根据不同出版社各自情况，可能需要加一些ajax参数
         return volume_link
 
-    def crawl_volume_page(self,volume_item,AllItemsPageParser,JournalArticle):
+    def crawl_volume_page(self,volume_item,
+                AllItemsPageParser,JournalArticle,use_tor=False):
         volume_link = self.handle_volume_link_for_multi_results(volume_item[0])
         volume_db_id = volume_item[1]
-        parser = AllItemsPageParser(
+        if use_tor:
+            #此情况属于完全不可能直接获取pdf_url时使用，用远程服务器加速
+            html_source = request_with_proxy(volume_link).text
+        else:
             html_source = request_with_random_ua(volume_link).text
-        )
+        parser = AllItemsPageParser(html_source)
         try:
             sections = parser.sections
         except Exception as e:

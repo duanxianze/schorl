@@ -73,7 +73,8 @@ class TaylorFrancisSpider(JournalSpider):
     def run(self):
         self._run(
             AllItemsPageParser = TaylorFrancisParser,
-            JournalArticle = TaylorFrancisArticle
+            JournalArticle = TaylorFrancisArticle,
+            use_tor = True
         )
 
 if __name__=="__main__":
