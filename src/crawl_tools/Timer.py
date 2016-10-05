@@ -10,6 +10,7 @@
             用于对任务某区间计时
 """
 import time
+from datetime import datetime, timedelta, timezone
 
 class Timer:
     def __init__(self):
@@ -23,3 +24,9 @@ class Timer:
         if not self.start_ok:
             raise Exception('[Error] in Timer: Please run start() first.')
         self.gap = round(time.time()-self.st,2)
+
+
+def get_beijing_time():
+    utc_dt = datetime.utcnow().replace(tzinfo=timezone.utc)
+    return utc_dt.astimezone(timezone(timedelta(hours=8)))\
+        .strftime("%Y-%m-%d %H:%M:%S")
