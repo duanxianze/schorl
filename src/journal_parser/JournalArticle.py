@@ -19,6 +19,7 @@ sys.path.append(root_dir)
 from db_config import DB_CONNS_POOL
 
 import psycopg2
+from crawl_tools.Timer import get_beijing_time
 
 class JournalArticle:
     def __init__(self,JournalObj,volume_db_id):
@@ -33,6 +34,7 @@ class JournalArticle:
         self.link = None
         self.id_by_journal = None
         self.year = None
+        self.create_time = get_beijing_time()
 
     def generate_title(self):
         pass
@@ -103,10 +105,10 @@ class JournalArticle:
         try:
             self.cur.execute(
                 'insert into articles(title,category_id,year,link,pdf_temp_url,resource_type,\
-                    resource_link,summary,journal_id,id_by_journal,volume_db_id)'
-                'values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
+                    resource_link,summary,journal_id,id_by_journal,volume_db_id,create_time)'
+                'values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
                 (self.title,self.JournalObj.category_id,self.year,self.link,self.pdf_temp_url,self.resource_type,\
-                    self.pdf_url,self.abstract,self.JournalObj.sjr_id,self.id_by_journal,self.volume_db_id)
+                    self.pdf_url,self.abstract,self.JournalObj.sjr_id,self.id_by_journal,self.volume_db_id,self.create_time)
             )
             self.show_in_cmd()
         except psycopg2.IntegrityError:
@@ -118,9 +120,9 @@ class JournalArticle:
     def save_scholar(self,scholar_name):
         try:
             self.cur.execute(
-                'insert into temp_scholar(name)'
-                'values(%s)',
-                (scholar_name.strip().replace("'",' ').replace('  ',' ').replace('  ',' '),)
+                'insert into temp_scholar(name,create_time)'
+                'values(%s,%s)',
+                (scholar_name.strip().replace("'",' ').replace('  ',' ').replace('  ',' '),self.create_time)
             )
             print('[Success] Save scholar "{}" ok!'.format(scholar_name.strip().replace("'",' ')))
         except psycopg2.IntegrityError:
@@ -161,9 +163,9 @@ class JournalArticle:
         '''
         try:
             self.cur.execute(
-                'insert into temp_scholar_category(temp_scholar_id,category_id)'
-                'values(%s,%s)',
-                (temp_scholar_id,self.JournalObj.category_id)
+                'insert into temp_scholar_category(temp_scholar_id,category_id,create_time)'
+                'values(%s,%s,%s)',
+                (temp_scholar_id,self.JournalObj.category_id,self.create_time)
             )
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar_category_realtion():{}'.format(str(e)))
@@ -178,9 +180,9 @@ class JournalArticle:
         '''
         try:
             self.cur.execute(
-                'insert into temp_scholar_area(temp_scholar_id,area_id)'
-                'values(%s,%s)',
-                (temp_scholar_id,self.JournalObj.area_id)
+                'insert into temp_scholar_area(temp_scholar_id,area_id,create_time)'
+                'values(%s,%s,%s)',
+                (temp_scholar_id,self.JournalObj.area_id,self.create_time)
             )
         except Exception as e:
             print('[Error] in JournalArticle:save_scholar_area_realtion():{}'.format(str(e)))
@@ -194,9 +196,9 @@ class JournalArticle:
         '''
         try:
             self.cur.execute(
-                'insert into temp_scholar_article(temp_scholar_id,article_id)'
-                'values(%s,%s)',
-                (temp_scholar_id,self.id_by_journal)
+                'insert into temp_scholar_article(temp_scholar_id,article_id,create_time)'
+                'values(%s,%s,%s)',
+                (temp_scholar_id,self.id_by_journal,self.create_time)
             )
             print('[Success] Save ScArticle relation[{},{}] ok'\
                   .format(temp_scholar_id,self.id_by_journal))
@@ -265,6 +267,7 @@ class JournalArticle:
         print('year:\t\t\t{}'.format(self.year))
         print('category_id:\t\t{}'.format(self.JournalObj.category_id))
         print('area_id:\t\t{}'.format(self.JournalObj.area_id))
+        print('create_time:\t\t{}'.format(self.create_time))
         print('abstract:\t\t{}'.format(self.abstract))
         print('*********New article of <{}>***********'.format(self.JournalObj.name))
 

@@ -17,6 +17,7 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
+from crawl_tools.Timer import get_beijing_time
 from crawl_tools.request_with_proxy import request_with_random_ua,request_with_proxy
 from db_config import REMOTE_CONNS_POOL
 import psycopg2,time,random
@@ -118,9 +119,9 @@ class JournalSpider:
         try:
             cur = REMOTE_CONNS_POOL.new_db_cursor()
             cur.execute(
-                "insert into journal_volume(link,journal_sjr_id,is_crawled)"
-                "values(%s,%s,%s)",
-                (volume_link,self.JournalObj.sjr_id,False)
+                "insert into journal_volume(link,journal_sjr_id,is_crawled,create_time)"
+                "values(%s,%s,%s,%s)",
+                (volume_link,self.JournalObj.sjr_id,False,get_beijing_time())
             )
             print('[Success]Save ok volume_link: {} !'.format(volume_link))
         except psycopg2.IntegrityError as e:
