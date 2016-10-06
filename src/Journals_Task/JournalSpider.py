@@ -21,13 +21,18 @@ from crawl_tools.Timer import get_beijing_time
 from crawl_tools.request_with_proxy import request_with_random_ua,request_with_proxy
 from db_config import REMOTE_CONNS_POOL
 import psycopg2,time,random
+from crawl_tools.decorators import except_pass,except_return_none
+EP_METHOD = lambda func:except_pass(func,'JournalSpider')
+ERN_METHOD = lambda func:except_return_none(func,'JournalSpider')
 
 class JournalSpider:
+    @EP_METHOD
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.volume_links = []
         self.write_cur = REMOTE_CONNS_POOL.new_db_cursor()
 
+    @EP_METHOD
     def _run(self,AllItemsPageParser,JournalArticle,use_tor=False):
         volume_items = list(set(
             self.get_unfinished_volume_links()
@@ -41,10 +46,12 @@ class JournalSpider:
         if AllVolumesOK and volume_items:
             self.mark_journal_ok()
 
+    @ERN_METHOD
     def handle_volume_link_for_multi_results(self,volume_link):
         #对多页的支持，根据不同出版社各自情况，可能需要加一些ajax参数
         return volume_link
 
+    @ERN_METHOD
     def crawl_volume_page(self,volume_item,
                 AllItemsPageParser,JournalArticle,use_tor=False):
         volume_link = self.handle_volume_link_for_multi_results(volume_item[0])
@@ -75,6 +82,7 @@ class JournalSpider:
             return True
         return False
 
+    @ERN_METHOD
     def crawl_articles(self,sections,volume_year,volume_db_id,JournalArticle):
         pdf_url_null_cot = 0
         for sec in sections:
@@ -99,12 +107,14 @@ class JournalSpider:
                 continue
             article.save_to_db()
 
+    @EP_METHOD
     def mark_journal_ok(self):
         self.write_cur.execute(
             'update journal set is_crawled_all_article = true\
              where sjr_id = {}'.format(self.JournalObj.sjr_id)
         )
 
+    @ERN_METHOD
     def get_db_volume_item(self,volume_link):
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
@@ -115,6 +125,7 @@ class JournalSpider:
         cur.close()
         return data
 
+    @EP_METHOD
     def create_volume(self,volume_link):
         try:
             cur = REMOTE_CONNS_POOL.new_db_cursor()
@@ -130,13 +141,14 @@ class JournalSpider:
             print('[Error] in volume_link create:\nserver conn error{}'.format(str(e)))
         cur.close()
 
+    @EP_METHOD
     def mark_volume_ok(self,volume_db_id):
         sql = "update journal_volume set is_crawled=true \
                 where id={}".format(volume_db_id)
-        #print(sql)
         self.write_cur.execute(sql)
         print('Mark volume {} ok!'.format(volume_db_id))
 
+    @EP_METHOD
     def create_new_volumes(self):
         print('Init volume_links of {}...'.format(self.JournalObj.name))
         if self.volume_links==[]:
@@ -150,21 +162,23 @@ class JournalSpider:
         print(' volume links created ok! <{}>'.\
               format(self.JournalObj.name))
 
+    @ERN_METHOD
     def get_unfinished_volume_links(self):
         if not self.JournalObj.volume_links_got:
             #第一次初始化
             self.create_new_volumes()
+        '''
+        #想一次性初始化完volume_links时使用
             return []
         return []
+        '''
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select link,id from journal_volume \
               where journal_sjr_id={} and is_crawled=FALSE'\
                 .format(self.JournalObj.sjr_id)
         )
-        data = cur.fetchall()
-        cur.close()
-        return data
+        return cur.fetchall()
 
 if __name__=="__main__":
     from Journals_Task.JournalClass import Journal
