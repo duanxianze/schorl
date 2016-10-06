@@ -17,7 +17,7 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-import random
+import random,time
 from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
 from Journals_Task.GetDBJournals import MajorEntrance,PublisherEntrance
 from multiprocessing.dummy import Pool as ThreadPool
@@ -111,20 +111,22 @@ class JournalTaskManager:
             open_access = journal_need_open_access,
             max_count = max_count
         )
-        thread_pool = ThreadPool(thread_cot)
-        self.drviers_pool = DriversPool(
-            size = driver_pool_size,
-            visual = drvier_is_visual,
-            launch_with_thread_pool=thread_pool
-        )
-        journal_items = []
-        for key in journals_info.keys():
-            category_name = key
-            journal_items.extend(journals_info[key])
-            print('\n<%s>: len = %s' % ( category_name,len(journals_info[key])) )
-        journal_items = list(set(journal_items))
-        random.shuffle(journal_items)
-        thread_pool.map(self.launch_journal_spider,journal_items)
-        thread_pool.close()
-        thread_pool.join()
+        while True:
+            thread_pool = ThreadPool(thread_cot)
+            self.drviers_pool = DriversPool(
+                size = driver_pool_size,
+                visual = drvier_is_visual,
+                launch_with_thread_pool=thread_pool
+            )
+            journal_items = []
+            for key in journals_info.keys():
+                category_name = key
+                journal_items.extend(journals_info[key])
+                print('\n<%s>: len = %s' % ( category_name,len(journals_info[key])) )
+            journal_items = list(set(journal_items))
+            random.shuffle(journal_items)
+            thread_pool.map(self.launch_journal_spider,journal_items)
+            thread_pool.close()
+            thread_pool.join()
+            time.sleep(1)
         raise Exception('fuck you . give me feed ok ???')

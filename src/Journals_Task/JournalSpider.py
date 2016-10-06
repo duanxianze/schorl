@@ -26,7 +26,6 @@ EP_METHOD = lambda func:except_pass(func,'JournalSpider')
 ERN_METHOD = lambda func:except_return_none(func,'JournalSpider')
 
 class JournalSpider:
-    @EP_METHOD
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.volume_links = []
@@ -45,7 +44,6 @@ class JournalSpider:
         if AllVolumesOK and volume_items:
             self.mark_journal_ok()
 
-    @ERN_METHOD
     def handle_volume_link_for_multi_results(self,volume_link):
         #对多页的支持，根据不同出版社各自情况，可能需要加一些ajax参数
         return volume_link
