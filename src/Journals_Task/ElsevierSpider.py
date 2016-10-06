@@ -91,14 +91,3 @@ class ElsevierSpider(JournalSpider):
             JournalArticle = ElsevierAricle
         )
 
-
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    from crawl_tools.DriversPool import Driver
-    JournalObj=Journal()
-    JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
-    JournalObj.sjr_id = 123
-    ElsevierSpider(
-        JournalObj=JournalObj,
-        driverObj=Driver(visual=True)
-    ).run()

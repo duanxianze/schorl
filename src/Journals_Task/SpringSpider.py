@@ -54,12 +54,3 @@ class SpringSpider(JournalSpider):
             AllItemsPageParser = SpringParser,
             JournalArticle = SpringArticle
         )
-
-
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    JournalObj=Journal()
-    JournalObj.site_source = 'http://www.springer.com/computer+science/image+processing/journal/10055'
-    SpringSpider(
-        JournalObj
-    ).run()

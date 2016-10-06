@@ -20,6 +20,7 @@ def except_return_none(func,ModelName):
             return None
     return wrapper
 
+#尽量用有返回值的
 def except_pass(func,ModelName):
     def wrapper(*args, **kwargs):
         try:

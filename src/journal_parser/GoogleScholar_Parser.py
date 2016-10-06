@@ -198,13 +198,3 @@ class Article:
         print('link:\t\t\t{}'.format(self.link))
         print('summary:\t\t{}'.format(self.summary))
 
-
-
-if __name__=='__main__':
-    from db_config import new_db_cursor
-    cur = new_db_cursor()
-    for sec in ParseHTML(from_web=False,file_name='scholar_articles.htm').sections():
-        Article(sec).save_to_db(cur)
-        #print(Article(sec).db_item_values(cur))
-        #Article(sec).update_journal(cur)
-        #Article(sec).show_in_cmd()

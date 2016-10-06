@@ -77,11 +77,4 @@ class TaylorFrancisSpider(JournalSpider):
             use_tor = True
         )
 
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    JournalObj = Journal()
-    JournalObj.site_source = 'http://www.tandfonline.com/toc/ghbi20/current'
-    JournalObj.sjr_id = 123
-    spider = TaylorFrancisSpider(JournalObj)
-    print(spider.volume_links)
 

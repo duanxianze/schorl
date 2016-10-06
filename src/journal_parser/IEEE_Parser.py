@@ -185,18 +185,3 @@ class IEEE_Article(JournalArticle):
     @EP_METHOD
     def generate_id_by_journal(self):
         self.id_by_journal = 'IEEE'+self.title_parent_a_tag['data-arnumber']
-
-
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    parser = IEEE_AllItemsPageParser(from_web=False)
-    JournalObj=Journal()
-    JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
-    JournalObj.sjr_id = 123
-    print(parser.volume_links)
-    for link in parser.volume_links:
-        print(link)
-    '''
-    for sec in parser.sections:
-        IEEE_Article(sec,JournalObj,year=parser.volume_year).show_in_cmd()
-    '''

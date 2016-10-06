@@ -128,13 +128,13 @@ if __name__=="__main__":
     if os.name=='nt':
         if platform.processor()=='Intel64 Family 6 Model 69 Stepping 1, GenuineIntel':
             self_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/TaskManagerWatchdog.py']
-            proc_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/MajorTaskManager.py']
+            proc_cmd_line=['C:\\Python33\\python.exe','Q:/scholar_articles/src/Journals_Task/run.py']
         elif platform.processor()=='Intel64 Family 6 Model 58 Stepping 9, GenuineIntel':
             self_cmd_line=['D:\\Python33\\python.exe','E:/scholar_articles/src/Journals_Task/TaskManagerWatchdog.py']
-            proc_cmd_line=['D:\\Python33\\python.exe','E:/scholar_articles/src/Journals_Task/MajorTaskManager.py']
+            proc_cmd_line=['D:\\Python33\\python.exe','E:/scholar_articles/src/Journals_Task/run.py']
         else:
             pass
     else:
         self_cmd_line = ['python3', 'TaskManagerWatchdog.py']
-        proc_cmd_line = ['python3','MajorTaskManager.py']
+        proc_cmd_line = ['python3','run.py']
     JournalTaskManagerWatchdog(self_cmd_line,proc_cmd_line).run()

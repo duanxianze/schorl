@@ -233,6 +233,3 @@ class JournalDetailPageParser:
         )
         print('{} update ok '.format(self.journal_id))
 
-if __name__=="__main__":
-    jdp = JournalDetailPageParser(journal_sjr_id=25208)
-    jdp.show_in_cmd()

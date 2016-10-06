@@ -179,12 +179,3 @@ class JournalSpider:
                 .format(self.JournalObj.sjr_id)
         )
         return cur.fetchall()
-
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    JournalObj=Journal()
-    JournalObj.site_source = 'http://www.elsevier.com/wps/find/journaldescription.cws_home/505606/description#description'
-    JournalObj.sjr_id = 1
-    js = JournalSpider(JournalObj)
-    js.mark_volume_ok('www.xxxx.com')
-    #js.create_volume(volume_link='www.xxxx.com')

@@ -48,11 +48,3 @@ class IEEE_Spider(JournalSpider):
             AllItemsPageParser = IEEE_AllItemsPageParser,
             JournalArticle = IEEE_Article
         )
-
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    from crawl_tools.DriversPool import Driver
-    JournalObj=Journal()
-    JournalObj.site_source = 'http://ieeexplore.ieee.org/xpl/tocresult.jsp?isnumber=5480&punumber=83'
-    JournalObj.sjr_id = 123
-    IEEE_Spider(JournalObj).run()

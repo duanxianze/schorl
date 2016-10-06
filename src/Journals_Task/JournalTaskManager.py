@@ -17,7 +17,7 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
-import random,time
+import random
 from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
 from Journals_Task.GetDBJournals import MajorEntrance,PublisherEntrance
 from multiprocessing.dummy import Pool as ThreadPool
@@ -73,9 +73,7 @@ class JournalTaskManager:
         JournalObj.publisher = db_journal_item[5]
         JournalObj.volume_links_got = db_journal_item[6]
         JournalObj.generate_area_category_id()
-        #print(journal_name,journal_sjr_id,journal_url)
         spider_item = self.get_task_spider(EXISTED_SPIDERS,JournalObj.site_source)
-        #print(spider_item,'spider_item')
         if spider_item:
             Spider = spider_item[0]
             need_webdriver = spider_item[1]
@@ -130,29 +128,3 @@ class JournalTaskManager:
         thread_pool.close()
         thread_pool.join()
         raise Exception('fuck you . give me feed ok ???')
-
-
-if __name__=="__main__":
-    #为使远程数据库传输压力变小，建议选择比较精细的领域关键词
-    from crawl_tools.WatchDog import close_procs_by_keyword
-    close_procs_by_keyword('chromedriver')
-    close_procs_by_keyword('phantom')
-    JournalTaskManager(keyword = 'elsevier').run(
-        DB_EntranceFunc=PublisherEntrance,
-        journal_need_single_area_relation = False,
-        journal_need_open_access = False,
-        thread_cot = 32,
-        max_count=100
-    )
-    '''
-    JournalTaskManager(keyword = 'Artificial').run(
-        DB_EntranceFunc=MajorEntrance,
-        journal_need_single_area_relation = False,
-        journal_need_open_access = False,
-        journal_need_index_by_area = False,
-        journal_need_index_by_category = True,
-        drvier_is_visual=False,
-        thread_cot = 32,
-        driver_pool_size = 16
-    )
-    '''

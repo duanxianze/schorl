@@ -75,9 +75,3 @@ class SpringArticle(JournalArticle):
         self.id_by_journal = self.link.split('/')[-1]
 
 
-if __name__=="__main__":
-    for sec in SpringParser(from_web=False).secs:
-        SpringArticle(sec,'123').show_in_cmd()
-        print('------------')
-
-

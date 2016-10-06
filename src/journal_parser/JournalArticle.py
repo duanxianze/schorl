@@ -250,13 +250,6 @@ class JournalArticle:
 
     def show_in_cmd(self):
         print('\n*********New article of <{}>***********'.format(self.JournalObj.name))
-        '''
-        if not self.pdf_url:
-            print('________________________________')
-            print('________________________________')
-            print('________________________________')
-            print('________________________________')
-        '''
         print('title:\t\t{}'.format(self.title))
         print('authors:\t{}'.format(self.authors))
         print('pdf_url:\t{}'.format(self.pdf_url))

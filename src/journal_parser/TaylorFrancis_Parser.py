@@ -103,11 +103,3 @@ class TaylorFrancisArticle(JournalArticle):
     @EP_METHOD
     def generate_id_by_journal(self):
         self.id_by_journal = 'TF'+self.sec.select_one('.art_title > a')['href'].split('/')[-1]
-
-if __name__=="__main__":
-    from Journals_Task.JournalClass import Journal
-    JournalObj = Journal()
-    JournalObj.site_source = 'http://www.tandfonline.com/toc/ghbi20/current'
-    JournalObj.sjr_id = 123
-    for sec in TaylorFrancisParser(from_web=False).sections:
-        TaylorFrancisArticle(sec,JournalObj,2).show_in_cmd()
