@@ -37,7 +37,6 @@ class TF_DetailPageParser:
 
 class TaylorFrancisParser:
     '''
-
         sample_url: http://www.tandfonline.com/toc/ghbi20/28/8?nav=tocList
     '''
     def __init__(self,html_source=None,from_web=True):
