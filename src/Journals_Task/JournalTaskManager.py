@@ -19,29 +19,42 @@ sys.path.append(root_dir)
 
 import random,time
 from Journals_Task.ExistedSpiders import EXISTED_SPIDERS
-from Journals_Task.GetMajorJournals import MajorEntrance
+from Journals_Task.GetDBJournals import MajorEntrance,PublisherEntrance
 from multiprocessing.dummy import Pool as ThreadPool
 from Journals_Task.JournalClass import Journal
 from crawl_tools.DriversPool import DriversPool
 
-class MajorTaskManager:
-    def __init__(self,majorKeyword):
-        self.majorKeyword = majorKeyword
+class JournalTaskManager:
+    def __init__(self,keyword):
+        self.keyword = keyword
 
-    def get_journals_info_dict(self,
+    def get_journals_info(self,
+        EntranceFunc = PublisherEntrance,
         single_area_relation = True,
         index_by_area = False,
         index_by_category = True,
-        open_access = True
+        open_access = True,
+        max_count = 100
     ):
-        return MajorEntrance(
-            major_keyword = self.majorKeyword
-        ).get_possible_journals(
-            single_area_relation=single_area_relation,
-            index_by_area=index_by_area,
-            index_by_category=index_by_category,
-            open_access=open_access
-        )
+        if EntranceFunc==MajorEntrance:
+            return MajorEntrance(
+                major_keyword = self.keyword
+            ).get_possible_journals(
+                single_area_relation=single_area_relation,
+                index_by_area=index_by_area,
+                index_by_category=index_by_category,
+                open_access=open_access,
+                limit = max_count
+            )
+        if EntranceFunc==PublisherEntrance:
+            return PublisherEntrance(
+                publisher_keyword=self.keyword
+            ).get_unfinished_journals(
+                single_area_relation=single_area_relation,
+                open_access=open_access,
+                limit = max_count
+            )
+        return []
 
     def get_task_spider(self,spiders_infos,journal_url):
         for spider_info in spiders_infos:
@@ -68,40 +81,37 @@ class MajorTaskManager:
             need_webdriver = spider_item[1]
             print('[{}]: Got Task of <{}> ( {} )'.\
                   format(Spider.__name__,JournalObj.name,JournalObj.site_source))
+            params = [JournalObj]
             if need_webdriver:
                 driverObj = self.drviers_pool.get_one_free_driver()
-                try:
-                    Spider(JournalObj,driverObj).run()
-                except Exception as e:
-                    print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
-                    return
-            else:
-                try:
-                    Spider(JournalObj).run()
-                except Exception as e:
-                    print('[Error] MajorTaskManager:launch_journal_spider:{}'.format(str(e)))
-                    return
+                params.append(driverObj)
+            try:
+                Spider(*params).run()
+            except Exception as e:
+                print('[Error] JournalTaskManager:launch_journal_spider:{}'.format(str(e)))
+                return
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
                   .format(JournalObj.name,JournalObj.site_source))
-    
-    def kill_myself(self):
-        close_procs_by_keyword('Major')
 
     def run(
-            self,journal_need_single_area_relation = True,
+            self,DB_EntranceFunc,
+            journal_need_single_area_relation = True,
             journal_need_open_access = True,
             journal_need_index_by_area = False,
             journal_need_index_by_category = True,
+            max_count = 100,
             drvier_is_visual = False,
             thread_cot = 16,
-            driver_pool_size = 4
+            driver_pool_size = 0
         ):
-        journals_info_dict = self.get_journals_info_dict(
+        journals_info = self.get_journals_info(
+            EntranceFunc=DB_EntranceFunc,
             single_area_relation = journal_need_single_area_relation,
             index_by_area = journal_need_index_by_area,
             index_by_category = journal_need_index_by_category,
-            open_access = journal_need_open_access
+            open_access = journal_need_open_access,
+            max_count = max_count
         )
         thread_pool = ThreadPool(thread_cot)
         self.drviers_pool = DriversPool(
@@ -110,10 +120,10 @@ class MajorTaskManager:
             launch_with_thread_pool=thread_pool
         )
         journal_items = []
-        for key in journals_info_dict.keys():
+        for key in journals_info.keys():
             category_name = key
-            journal_items.extend(journals_info_dict[key])
-            print(category_name,journals_info_dict[key])
+            journal_items.extend(journals_info[key])
+            print('\n<%s>: len = %s' % ( category_name,len(journals_info[key])) )
         journal_items = list(set(journal_items))
         random.shuffle(journal_items)
         thread_pool.map(self.launch_journal_spider,journal_items)
@@ -127,12 +137,22 @@ if __name__=="__main__":
     from crawl_tools.WatchDog import close_procs_by_keyword
     close_procs_by_keyword('chromedriver')
     close_procs_by_keyword('phantom')
-    MajorTaskManager(majorKeyword = 'Artificial').run(
+    JournalTaskManager(keyword = 'elsevier').run(
+        DB_EntranceFunc=PublisherEntrance,
+        journal_need_single_area_relation = False,
+        journal_need_open_access = False,
+        thread_cot = 32,
+        max_count=100
+    )
+    '''
+    JournalTaskManager(keyword = 'Artificial').run(
+        DB_EntranceFunc=MajorEntrance,
         journal_need_single_area_relation = False,
         journal_need_open_access = False,
         journal_need_index_by_area = False,
         journal_need_index_by_category = True,
         drvier_is_visual=False,
         thread_cot = 32,
-        driver_pool_size = 0
+        driver_pool_size = 16
     )
+    '''
