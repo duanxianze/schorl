@@ -121,6 +121,11 @@ def journals_of_specific_index(
     else:
         open_access_word = ''
     cur = REMOTE_CONNS_POOL.new_db_cursor()
+    if limit < 0:
+        limit = -limit
+        desc_word = 'desc'
+    else:
+        desc_word = ''
     sql =  "select name,sjr_id,site_source,area_relation_cot,\
             category_relation_cot,publisher,volume_links_got from journal \
           WHERE{}{}(site_source like '%lsevier%' or site_source like '%ieee%' or site_source like '%springer%')and\
@@ -128,9 +133,9 @@ def journals_of_specific_index(
           sjr_id IN(\
             select journal_id from journal_{} \
             WHERE {}_id={} \
-        ) ORDER by h_index desc limit {}".format(
+        ) ORDER by h_index {} limit {}".format(
             single_area_relation_word,open_access_word,
-            index_name,index_name,index_sjr_id,limit
+            index_name,index_name,index_sjr_id,desc_word,limit
         )
     #print(sql)
     cur.execute(sql)
@@ -173,6 +178,11 @@ class PublisherEntrance:
     def get_unfinished_journals(
             self,single_area_relation=True,open_access=True,limit=100):
         journal_filter = ' '
+        if limit < 0:
+            limit = -limit
+            desc_word = 'desc'
+        else:
+            desc_word = ''
         if single_area_relation:
             journal_filter += ' area_relation_cot=1 and '
         if open_access:
@@ -181,8 +191,8 @@ class PublisherEntrance:
         sql =  "select name,sjr_id,site_source,area_relation_cot,\
                     category_relation_cot,publisher,volume_links_got from journal \
               WHERE{}is_crawled_all_article=FALSE\
-                and ( site_source like '%{}%') limit {}"\
-            .format(journal_filter,self.publisher_keyword,limit)
+                and ( site_source like '%{}%') order by id {} limit {}"\
+            .format(journal_filter,self.publisher_keyword,desc_word,limit)
         #print(sql)
         cur.execute(sql)
         data = cur.fetchall()
