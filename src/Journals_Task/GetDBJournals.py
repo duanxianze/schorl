@@ -120,24 +120,16 @@ def journals_of_specific_index(
         open_access_word = ''
     cur = REMOTE_CONNS_POOL.new_db_cursor()
     sql =  "select name,sjr_id,site_source,area_relation_cot,\
-                category_relation_cot,publisher,volume_links_got from journal \
-          WHERE{}{} is_crawled_all_article=FALSE\
-            and ( site_source like '%elsevier%'\
-          ) limit 100".format(
-            single_area_relation_word,open_access_word
-        )
-    '''
-    sql =  "select name,sjr_id,site_source,area_relation_cot,\
-                category_relation_cot,publisher,volume_links_got from journal \
-          WHERE{}(site_source like '%lsevier%' or site_source like '%ieee%' or site_source like '%springer%')and\
+            category_relation_cot,publisher,volume_links_got from journal \
+          WHERE{}{}(site_source like '%lsevier%' or site_source like '%ieee%' or site_source like '%springer%')and\
           is_crawled_all_article=FALSE and \
           sjr_id IN(\
             select journal_id from journal_{} \
             WHERE {}_id={} \
         ) ORDER by h_index desc".format(
-            single_area_relation_word,index_name,index_name,index_sjr_id
+            single_area_relation_word,open_access_word,
+            index_name,index_name,index_sjr_id
         )
-    '''
     #print(sql)
     cur.execute(sql)
     return cur.fetchall()
@@ -173,7 +165,34 @@ def journals_of_specific_major(
     return journal_dict
 
 
+class PublisherEntrance:
+    def __init__(self,publisher_keyword):
+        self.publisher_keyword = publisher_keyword
+
+    def get_unfinished_journals(self,single_area_relation=True,open_access=True):
+        journal_filter = ' '
+        if single_area_relation:
+            journal_filter += ' area_relation_cot=1 and '
+        if open_access:
+            journal_filter += ' open_access=true and '
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
+        sql =  "select name,sjr_id,site_source,area_relation_cot,\
+                    category_relation_cot,publisher,volume_links_got from journal \
+              WHERE{}is_crawled_all_article=FALSE\
+                and volume_links_got=false\
+                and ( site_source like '%{}%') ".format(journal_filter,self.publisher_keyword)
+        print(sql)
+        cur.execute(sql)
+        data = cur.fetchall()
+        cur.close()
+        return data
+
+
 if __name__=="__main__":
+    x = PublisherEntrance('informa').get_unfinished_journals()
+    for y in x:
+        print(y)
+    '''
     major = MajorEntrance(major_keyword='Science')
     major.show_in_cmd()
     major.get_possible_journals(
@@ -182,5 +201,6 @@ if __name__=="__main__":
         index_by_category=True,
         open_access=True
     )
+    '''
     # 非跨领域，且从小类分
     # 因为前期目标是定位学者，杂志社领域精度越细越好

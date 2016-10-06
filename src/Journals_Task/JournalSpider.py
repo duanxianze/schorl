@@ -148,12 +148,14 @@ class JournalSpider:
               where sjr_id={}'.format(self.JournalObj.sjr_id)
         )
         print(' volume links created ok! <{}>'.\
-              format(self,JournalObj.name))
+              format(self.JournalObj.name))
 
     def get_unfinished_volume_links(self):
         if not self.JournalObj.volume_links_got:
             #第一次初始化
             self.create_new_volumes()
+            return []
+        return []
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select link,id from journal_volume \
