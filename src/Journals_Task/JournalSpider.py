@@ -30,7 +30,6 @@ class JournalSpider:
     def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.volume_links = []
-        self.write_cur = REMOTE_CONNS_POOL.new_db_cursor()
 
     @EP_METHOD
     def _run(self,AllItemsPageParser,JournalArticle,use_tor=False):
@@ -109,10 +108,12 @@ class JournalSpider:
 
     @EP_METHOD
     def mark_journal_ok(self):
-        self.write_cur.execute(
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
+        cur.execute(
             'update journal set is_crawled_all_article = true\
              where sjr_id = {}'.format(self.JournalObj.sjr_id)
         )
+        cur.close()
 
     @ERN_METHOD
     def get_db_volume_item(self,volume_link):
@@ -145,7 +146,9 @@ class JournalSpider:
     def mark_volume_ok(self,volume_db_id):
         sql = "update journal_volume set is_crawled=true \
                 where id={}".format(volume_db_id)
-        self.write_cur.execute(sql)
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
+        cur.execute(sql)
+        cur.close()
         print('Mark volume {} ok!'.format(volume_db_id))
 
     @EP_METHOD
@@ -155,10 +158,12 @@ class JournalSpider:
             return
         for volume_link in self.volume_links:
             self.create_volume(volume_link)
-        self.write_cur.execute(
+        cur = REMOTE_CONNS_POOL.new_db_cursor()
+        cur.execute(
             'update journal set volume_links_got=TRUE \
               where sjr_id={}'.format(self.JournalObj.sjr_id)
         )
+        cur.close()
         print(' volume links created ok! <{}>'.\
               format(self.JournalObj.name))
 
