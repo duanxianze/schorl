@@ -55,7 +55,7 @@ class MajorEntrance:
         return cur.fetchall()
 
     def get_possible_journals(self,index_by_area=True,index_by_category=True,
-            single_area_relation=True,open_access=True):
+            single_area_relation=True,open_access=True,limit=100):
         '''
             注意此处的几个参数，需要根据领域特性微调
             1.假如领域分支较笼统，建议选index_by_area（通过大类找杂志）,反之则用小类找
@@ -68,7 +68,8 @@ class MajorEntrance:
                 journals_of_specific_func = journals_of_specific_area,
                 tag_info = 'Area',
                 single_area_relation = single_area_relation,
-                open_access = open_access
+                open_access = open_access,
+                limit = limit
             )
             print('--------------------------------')
         if index_by_category:
@@ -78,7 +79,8 @@ class MajorEntrance:
                 journals_of_specific_func = journals_of_specific_category,
                 tag_info = 'Category',
                 single_area_relation = single_area_relation,
-                open_access = open_access
+                open_access = open_access,
+                limit = limit
             )
         '''
             journal_dict is like:{
@@ -108,7 +110,7 @@ def categories_of_specific_area(area_sjr_id):
 
 def journals_of_specific_index(
         index_sjr_id,single_area_relation,
-        index_name,open_access
+        index_name,open_access,limit=100
 ):
     if single_area_relation:
         single_area_relation_word = ' area_relation_cot=1 and '
@@ -126,9 +128,9 @@ def journals_of_specific_index(
           sjr_id IN(\
             select journal_id from journal_{} \
             WHERE {}_id={} \
-        ) ORDER by h_index desc".format(
+        ) ORDER by h_index desc limit {}".format(
             single_area_relation_word,open_access_word,
-            index_name,index_name,index_sjr_id
+            index_name,index_name,index_sjr_id,limit
         )
     #print(sql)
     cur.execute(sql)
@@ -143,8 +145,7 @@ def journals_of_specific_area(area_sjr_id,single_area_relation,open_access):
 
 def journals_of_specific_major(
     possible_db_items,journals_of_specific_func,tag_info,
-    single_area_relation = True,
-    open_access = True
+    single_area_relation = True,open_access = True
 ):
     journal_dict = {}
     index = 1
@@ -169,7 +170,8 @@ class PublisherEntrance:
     def __init__(self,publisher_keyword):
         self.publisher_keyword = publisher_keyword
 
-    def get_unfinished_journals(self,single_area_relation=True,open_access=True):
+    def get_unfinished_journals(
+            self,single_area_relation=True,open_access=True,limit=100):
         journal_filter = ' '
         if single_area_relation:
             journal_filter += ' area_relation_cot=1 and '
@@ -179,13 +181,13 @@ class PublisherEntrance:
         sql =  "select name,sjr_id,site_source,area_relation_cot,\
                     category_relation_cot,publisher,volume_links_got from journal \
               WHERE{}is_crawled_all_article=FALSE\
-                and volume_links_got=false\
-                and ( site_source like '%{}%') ".format(journal_filter,self.publisher_keyword)
-        print(sql)
+                and ( site_source like '%{}%') limit {}"\
+            .format(journal_filter,self.publisher_keyword,limit)
+        #print(sql)
         cur.execute(sql)
         data = cur.fetchall()
         cur.close()
-        return data
+        return {self.publisher_keyword:data}
 
 
 if __name__=="__main__":
