@@ -14,26 +14,25 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from GoogleScholar_Task.articles_watchdog import Artciles_Spider_WatchDog
+from crawl_tools.DB_Config import DB_Config
+from crawl_tools.WatchDog import WatchDog
 import time,psycopg2
 
-REMOTE_HOST = '45.76.71.26'
-REMOTE_PORT = 5432
+configs = DB_Config('../db_config.json').info_dict
 
 conn = psycopg2.connect(
-    dbname = "sf_development",
-    user = "lyn",
-    password = "tonylu716",
-    host = REMOTE_HOST,
-    port = REMOTE_PORT
+    dbname = configs['db_name'],
+    user = configs['user'],
+    password = configs['password'],
+    host = configs['host'],
+    port = configs['port']
 )
 conn.autocommit = True
 cur = conn.cursor()
 
-class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
+class JournalTaskManagerWatchdog(WatchDog):
     def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
-        Artciles_Spider_WatchDog.__init__(
-            self,cmd_line,task_proc_cmd_line,pid)
+        WatchDog.__init__(self,cmd_line,task_proc_cmd_line,pid)
         self.cur = cur
 
     @property
@@ -97,8 +96,9 @@ class JournalTaskManagerWatchdog(Artciles_Spider_WatchDog):
                     prev_amount = amount
                     self.print_log(tf)
                 self.restart_task_proc()
-            except:
-                pass
+            except Exception as e:
+                print(str(e))
+                self.cur = conn.cursor()
 
     def print_log(self,tf):
         for i in range(1,60):

@@ -16,18 +16,21 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
+from crawl_tools.DB_Config import DB_Config
 from crawl_tools.WatchDog import WatchDog
 import psycopg2,time
 
 REMOTE_HOST = '45.76.71.26'
 REMOTE_PORT = 5432
 
+configs = DB_Config('../db_config.json').info_dict
+
 conn = psycopg2.connect(
-    dbname = "sf_development",
-    user = "lyn",
-    password = "tonylu716",
-    host = REMOTE_HOST,
-    port = REMOTE_PORT
+    dbname = configs['db_name'],
+    user = configs['user'],
+    password = configs['password'],
+    host = configs['host'],
+    port = configs['port']
 )
 conn.autocommit = True
 cur = conn.cursor()
