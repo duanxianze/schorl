@@ -32,9 +32,14 @@ class DB_Config:
 
     def generate(self):
         with open(self.json_file_path, 'r') as fp:
-            infos = json.load(fp)
-            for key in infos.keys():
-                self.info_dict[key] = infos[key]
+            input_infos = json.load(fp)
+            for input_key in input_infos.keys():
+                if input_key in self.info_dict.keys():
+                    self.info_dict[input_key] = input_infos[input_key]
+                else:
+                    raise Exception(
+                        'DB_Config: <{}> is invalid key'.format(input_key)
+                    )
 
     def get_info_dict(self):
         self.generate()
