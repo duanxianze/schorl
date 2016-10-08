@@ -34,6 +34,13 @@ class JournalTaskManagerWatchdog(WatchDog):
     def __init__(self,cmd_line,task_proc_cmd_line,pid=None):
         WatchDog.__init__(self,cmd_line,task_proc_cmd_line,pid)
         self.cur = cur
+    
+    @property
+    def articles_amount(self):
+        self.cur.execute(
+            'select count(*) from articles'
+        )
+        return int(self.cur.fetchall()[0][0])
 
     @property
     def volumes_amount(self):
