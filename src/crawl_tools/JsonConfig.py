@@ -37,6 +37,7 @@ class ServerConfig(JsonConfig):
     def __init__(self,json_file_path):
         default_info_dict = {
             'ip':   None,
+            'port': 22,
             'user': None,
             'password': None,
             'nickname': None

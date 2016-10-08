@@ -7,7 +7,7 @@
 @editor:    PyCharm
 @create:    2016-10-08 9:47
 @description:
-        代码版本或文件推送到集群（除ip外，路径密码用户名不单独配置）
+        代码版本或文件推送到集群（除ip密码用户名端口外，路径不单独配置）
 """
 from crawl_tools.JsonConfig import ServerConfig
 import os
@@ -32,10 +32,11 @@ class ScpToGroup:
         return machines_info_list
 
     def push(self):
-        params = '-C'
+        params = ' -C '
         if self.is_folder:
-            params += ' -r'
+            params += ' -r '
         for machine_info in self.get_config_infos():
+            params += '-P {} '.format(machine_info['port'])
             cmd = 'sshpass -p "{}" scp {} {} {}@{}:{}'.format(
                 machine_info['password'],params,self.local_path
                 ,machine_info['user'],machine_info['ip'],self.remote_path
