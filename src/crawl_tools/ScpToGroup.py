@@ -10,6 +10,7 @@
         代码版本或文件推送到集群（除ip密码用户名端口外，路径不单独配置）
         需注意：使用sshpass命令前需要手动进行第一次握手ssh，信任证书
 """
+from multiprocessing.dummy import Pool as ThreadPool
 from crawl_tools.JsonConfig import ServerConfig
 import os
 
@@ -32,15 +33,26 @@ class ScpToGroup:
             )
         return machines_info_list
 
+    def push_one(self,machine_info):
+        scp_params = '-C -v -P {} '.format(machine_info['port'])
+        if self.is_folder:
+            scp_params += '-r '
+        cmd = 'sshpass -p {} scp {} {} {}@{}:{}'.format(
+            machine_info['password'],scp_params,
+            self.local_path,machine_info['user'],
+            machine_info['ip'],self.remote_path
+        )
+        print(cmd)
+        os.system(cmd)
+
     def push(self):
-        for machine_info in self.get_config_infos():
-            params = '-C -v '
-            if self.is_folder:
-                params += '-r '
-            params += '-P {} '.format(machine_info['port'])
-            cmd = 'sshpass -p {} scp {} {} {}@{}:{}'.format(
-                machine_info['password'],params,self.local_path
-                ,machine_info['user'],machine_info['ip'],self.remote_path
-            )
-            print(cmd)
-            os.system(cmd)
+       machine_infos = self.get_config_infos()
+       if len(machine_infos) < 4:
+           thread_count = len(machine_infos)
+       else:
+           thread_count = 4
+       pool = ThreadPool(thread_count)
+       pool.map(self.push_one,machine_infos)
+       pool.close()
+       pool.join()
+
