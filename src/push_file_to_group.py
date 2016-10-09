@@ -13,8 +13,8 @@
 from crawl_tools.ScpToGroup import ScpToGroup
 
 ScpToGroup(
-    local_path='../',
-    remote_path='~/',
+    local_path='./',
+    remote_path='~/scholar_articles/',
     config_folder_path='./group_configs',
     is_folder=True
 ).push()

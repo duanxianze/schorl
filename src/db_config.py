@@ -1,7 +1,7 @@
 from crawl_tools.DB_Connect_Pool import DB_Connect_Pool
-from crawl_tools.DB_Config import DB_Config
+from crawl_tools.JsonConfig import DB_Config
 
-configs = DB_Config('../db_config.json').info_dict
+configs = DB_Config('../db_config.json').to_dict()
 for key in configs.keys():
     print(key,":",configs[key])
 
