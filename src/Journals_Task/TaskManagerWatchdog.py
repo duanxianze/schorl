@@ -18,7 +18,7 @@ from crawl_tools.JsonConfig import DB_Config
 from crawl_tools.WatchDog import WatchDog
 import time,psycopg2
 
-configs = DB_Config('../db_config.json').info_dict
+configs = DB_Config('../db_config.json').to_dict()
 
 conn = psycopg2.connect(
     dbname = configs['db_name'],
