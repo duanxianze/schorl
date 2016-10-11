@@ -31,15 +31,16 @@ class JournalSpider:
         self.volume_links = []
 
     @EP_METHOD
-    def _run(self,AllItemsPageParser,JournalArticle,use_tor=False):
+    def _run(self,AllItemsPageParser,JournalArticle,
+             use_tor=False,check_pdf_url=True):
         volume_items = list(set(
             self.get_unfinished_volume_links()
         ))
         random.shuffle(volume_items)
         AllVolumesOK = True
         for volume_item in volume_items:
-            if not self.crawl_volume_page(
-                volume_item,AllItemsPageParser,JournalArticle,use_tor):
+            if not self.crawl_volume_page(volume_item,AllItemsPageParser,
+                    JournalArticle,use_tor,check_pdf_url):
                 AllVolumesOK = False
         if AllVolumesOK and volume_items:
             self.mark_journal_ok()
@@ -49,8 +50,8 @@ class JournalSpider:
         return volume_link
 
     @ERN_METHOD
-    def crawl_volume_page(self,volume_item,
-                AllItemsPageParser,JournalArticle,use_tor=False):
+    def crawl_volume_page(self,volume_item,AllItemsPageParser,
+                JournalArticle,use_tor=False,check_pdf_url=True):
         volume_link = self.handle_volume_link_for_multi_results(volume_item[0])
         volume_db_id = volume_item[1]
         if use_tor:
@@ -71,8 +72,8 @@ class JournalSpider:
         except AttributeError:
             volume_year = None
         print('\nPage Url: %s '%volume_link)
-        if self.crawl_articles(sections,
-                volume_year,volume_db_id,JournalArticle)==False:
+        if self.crawl_articles(sections,volume_year,
+                volume_db_id,JournalArticle,check_pdf_url)==False:
             return False
         if len(parser.sections)>0:
             self.mark_volume_ok(volume_db_id)
@@ -80,7 +81,8 @@ class JournalSpider:
         return False
 
     @ERN_METHOD
-    def crawl_articles(self,sections,volume_year,volume_db_id,JournalArticle):
+    def crawl_articles(self,sections,volume_year,
+            volume_db_id,JournalArticle,check_pdf_url=True):
         pdf_url_null_cot = 0
         for sec in sections:
             params = [sec,self.JournalObj,volume_db_id]
@@ -92,12 +94,13 @@ class JournalSpider:
                 print('[Error] JournalSpider:JournalArticle Init:{}'\
                       .format(str(e)))
                 continue
-            if article.pdf_url==None and article.pdf_temp_url==None:
-                pdf_url_null_cot += 1
-            else:
-                pdf_url_null_cot = 0
-            if pdf_url_null_cot>3:
-                return False
+            if check_pdf_url:
+                if article.pdf_url==None and article.pdf_temp_url==None:
+                    pdf_url_null_cot += 1
+                else:
+                    pdf_url_null_cot = 0
+                if pdf_url_null_cot>3:
+                    return False
             if article.authors in ([''],[]):
                 print('[Error] JournalSpider:\
                     No authors in article <{}>'.format(article.title))
