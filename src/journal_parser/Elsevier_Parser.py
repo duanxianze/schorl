@@ -84,7 +84,7 @@ class ElsevierAllItemsPageParser:
                     .text.strip().split(' ')[-1][1:-1])
             except:
                 return int(self.soup.select_one('.volumeHeader').find(re.compile("h[0-9]"))\
-                    .text.strip().split(' ')[-1][:4])
+                    .text.strip().split(' ')[-1][:5])
 
     @property
     def volume_area_links(self):
