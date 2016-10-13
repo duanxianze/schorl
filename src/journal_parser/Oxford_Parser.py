@@ -23,9 +23,6 @@ import re
 
 
 class OxfordAllItemsPageParser:
-    '''
-        sample_url:
-    '''
     def __init__(self,html_source=None,from_web=True):
         if not from_web:
             with open('Oxford.html','rb') as f:

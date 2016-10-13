@@ -23,6 +23,9 @@ from Journals_Task.JournalSpider import JournalSpider
 from crawl_tools.request_with_proxy import request_with_random_ua
 
 class OxfordSpider(JournalSpider):
+    '''
+        sample_url: http://bja.oxfordjournals.org/
+    '''
     def __init__(self,JournalObj):
         JournalSpider.__init__(self,JournalObj)
         self.JournalObj = JournalObj
