@@ -86,7 +86,7 @@ def request_with_proxy(url, timeout=14, use_ss=False,
         }
         return requests.get(url, proxies=proxies, timeout=timeout, headers=headers,verify=False)
 
-def request_with_random_ua(url):
+def request_with_random_ua(url,timeout=3):
     for i in range(6):
         try:
             return requests.get(
@@ -95,5 +95,5 @@ def request_with_random_ua(url):
             )
         except Exception as e:
             print('[Error]request_with_random_ua :%s'%str(e))
-            time.sleep(1)
+            time.sleep(timeout)
     return None
