@@ -11,9 +11,75 @@
         该文件对某领域的杂志社排名页，以及杂志社详情页做解析
 """
 import time,requests
-from db_config import new_db_cursor
+from db_config import DB_CONNS_POOL
 from bs4 import BeautifulSoup
 from crawl_tools.ua_pool import get_one_random_ua
+from crawl_tools.request_with_proxy import request_with_random_ua
+
+class SJR_Searcher:
+    def __init__(self,keyword):
+        self.url = 'http://www.scimagojr.com/journalsearch.php?q={}'.format(keyword)
+
+    @property
+    def page_amount(self):
+        self.result_amount = SearchPageParser(
+            html_source = request_with_random_ua(self.url).text
+        ).result_amount
+        return int(self.result_amount/50) + 1
+
+    @property
+    def urls(self):
+        urls = []
+        for page_index in range(1,self.page_amount+1):
+            print(page_index)
+            url = self.url + '&page={}%total_size={}'\
+                .format(page_index,self.result_amount)
+            urls.append(url)
+        return urls
+
+class SearchPageParser:
+    def __init__(self,html_source):
+        self.soup = BeautifulSoup(html_source,'lxml')
+
+    @property
+    def sections(self):
+        return self.soup.select('.search_results > a')
+
+    @property
+    def result_amount(self):
+        return int(self.soup.select_one('.pagination').text.split(' ')[-1])
+
+
+class PublisherJournal:
+    def __init__(self,sec):
+        self.unit = sec
+        self.cur = DB_CONNS_POOL.new_db_cursor()
+
+    @property
+    def name(self):
+        return self.unit.select_one('.jrnlname').text
+
+    @property
+    def sjr_id(self):
+        return int(self.unit['href'].\
+            split('?')[-1].split('&')[0].split('=')[-1])
+
+    def show(self):
+        print('**********New Journal**********')
+        print('name:\t{}'.format(self.name))
+        print('sjr_id:\t{}'.format(self.sjr_id))
+
+    def save_to_db(self):
+        try:
+            self.cur.execute(
+                'insert into journal(name,sjr_id)'
+                'values(%s,%s)',
+                (self.name,self.sjr_id)
+            )
+            self.show()
+        except Exception as e:
+            print(str(e))
+
 
 class JournalRankPageParser:
     def __init__(self,area_id,category_id,driver):
@@ -33,7 +99,7 @@ class RankJournal:
     def __init__(self,sec):
         self.sec = sec
         self.tit = sec.find_element_by_class_name('tit')
-        self.cur = new_db_cursor()
+        self.cur = DB_CONNS_POOL.new_db_cursor()
 
     @property
     def sjr_id(self):
@@ -117,10 +183,8 @@ class RankJournal:
 class JournalDetailPageParser:
     def __init__(self,journal_sjr_id):
         url = 'http://www.scimagojr.com/journalsearch.php?q={}&tip=sid&clean=0'.format(journal_sjr_id)
-        #print(url)
-        resp = requests.get(url,
-            headers = {'User-Agent':get_one_random_ua()}
-        )
+        print(url)
+        resp = request_with_random_ua(url)
         self.journal_id = journal_sjr_id
         self.soup = BeautifulSoup(resp.text,'lxml')
         self.trs = self.soup.find('tbody').find_all('tr')
@@ -129,7 +193,7 @@ class JournalDetailPageParser:
             tds = tr.find_all('td')
             self.info_dict[tds[0].text] = tds[1]
         #print(self.info_dict.keys())
-        self.cur = new_db_cursor()
+        self.cur = DB_CONNS_POOL.new_db_cursor()
 
     @property
     def h_index(self):
@@ -165,6 +229,7 @@ class JournalDetailPageParser:
         return list(map(lambda x:int(x['href'].split('=')[-1]),a_tags))
 
     def show_in_cmd(self):
+        print('************New Update********************')
         print('journal_id:{}'.format(self.journal_id))
         print('h_index:{}'.format(self.h_index))
         print('country:{}'.format(self.country))
@@ -232,4 +297,9 @@ class JournalDetailPageParser:
                 self.issn,self.site_source,True,self.journal_id)
         )
         print('{} update ok '.format(self.journal_id))
+
+    def save_new_info(self):
+        self.save_journal_area()
+        self.save_journal_category()
+        self.update_db_journal()
 
