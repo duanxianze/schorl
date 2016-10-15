@@ -7,24 +7,41 @@
 @editor:    PyCharm
 @create:    2016-10-15 18:51
 @description:
-            用于迭代采购SJR网站上关于某publisher完全版本的journal magazine信息
+            用于迭代采购SJR网站上关于某publisher(或全库)完全版本的journal magazine信息
 """
-from journal_parser.SJR_Parser import SJR_Searcher,SearchPageParser,PublisherJournal,JournalDetailPageParser
+from journal_parser.SJR_Parser import SJR_Searcher,SearchPageParser\
+    ,PublisherJournal,RankPageParser,RankJournal,JournalDetailPageParser
 from crawl_tools.request_with_proxy import request_with_random_ua
 from multiprocessing.dummy import Pool as ThreadPool
 from db_config import DB_CONNS_POOL
+from crawl_tools.DriversPool import DriversPool
 
 class SJR_Iterator:
-    def __init__(self,publisher_keyword):
+    def __init__(self,publisher_keyword=None):
         self.urls = SJR_Searcher(publisher_keyword).urls
+        if publisher_keyword:
+            self.crawl_all = False
+        else:
+            self.crawl_all = True
+            self.drivers = DriversPool(size=8,visual=True)
 
     def crawl_per_page_result(self,url):
         print(url)
-        html_source = request_with_random_ua(url).text
-        parser = SearchPageParser(html_source)
-        sections = parser.sections
-        for sec in sections:
-            PublisherJournal(sec).save_to_db()
+        if self.crawl_all:
+            driver = self.drivers.get_one_free_driver()
+            try:
+                parser = RankPageParser(driver)
+            except Exception as e:
+                print(str(e))
+            driver.status = 'free'
+            JournalItem = RankJournal
+        else:
+            html_source = request_with_random_ua(url).text
+            parser = SearchPageParser(html_source)
+            JournalItem = PublisherJournal
+        print(len(parser.sections))
+        for sec in parser.sections:
+            JournalItem(sec).show_in_cmd()
 
     def run(self):
         pool = ThreadPool(16)
@@ -65,10 +82,8 @@ class SJR_Updater:
 
 
 if __name__=="__main__":
-    SJR_Updater().run()
-    # for keyword in ['Elsevier','Taylor']:
-    #     SJR_Iterator(keyword).run()
-
+    SJR_Iterator(publisher_keyword=None).run()
+    #SJR_Updater().run()
 
 
 

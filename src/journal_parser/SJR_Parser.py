@@ -17,22 +17,28 @@ from crawl_tools.ua_pool import get_one_random_ua
 from crawl_tools.request_with_proxy import request_with_random_ua
 
 class SJR_Searcher:
-    def __init__(self,keyword):
-        self.url = 'http://www.scimagojr.com/journalsearch.php?q={}'.format(keyword)
+    def __init__(self,keyword=None):
+        self.keyword = keyword
+        if keyword:
+            self.url = 'http://www.scimagojr.com/journalsearch.php?q={}'.format(keyword)
+        else:
+            self.url = 'http://www.scimagojr.com/journalrank.php'
 
     @property
     def page_amount(self):
-        self.result_amount = SearchPageParser(
-            html_source = request_with_random_ua(self.url).text
-        ).result_amount
+        if self.keyword:
+            self.result_amount = SearchPageParser(
+                html_source = request_with_random_ua(self.url).text
+            ).result_amount
+        else:
+            self.result_amount = RankPageParser().result_amount
         return int(self.result_amount/50) + 1
 
     @property
     def urls(self):
         urls = []
         for page_index in range(1,self.page_amount+1):
-            print(page_index)
-            url = self.url + '&page={}%total_size={}'\
+            url = self.url + '?&page={}&total_size={}'\
                 .format(page_index,self.result_amount)
             urls.append(url)
         return urls
@@ -64,7 +70,7 @@ class PublisherJournal:
         return int(self.unit['href'].\
             split('?')[-1].split('&')[0].split('=')[-1])
 
-    def show(self):
+    def show_in_cmd(self):
         print('**********New Journal**********')
         print('name:\t{}'.format(self.name))
         print('sjr_id:\t{}'.format(self.sjr_id))
@@ -81,30 +87,37 @@ class PublisherJournal:
             print(str(e))
 
 
-class JournalRankPageParser:
-    def __init__(self,area_id,category_id,driver):
-        self.url = 'http://www.scimagojr.com/journalrank.php?area={}&category={}&order=tr&type=j'.format(area_id,category_id)
-        driver.get(self.url)
-        self.driver = driver
-        time.sleep(2)
+class RankPageParser:
+    def __init__(self,area_id=None,category_id=None,driver=None):
+        self.url = 'http://www.scimagojr.com/journalrank.php'
+        if category_id and area_id:
+            self.url += '?area={}&category={}&order=tr&type=j'.format(area_id,category_id)
+        if driver:
+            driver.get(self.url)
+            time.sleep()
+            self.soup = BeautifulSoup(driver.page_source,'lxml')
+        else:
+            resp = request_with_random_ua(self.url,timeout=20)
+            self.soup = BeautifulSoup(resp.text,'lxml')
 
     @property
-    def secs(self):
-        return self.driver.find_element_by_xpath(
-            '/html/body/div[6]/div[7]/table/tbody'
-        ).find_elements_by_tag_name('tr')
+    def sections(self):
+        return self.soup.select('.teble_wrap > tr')[1:]
+
+    @property
+    def result_amount(self):
+        return int(self.soup.select_one('.pagination').text.split(' ')[-1])
 
 
 class RankJournal:
     def __init__(self,sec):
         self.sec = sec
-        self.tit = sec.find_element_by_class_name('tit')
+        self.tit = sec.select_one('.tit')
         self.cur = DB_CONNS_POOL.new_db_cursor()
 
     @property
     def sjr_id(self):
-        for kv in self.tit.find_element_by_tag_name('a')\
-            .get_attribute('href').split('?')[-1].split('&'):
+        for kv in self.tit.select_one('a')['href'].split('?')[-1].split('&'):
             key = kv.split('=')[0]
             value = kv.split('=')[1]
             if key == 'q':
@@ -112,12 +125,12 @@ class RankJournal:
 
     @property
     def name(self):
-        return self.tit.find_element_by_tag_name('a').text
+        return self.tit.select_one('a').text
 
     @property
     def open_access(self):
         try:
-            self.sec.find_element_by_class_name('openaccessicon')
+            self.sec.select_one('.openaccessicon')
             return True
         except Exception as e:
             #print(str(e))
@@ -126,7 +139,7 @@ class RankJournal:
     def show_in_cmd(self):
         print('name:{}'.format(self.name))
         print('sjr_id:{}'.format(self.sjr_id))
-        #print('open_access:{}'.format(self.open_access))
+        print('open_access:{}'.format(self.open_access))
 
     def is_saved(self,sjr_id):
         cur = self.cur
@@ -146,7 +159,6 @@ class RankJournal:
         amount = cur.fetchall()[0][0]
         return amount
 
-
     def save_to_db(self,category_sjr_id):
         sjr_id = self.sjr_id
         if None in (self.name,sjr_id,self.open_access):
@@ -164,7 +176,6 @@ class RankJournal:
         #关系表在journal表之后存
         self.save_category_journal(category_sjr_id,sjr_id)
         self.cur.close()
-
 
     def save_category_journal(self,
             category_sjr_id,journal_sjr_id):

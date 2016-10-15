@@ -28,6 +28,7 @@
 """
 import time
 from selenium import webdriver
+from multiprocessing.dummy import Pool as ThreadPool
 
 class Driver:
     '''
@@ -60,8 +61,10 @@ class DriversPool:
             #启动大幅加速
             launch_with_thread_pool.map(self.add_to_pool,range(self.size))
         else:
-            for i in range(self.size):
-                self.add_to_pool(i)
+            launch_with_thread_pool = ThreadPool(8)
+            launch_with_thread_pool.map(self.add_to_pool,range(self.size))
+            launch_with_thread_pool.close()
+            launch_with_thread_pool.join()
 
 
     def alter_driver_status(self,index,status):
