@@ -89,7 +89,7 @@ class JournalTaskManagerWatchdog(WatchDog):
         tf = open('../amount_log.txt','a+')
         while(1):
             try:
-                for i in range(6):
+                for i in range(3):
                     amount = self.articles_amount
                     local_time = time.strftime(
                         "%Y-%m-%d %H:%M:%S",time.localtime(time.time()))
@@ -101,7 +101,7 @@ class JournalTaskManagerWatchdog(WatchDog):
                     tf.close()
                     tf = open('../amount_log.txt','a+')
                     prev_amount = amount
-                    time.sleep(600)
+                    time.sleep(1200)
                 self.restart_task_proc()
             except Exception as e:
                 print(str(e))
