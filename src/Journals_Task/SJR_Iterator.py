@@ -17,23 +17,34 @@ from db_config import DB_CONNS_POOL
 from crawl_tools.DriversPool import DriversPool
 
 class SJR_Iterator:
-    def __init__(self,publisher_keyword=None):
+    def __init__(self,publisher_keyword=None,driver_pool_size=0):
         self.urls = SJR_Searcher(publisher_keyword).urls
+        self.driver_pool_size = driver_pool_size
         if publisher_keyword:
             self.crawl_all = False
         else:
             self.crawl_all = True
-            self.drivers = DriversPool(size=8,visual=True)
+            if driver_pool_size>0:
+                self.drivers = DriversPool(
+                    size=driver_pool_size,visual=True
+                )
 
     def crawl_per_page_result(self,url):
         print(url)
         if self.crawl_all:
-            driver = self.drivers.get_one_free_driver()
+            if self.driver_pool_size>0:
+                driverObj = self.drivers.get_one_free_driver()
+                drvier = driverObj.engine
+            else:
+                drvier = None
             try:
-                parser = RankPageParser(driver)
+                parser = RankPageParser(url,drvier)
             except Exception as e:
                 print(str(e))
-            driver.status = 'free'
+            try:
+                driverObj.status = 'free'
+            except:
+                pass
             JournalItem = RankJournal
         else:
             html_source = request_with_random_ua(url).text
@@ -41,10 +52,10 @@ class SJR_Iterator:
             JournalItem = PublisherJournal
         print(len(parser.sections))
         for sec in parser.sections:
-            JournalItem(sec).show_in_cmd()
+            JournalItem(sec).save_to_db()
 
-    def run(self):
-        pool = ThreadPool(16)
+    def run(self,thread_count=16):
+        pool = ThreadPool(thread_count)
         pool.map(self.crawl_per_page_result,self.urls)
         pool.close()
         pool.join()
@@ -75,15 +86,20 @@ class SJR_Updater:
             print(str(e))
 
     def run(self):
-        pool = ThreadPool(32)
+        pool = ThreadPool(64)
         pool.map(self.crawl_per_item,self.db_items)
         pool.close()
         pool.join()
 
 
 if __name__=="__main__":
-    SJR_Iterator(publisher_keyword=None).run()
-    #SJR_Updater().run()
+    '''
+    from crawl_tools.WatchDog import close_procs_by_keyword
+    close_procs_by_keyword('chromedriver')
+    close_procs_by_keyword('phantom')
+    SJR_Iterator(publisher_keyword=None).run(thread_count=64)
+    '''
+    SJR_Updater().run()
 
 
 

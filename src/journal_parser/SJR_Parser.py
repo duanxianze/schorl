@@ -31,7 +31,7 @@ class SJR_Searcher:
                 html_source = request_with_random_ua(self.url).text
             ).result_amount
         else:
-            self.result_amount = RankPageParser().result_amount
+            self.result_amount = RankPageParser(self.url).result_amount
         return int(self.result_amount/50) + 1
 
     @property
@@ -88,13 +88,13 @@ class PublisherJournal:
 
 
 class RankPageParser:
-    def __init__(self,area_id=None,category_id=None,driver=None):
-        self.url = 'http://www.scimagojr.com/journalrank.php'
+    def __init__(self,url,area_id=None,category_id=None,driver=None):
+        self.url = url
         if category_id and area_id:
             self.url += '?area={}&category={}&order=tr&type=j'.format(area_id,category_id)
         if driver:
             driver.get(self.url)
-            time.sleep()
+            time.sleep(2)
             self.soup = BeautifulSoup(driver.page_source,'lxml')
         else:
             resp = request_with_random_ua(self.url,timeout=20)
@@ -102,7 +102,7 @@ class RankPageParser:
 
     @property
     def sections(self):
-        return self.soup.select('.teble_wrap > tr')[1:]
+        return self.soup.select('tr')[1:]
 
     @property
     def result_amount(self):
@@ -137,6 +137,7 @@ class RankJournal:
             return False
 
     def show_in_cmd(self):
+        print('***********New RankJournal*********************')
         print('name:{}'.format(self.name))
         print('sjr_id:{}'.format(self.sjr_id))
         print('open_access:{}'.format(self.open_access))
@@ -159,11 +160,11 @@ class RankJournal:
         amount = cur.fetchall()[0][0]
         return amount
 
-    def save_to_db(self,category_sjr_id):
+    def save_to_db(self,category_sjr_id=None):
         sjr_id = self.sjr_id
         if None in (self.name,sjr_id,self.open_access):
             return False
-        if not self.is_saved(sjr_id):
+        try:
             self.cur.execute(
                 'insert into journal(name,sjr_id,open_access)'
                 'values(%s,%s,%s)',
@@ -171,10 +172,12 @@ class RankJournal:
             )
             print('********New journal info***********')
             self.show_in_cmd()
-        else:
-            print('{} [ERROR] in RankJournal: {} Already saved...'.format(category_sjr_id,self.sjr_id))
-        #关系表在journal表之后存
-        self.save_category_journal(category_sjr_id,sjr_id)
+        except Exception as e:
+            print(str(e))
+            #print('{} [ERROR] in RankJournal: {} Already saved...'.format(category_sjr_id,self.sjr_id))
+        if category_sjr_id:
+            #关系表在journal表后存
+            self.save_category_journal(category_sjr_id,sjr_id)
         self.cur.close()
 
     def save_category_journal(self,
