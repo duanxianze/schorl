@@ -49,8 +49,9 @@ class SpringSpider(JournalSpider):
                             .format(page_num,self.spring_journal_id)
             self.volume_links.append(page_url)
 
-    def run(self):
+    def run(self,internal_thread_cot=8):
         self._run(
             AllItemsPageParser = SpringParser,
-            JournalArticle = SpringArticle
+            JournalArticle = SpringArticle,
+            internal_thread_cot=internal_thread_cot,
         )

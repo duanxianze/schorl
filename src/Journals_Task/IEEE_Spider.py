@@ -43,8 +43,9 @@ class IEEE_Spider(JournalSpider):
     def handle_volume_link_for_multi_results(self,volume_link):
         return volume_link+'&rowsPerPage=500&pageNumber=1'
 
-    def run(self):
+    def run(self,internal_thread_cot=8):
         self._run(
             AllItemsPageParser = IEEE_AllItemsPageParser,
-            JournalArticle = IEEE_Article
+            JournalArticle = IEEE_Article,
+            internal_thread_cot=internal_thread_cot
         )

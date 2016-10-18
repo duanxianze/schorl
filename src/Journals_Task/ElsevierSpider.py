@@ -85,10 +85,11 @@ class ElsevierSpider(JournalSpider):
             #得到该区间所有年份的page_url
             self.volume_links.extend(area_volume_links)
 
-    def run(self):
+    def run(self,internal_thread_cot=8):
         self._run(
             AllItemsPageParser = ElsevierAllItemsPageParser,
             JournalArticle = ElsevierAricle,
-            check_pdf_url=False
+            check_pdf_url=False,
+            internal_thread_cot=internal_thread_cot,
         )
 
