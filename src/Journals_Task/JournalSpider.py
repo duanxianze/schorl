@@ -48,13 +48,20 @@ class JournalSpider:
         params_dicts = []
         for volume_item in volume_items:
             params_dict['volume_item'] = volume_item
-            params_dicts.append(params_dict)
+            new_dict = {}
+            for key in params_dict.keys():
+                new_dict[key] = params_dict[key]
+            params_dicts.append(new_dict)
         pool = ThreadPool(internal_thread_cot)
+        for params_dict in params_dicts:
+            print(params_dict['volume_item'])
         result_list = pool.map(self.crawl_vp,params_dicts)
-        print('res = {}'.format(result_list))
+        print('Results List = {}'.format(result_list))
         AllVolumesOK = False not in result_list
         if AllVolumesOK and volume_items:
             self.mark_journal_ok()
+        pool.close()
+        pool.join()
 
     @ERN_METHOD
     def crawl_vp(self,params_dict):
