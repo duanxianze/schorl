@@ -22,6 +22,8 @@ from crawl_tools.request_with_proxy import request_with_random_ua,request_with_p
 from db_config import REMOTE_CONNS_POOL
 import psycopg2,time,random
 from crawl_tools.decorators import except_pass,except_return_none
+from multiprocessing.dummy import Pool as ThreadPool
+
 EP_METHOD = lambda func:except_pass(func,'JournalSpider')
 ERN_METHOD = lambda func:except_return_none(func,'JournalSpider')
 
@@ -32,18 +34,37 @@ class JournalSpider:
 
     @EP_METHOD
     def _run(self,AllItemsPageParser,JournalArticle,
-             use_tor=False,check_pdf_url=True):
+             use_tor=False,check_pdf_url=True,internal_thread_cot=8):
         volume_items = list(set(
             self.get_unfinished_volume_links()
         ))
         random.shuffle(volume_items)
-        AllVolumesOK = True
+        params_dict = {
+            'AllItemsPageParser':AllItemsPageParser,
+            'JournalArticle':JournalArticle,
+            'use_tor':use_tor,
+            'check_pdf_url':check_pdf_url
+        }
+        params_dicts = []
         for volume_item in volume_items:
-            if not self.crawl_volume_page(volume_item,AllItemsPageParser,
-                    JournalArticle,use_tor,check_pdf_url):
-                AllVolumesOK = False
+            params_dict['volume_item'] = volume_item
+            params_dicts.append(params_dict)
+        pool = ThreadPool(internal_thread_cot)
+        result_list = pool.map(self.crawl_vp,params_dicts)
+        print('res = {}'.format(result_list))
+        AllVolumesOK = False not in result_list
         if AllVolumesOK and volume_items:
             self.mark_journal_ok()
+
+    @ERN_METHOD
+    def crawl_vp(self,params_dict):
+        return self.crawl_volume_page(
+            volume_item = params_dict['volume_item'],
+            AllItemsPageParser = params_dict['AllItemsPageParser'],
+            JournalArticle = params_dict['JournalArticle'],
+            use_tor = params_dict['use_tor'],
+            check_pdf_url = params_dict['check_pdf_url']
+        )
 
     def handle_volume_link_for_multi_results(self,volume_link):
         #对多页的支持，根据不同出版社各自情况，可能需要加一些ajax参数
