@@ -22,52 +22,33 @@ from bs4 import BeautifulSoup
 from Journals_Task.JournalSpider import JournalSpider
 from crawl_tools.request_with_proxy import request_with_random_ua
 from journal_parser.Elsevier_Parser import ElsevierAricle,ElsevierAllItemsPageParser
-import time,psycopg2
+from crawl_tools.decorators import except_return_none
+ERN_METHOD = lambda func:except_return_none(func,'ElsevierSpider')
 
 
 class ElsevierSpider(JournalSpider):
     '''
         sample_url: http://www.sciencedirect.com/science/journal/15708268
     '''
-    def __init__(self,JournalObj,driverObj=None):
+    def __init__(self,JournalObj):
         JournalSpider.__init__(self,JournalObj)
         self.url = JournalObj.site_source
-        self.driverObj = driverObj
         self.JournalObj = JournalObj
         self.handle_sciencedirect_url()
         self.generate_volume_links()
 
+    @ERN_METHOD
     def handle_sciencedirect_url(self):
         #print(self.url)
         if 'sciencedirect' in self.url:
             return
-        try:
-            resp = request_with_random_ua(self.url)
-            html = resp.text
-            #print('by request ok')
-            method = 'request'
-        except Exception as e:
-            print('Handle URL:  request error:{}'.format(str(e)))
-            driver = self.driverObj.engine
-            while(1):
-                try:
-                    driver.get(self.url)
-                    time.sleep(2)
-                    html = driver.page_source
-                    break
-                except Exception as e:
-                    print('[Error] in ElsevierSpider:init_url:\n{}'.format(str(e)))
-                    time.sleep(2)
-            method = 'driver'
-        if self.driverObj:
-            self.driverObj.status = 'free'
-        soup = BeautifulSoup(html,'lxml')
-        if method == 'request':
-            jouranl_index = soup.select_one('.cta-primary')['href'].split('/')[0].split('-')
-            self.url = 'http://www.sciencedirect.com/science/journal/{}'\
-                .format(jouranl_index[0]+jouranl_index[1])
-        else:
-            self.url = soup.select_one('.view-articles')['href']
+        resp = request_with_random_ua(self.url)
+        soup = BeautifulSoup(resp.text,'lxml')
+        print(self.url)
+        #print(soup)
+        jouranl_index = soup.select_one('.cta-primary')['href'].split('/')[0].split('-')
+        self.url = 'http://www.sciencedirect.com/science/journal/{}'\
+            .format(jouranl_index[0]+jouranl_index[1])
 
     def generate_volume_links(self):
         if self.JournalObj.volume_links_got:

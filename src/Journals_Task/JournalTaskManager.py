@@ -83,6 +83,7 @@ class JournalTaskManager:
             if need_webdriver:
                 driverObj = self.drviers_pool.get_one_free_driver()
                 params.append(driverObj)
+            #Spider(*params).run(internal_thread_cot=self.internal_thread_cot)
             try:
                 Spider(*params).run(
                     internal_thread_cot=self.internal_thread_cot

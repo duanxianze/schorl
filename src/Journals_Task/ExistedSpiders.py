@@ -26,7 +26,7 @@ from Journals_Task.TaylorFrancisSpider import TaylorFrancisSpider
 EXISTED_SPIDERS = [
     {
         'publisherSpiderClass': ElsevierSpider,
-        'publisherKeywords':    ['elsevier','sciencedirect'],
+        'publisherKeywords':    ['http://www.elsevier.com','sciencedirect'],
         'need_webdriver':       False
     },
     {
