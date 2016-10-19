@@ -54,4 +54,5 @@ class SpringSpider(JournalSpider):
             AllItemsPageParser = SpringParser,
             JournalArticle = SpringArticle,
             internal_thread_cot=internal_thread_cot,
+            check_pdf_url=False
         )
