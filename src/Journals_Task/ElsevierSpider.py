@@ -18,6 +18,7 @@ for i in range(up_level_N):
     root_dir = os.path.normpath(os.path.join(root_dir, '..'))
 sys.path.append(root_dir)
 
+import re
 from bs4 import BeautifulSoup
 from Journals_Task.JournalSpider import JournalSpider
 from crawl_tools.request_with_proxy import request_with_random_ua
@@ -34,7 +35,9 @@ class ElsevierSpider(JournalSpider):
         JournalSpider.__init__(self,JournalObj)
         self.url = JournalObj.site_source
         self.JournalObj = JournalObj
+        print('origin url',self.url)
         self.handle_sciencedirect_url()
+        print('finish url',self.url)
         self.generate_volume_links()
 
     @ERN_METHOD
@@ -44,11 +47,54 @@ class ElsevierSpider(JournalSpider):
             return
         resp = request_with_random_ua(self.url)
         soup = BeautifulSoup(resp.text,'lxml')
-        print(self.url)
-        #print(soup)
-        jouranl_index = soup.select_one('.cta-primary')['href'].split('/')[0].split('-')
-        self.url = 'http://www.sciencedirect.com/science/journal/{}'\
-            .format(jouranl_index[0]+jouranl_index[1])
+        '''
+        is_valid = soup.select_one('#maincontent')
+        print(is_valid)
+        '''
+        print('---------------------')
+        if soup.find_all(text='404'):
+            raise Exception('404')
+        temp_url = soup.select_one('.cta-primary')['href']
+        temp_url2 = soup.find_all("a",href=re.compile("guide-for-authors"))
+        if temp_url2:
+            temp_url2 = temp_url2[0]['href']
+        print('temp_url:{}'.format(temp_url))
+        print('temp_url2:{}'.format(temp_url2))
+        for url in [temp_url2,temp_url]:
+            try:
+                journal_index = url.split('/')[0].split('-')
+                self.url = 'http://www.sciencedirect.com/science/journal/{}'\
+                    .format(journal_index[0]+journal_index[1])
+                return
+            except Exception as e:
+                continue
+                print(str(e))
+        '''
+        if 'survey' in temp_url:
+            res = soup.find_all("a",href=re.compile("editorial-board"))
+            if not res:
+                res = soup.find_all("a",href=re.compile("guide-for-authors"))
+            if res:
+                editor_board_url = res[0]['href']
+                print('editor_board_url:',editor_board_url)
+                print('************************************')
+                soup2 = BeautifulSoup(request_with_random_ua(editor_board_url).text,'lxml')
+                urls = soup2.find_all("a",href=re.compile("sciencedi"))
+                print('urls',urls)
+                for url in urls:
+                    if 'journal' in url:
+                        self.url = url
+                        break
+                print('************************************')
+            else:
+                pass
+                #print(soup)
+                # for a in soup.select('a'):
+                #     print(a)
+                # raise Exception('Fuck')
+        else:
+            raise Exception('OK!')
+        '''
 
     def generate_volume_links(self):
         if self.JournalObj.volume_links_got:
