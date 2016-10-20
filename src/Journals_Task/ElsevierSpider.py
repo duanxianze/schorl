@@ -47,10 +47,6 @@ class ElsevierSpider(JournalSpider):
             return
         resp = request_with_random_ua(self.url)
         soup = BeautifulSoup(resp.text,'lxml')
-        '''
-        is_valid = soup.select_one('#maincontent')
-        print(is_valid)
-        '''
         print('---------------------')
         if soup.find_all(text='404'):
             raise Exception('404')
@@ -69,36 +65,10 @@ class ElsevierSpider(JournalSpider):
             except Exception as e:
                 continue
                 print(str(e))
-        '''
-        if 'survey' in temp_url:
-            res = soup.find_all("a",href=re.compile("editorial-board"))
-            if not res:
-                res = soup.find_all("a",href=re.compile("guide-for-authors"))
-            if res:
-                editor_board_url = res[0]['href']
-                print('editor_board_url:',editor_board_url)
-                print('************************************')
-                soup2 = BeautifulSoup(request_with_random_ua(editor_board_url).text,'lxml')
-                urls = soup2.find_all("a",href=re.compile("sciencedi"))
-                print('urls',urls)
-                for url in urls:
-                    if 'journal' in url:
-                        self.url = url
-                        break
-                print('************************************')
-            else:
-                pass
-                #print(soup)
-                # for a in soup.select('a'):
-                #     print(a)
-                # raise Exception('Fuck')
-        else:
-            raise Exception('OK!')
-        '''
 
     def generate_volume_links(self):
         if self.JournalObj.volume_links_got:
-            return
+            pass
         #假如数据库中已保存，直接读取即可，无需生成
         for volume_area_link in ElsevierAllItemsPageParser(
             html_source = request_with_random_ua(self.url).text
