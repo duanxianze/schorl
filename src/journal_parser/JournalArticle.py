@@ -99,7 +99,7 @@ class JournalArticle:
             后期对pdf做文本挖掘，就倚仗这些专业(cateogry_id)精准的article数据,
             作为训练集得到各领域专业术语，才能确定其余article的所属专业
         '''
-        if None in [self.title,self.year,self.link,self.id_by_journal]:
+        if None in [self.title,self.year,self.id_by_journal]:
             print('[Error] in Save Article: Info Not Enough...')
             return
         try:
