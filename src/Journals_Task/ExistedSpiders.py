@@ -22,8 +22,14 @@ from Journals_Task.ElsevierSpider import ElsevierSpider
 from Journals_Task.SpringSpider import SpringSpider
 from Journals_Task.IEEE_Spider import IEEE_Spider
 from Journals_Task.TaylorFrancisSpider import TaylorFrancisSpider
+from Journals_Task.SageSpider import SageSpider
 
 EXISTED_SPIDERS = [
+    {
+       'publisherSpiderClass': SageSpider,
+       'publisherKeywords':    ['sagepub'],
+       'need_webdriver':       False
+    },
     {
         'publisherSpiderClass': ElsevierSpider,
         'publisherKeywords':    ['http://www.elsevier.com','sciencedirect'],

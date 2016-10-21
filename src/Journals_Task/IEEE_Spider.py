@@ -20,7 +20,6 @@ sys.path.append(root_dir)
 from Journals_Task.JournalSpider import JournalSpider
 from journal_parser.IEEE_Parser import IEEE_AllItemsPageParser,IEEE_Article
 from crawl_tools.request_with_proxy import request_with_random_ua
-import psycopg2,time
 
 class IEEE_Spider(JournalSpider):
     '''
