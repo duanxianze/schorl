@@ -34,7 +34,8 @@ class JournalTaskManager:
         index_by_area = False,
         index_by_category = True,
         open_access = True,
-        max_count = 100
+        max_count = 100,
+        volume_links_got=True
     ):
         if EntranceFunc==MajorEntrance:
             return MajorEntrance(
@@ -52,7 +53,8 @@ class JournalTaskManager:
             ).get_unfinished_journals(
                 single_area_relation=single_area_relation,
                 open_access=open_access,
-                limit = max_count
+                limit = max_count,
+                volume_links_got=volume_links_got
             )
         return []
 
@@ -105,7 +107,8 @@ class JournalTaskManager:
             drvier_is_visual = False,
             internal_thread_cot = 8,
             thread_cot = 16,
-            driver_pool_size = 0
+            driver_pool_size = 0,
+            volume_links_got=True
         ):
         self.internal_thread_cot = internal_thread_cot
         journals_info = self.get_journals_info(
@@ -114,7 +117,8 @@ class JournalTaskManager:
             index_by_area = journal_need_index_by_area,
             index_by_category = journal_need_index_by_category,
             open_access = journal_need_open_access,
-            max_count = max_count
+            max_count = max_count,
+            volume_links_got=volume_links_got
         )
         while True:
             thread_pool = ThreadPool(thread_cot)
