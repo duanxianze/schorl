@@ -28,12 +28,13 @@ EP_METHOD = lambda func:except_pass(func,'JournalSpider')
 ERN_METHOD = lambda func:except_return_none(func,'JournalSpider')
 
 class JournalSpider:
-    def __init__(self,JournalObj):
+    def __init__(self,JournalObj,just_init=False):
         self.JournalObj = JournalObj
         self.volume_links = []
+        self.just_init = just_init
 
     @EP_METHOD
-    def _run(self,AllItemsPageParser,JournalArticle,
+    def _run(self,AllItemsPageParser,JournalArticle,just_init=False,
              use_tor=False,check_pdf_url=True,internal_thread_cot=8):
         volume_items = list(set(
             self.get_unfinished_volume_links()
@@ -43,7 +44,8 @@ class JournalSpider:
             'AllItemsPageParser':AllItemsPageParser,
             'JournalArticle':JournalArticle,
             'use_tor':use_tor,
-            'check_pdf_url':check_pdf_url
+            'check_pdf_url':check_pdf_url,
+            'just_init':just_init
         }
         params_dicts = []
         for volume_item in volume_items:
@@ -201,11 +203,8 @@ class JournalSpider:
         if not self.JournalObj.volume_links_got:
             #第一次初始化
             self.create_new_volumes()
-        '''
-        #想一次性初始化完volume_links时使用
+        if self.just_init:
             return []
-        return []
-        '''
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         cur.execute(
             'select link,id from journal_volume \

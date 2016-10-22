@@ -87,10 +87,16 @@ class JournalTaskManager:
                 params.append(driverObj)
             debug = False
             if debug:
-                Spider(*params).run(internal_thread_cot=self.internal_thread_cot)
+                Spider(*params).run(
+                    internal_thread_cot=self.internal_thread_cot,
+                    just_init = self.just_init
+                )
             else:
                 try:
-                    Spider(*params).run(internal_thread_cot=self.internal_thread_cot)
+                    Spider(*params).run(
+                        internal_thread_cot=self.internal_thread_cot,
+                        just_init = self.just_init
+                    )
                 except Exception as e:
                     print('[Error] JournalTaskManager:launch_journal_spider:{}'.format(str(e)))
                     return
@@ -109,8 +115,10 @@ class JournalTaskManager:
             internal_thread_cot = 8,
             thread_cot = 16,
             driver_pool_size = 0,
-            volume_links_got=True
+            volume_links_got=True,
+            just_init = False
         ):
+        self.just_init = just_init
         self.internal_thread_cot = internal_thread_cot
         journals_info = self.get_journals_info(
             EntranceFunc=DB_EntranceFunc,

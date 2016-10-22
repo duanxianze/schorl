@@ -187,7 +187,7 @@ class PublisherEntrance:
             journal_filter += ' area_relation_cot=1 and '
         if open_access:
             journal_filter += ' open_access=true and '
-        if volume_links_got is not 'no limit':
+        if volume_links_got != 'no limit':
             if volume_links_got:
                 journal_filter += ' volume_links_got=true and '
             else:
