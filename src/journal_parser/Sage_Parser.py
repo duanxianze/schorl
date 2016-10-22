@@ -35,11 +35,6 @@ class SageParser:
         self.soup = BeautifulSoup(html_source,'lxml')
 
     @property
-    def pages_amount(self):
-        return int(self.soup.select_one('.number-of-pages')
-                   .text.replace(",",""))
-
-    @property
     def sections(self):
         return self.soup.select('.toc-cit')
 

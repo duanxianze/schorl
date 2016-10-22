@@ -23,6 +23,7 @@ from Journals_Task.SpringSpider import SpringSpider
 from Journals_Task.IEEE_Spider import IEEE_Spider
 from Journals_Task.TaylorFrancisSpider import TaylorFrancisSpider
 from Journals_Task.SageSpider import SageSpider
+from Journals_Task.BiomedSpider import BioMedSpider
 
 EXISTED_SPIDERS = [
     {
@@ -48,6 +49,11 @@ EXISTED_SPIDERS = [
     {
        'publisherSpiderClass': IEEE_Spider,
        'publisherKeywords':    ['ieee'],
+       'need_webdriver':       False
+    },
+    {
+       'publisherSpiderClass': BioMedSpider,
+       'publisherKeywords':    ['biomedcen'],
        'need_webdriver':       False
     }
 ]

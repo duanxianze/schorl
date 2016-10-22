@@ -187,10 +187,11 @@ class PublisherEntrance:
             journal_filter += ' area_relation_cot=1 and '
         if open_access:
             journal_filter += ' open_access=true and '
-        if volume_links_got:
-            journal_filter += ' volume_links_got=true and '
-        else:
-            journal_filter += ' volume_links_got=false and '
+        if volume_links_got is not 'no limit':
+            if volume_links_got:
+                journal_filter += ' volume_links_got=true and '
+            else:
+                journal_filter += ' volume_links_got=false and '
         cur = REMOTE_CONNS_POOL.new_db_cursor()
         sql =  "select name,sjr_id,site_source,area_relation_cot,\
                     category_relation_cot,publisher,volume_links_got from journal \

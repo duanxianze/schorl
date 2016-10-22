@@ -85,14 +85,15 @@ class JournalTaskManager:
             if need_webdriver:
                 driverObj = self.drviers_pool.get_one_free_driver()
                 params.append(driverObj)
-            #Spider(*params).run(internal_thread_cot=self.internal_thread_cot)
-            try:
-                Spider(*params).run(
-                    internal_thread_cot=self.internal_thread_cot
-                )
-            except Exception as e:
-                print('[Error] JournalTaskManager:launch_journal_spider:{}'.format(str(e)))
-                return
+            debug = False
+            if debug:
+                Spider(*params).run(internal_thread_cot=self.internal_thread_cot)
+            else:
+                try:
+                    Spider(*params).run(internal_thread_cot=self.internal_thread_cot)
+                except Exception as e:
+                    print('[Error] JournalTaskManager:launch_journal_spider:{}'.format(str(e)))
+                    return
         else:
             print('[Spider Not Found]: <{}> 所属出版社解析器未找到( {} )'\
                   .format(JournalObj.name,JournalObj.site_source))
