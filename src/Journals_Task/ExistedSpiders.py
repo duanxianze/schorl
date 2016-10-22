@@ -24,8 +24,14 @@ from Journals_Task.IEEE_Spider import IEEE_Spider
 from Journals_Task.TaylorFrancisSpider import TaylorFrancisSpider
 from Journals_Task.SageSpider import SageSpider
 from Journals_Task.BiomedSpider import BioMedSpider
+from Journals_Task.WileySpider import WileySpider
 
 EXISTED_SPIDERS = [
+    {
+       'publisherSpiderClass': WileySpider,
+       'publisherKeywords':    ['interscience.wiley'],
+       'need_webdriver':       False
+    },
     {
        'publisherSpiderClass': SageSpider,
        'publisherKeywords':    ['sagepub'],
