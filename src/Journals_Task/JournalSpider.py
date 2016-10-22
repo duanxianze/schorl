@@ -28,14 +28,14 @@ EP_METHOD = lambda func:except_pass(func,'JournalSpider')
 ERN_METHOD = lambda func:except_return_none(func,'JournalSpider')
 
 class JournalSpider:
-    def __init__(self,JournalObj,just_init=False):
+    def __init__(self,JournalObj):
         self.JournalObj = JournalObj
         self.volume_links = []
-        self.just_init = just_init
 
     @EP_METHOD
-    def _run(self,AllItemsPageParser,JournalArticle,just_init=False,
-             use_tor=False,check_pdf_url=True,internal_thread_cot=8):
+    def _run(self,AllItemsPageParser,JournalArticle,use_tor=False,
+             check_pdf_url=True,internal_thread_cot=8,just_init=False):
+        self.just_init = just_init
         volume_items = list(set(
             self.get_unfinished_volume_links()
         ))
@@ -45,7 +45,6 @@ class JournalSpider:
             'JournalArticle':JournalArticle,
             'use_tor':use_tor,
             'check_pdf_url':check_pdf_url,
-            'just_init':just_init
         }
         params_dicts = []
         for volume_item in volume_items:
@@ -72,7 +71,7 @@ class JournalSpider:
             AllItemsPageParser = params_dict['AllItemsPageParser'],
             JournalArticle = params_dict['JournalArticle'],
             use_tor = params_dict['use_tor'],
-            check_pdf_url = params_dict['check_pdf_url']
+            check_pdf_url = params_dict['check_pdf_url'],
         )
 
     def handle_volume_link_for_multi_results(self,volume_link):
