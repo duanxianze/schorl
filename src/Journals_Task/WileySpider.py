@@ -56,7 +56,6 @@ class WileySpider(JournalSpider):
     def get_volume_links_by_year(self,year):
         ajax_url = '{}/fragment?activeYear={}&SKIP_DECORATION=true'\
             .format(self.volumes_page_url,year)
-        #print('ajax_url:{}'.format(ajax_url))
         for i in range(5):
             a_list = BeautifulSoup(
                 request_with_random_ua(ajax_url).text,'lxml'
@@ -64,7 +63,8 @@ class WileySpider(JournalSpider):
             if a_list:
                 break
         volume_links_by_year = [ 'http://onlinelibrary.wiley.com'+a['href'] for a in a_list ]
-        print(volume_links_by_year)
+        if volume_links_by_year==[]:
+            print('error ajax_url:{}'.format(ajax_url))
         self.volume_links.extend(volume_links_by_year)
 
     def run(self,internal_thread_cot=8,just_init=False):

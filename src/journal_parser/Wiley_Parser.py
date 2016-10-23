@@ -36,8 +36,10 @@ class WileyAllItemsPageParser:
 
 	@property
 	def volume_year(self):
-		return int(self.soup.select_one('.noMargin').text.split(' ')[-1])
-
+		try:
+			return int(self.soup.select_one('.noMargin').text.split(' ')[-1])
+		except:
+			return int(self.soup.select_one('.noMargin').text.split(' ')[-1].split('/')[0])
 
 class WileyArticle(JournalArticle):
 	def __init__(self,sec,JournalObj,volume_db_id,year):
