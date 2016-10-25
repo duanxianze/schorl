@@ -52,10 +52,11 @@ class BioMedSpider(JournalSpider):
             self.volume_links.append(page_url)
 
 
-    def run(self,internal_thread_cot=8):
+    def run(self,internal_thread_cot=8,just_init=False):
         self._run(
             AllItemsPageParser = BioMedParser,
             JournalArticle = BioMedArticle,
+            just_init=just_init,
             internal_thread_cot=internal_thread_cot
         )
 
