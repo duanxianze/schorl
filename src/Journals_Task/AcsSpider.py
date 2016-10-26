@@ -32,9 +32,11 @@ class AcsSpider(JournalSpider):
 
     def generate_volume_links(self):
         #http://pubs.acs.org/journal/ancac3
+        if self.JournalObj.volume_links_got:
+            return
         index = self.url.split('/')[-1]
         volumes_page_url = 'http://pubs.acs.org/loi/{}'.format(index)
-        print(volumes_page_url)
+        #print(volumes_page_url)
         a_list = BeautifulSoup(
             request_with_random_ua(volumes_page_url).text,'lxml'
         ).select('.publicationTitle')
@@ -50,12 +52,13 @@ class AcsSpider(JournalSpider):
                 print('length:',len(self.volume_links))
                 break
 
-    def run(self,internal_thread_cot=8,just_init=False):
+    def run(self,internal_thread_cot=8,just_init=False,debug=False):
         self._run(
             AllItemsPageParser=AcsParser,
             JournalArticle=AcsArticle,
             internal_thread_cot=internal_thread_cot,
-            just_init=just_init
+            just_init=just_init,
+            debug=True
         )
 
 if __name__=="__main__":

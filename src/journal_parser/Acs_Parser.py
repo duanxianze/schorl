@@ -38,11 +38,17 @@ class AcsParser:
     def sections(self):
         return self.soup.select('.articleBox')
 
+    @property
+    def volume_year(self):
+        return int(self.soup.select_one('#date').text.split(' ')[-1].strip())
+
+
 class AcsArticle(JournalArticle):
-    def __init__(self, sec, JournalObj,volume_db_id):
+    def __init__(self, sec, JournalObj,volume_db_id,year):
         self.sec = sec
         JournalArticle.__init__(self,JournalObj,volume_db_id)
         self.generate_all_method()
+        self.year = year
 
     @EP_METHOD
     def generate_title(self):
@@ -51,14 +57,6 @@ class AcsArticle(JournalArticle):
     @EP_METHOD
     def generate_authors(self):
         self.authors = [ author.text for author in self.sec.select('.entryAuthor')]
-
-    @EP_METHOD
-    def generate_year(self):
-        self.year = int(
-            sec.find_parent(class_='articles')\
-                .find_previous_sibling(class_='articleGroupHead').text\
-                .split(',')[1].strip()
-        )
 
     @EP_METHOD
     def generate_pdf_temp_url(self):
@@ -76,7 +74,7 @@ class AcsArticle(JournalArticle):
             +self.sec.select_one('.art_title > a')['href']
 
 if __name__=="__main__":
-    from crawl_tools.JournalClass import Journal
+    from Journals_Task.JournalClass import Journal
     acs = Journal()
     for sec in AcsParser(from_web=False).sections:
         article = AcsArticle(sec,acs,2)

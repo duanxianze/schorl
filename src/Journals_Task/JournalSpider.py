@@ -36,9 +36,10 @@ class JournalSpider:
         pass
 
     @EP_METHOD
-    def _run(self,AllItemsPageParser,JournalArticle,use_tor=False,
-             check_pdf_url=True,internal_thread_cot=8,just_init=False):
+    def _run(self,AllItemsPageParser,JournalArticle,use_tor=False,check_pdf_url=True,
+            internal_thread_cot=8,just_init=False,debug=False):
         self.just_init = just_init
+        self.debug = debug
         volume_items = list(set(
             self.get_unfinished_volume_links()
         ))
@@ -107,7 +108,7 @@ class JournalSpider:
         if self.crawl_articles(sections,volume_year,
                 volume_db_id,JournalArticle,check_pdf_url)==False:
             return False
-        if len(parser.sections)>0:
+        if len(parser.sections)>0 and self.debug==False:
             self.mark_volume_ok(volume_db_id)
             return True
         return False
@@ -137,7 +138,11 @@ class JournalSpider:
                 print('[Error] JournalSpider:\
                     No authors in article <{}>'.format(article.title))
                 continue
-            article.save_to_db()
+            if self.debug:
+                print('=========DEBUG INFO=============')
+                article.show_in_cmd()
+            else:
+                article.save_to_db()
 
     @EP_METHOD
     def mark_journal_ok(self):
