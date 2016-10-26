@@ -32,6 +32,9 @@ class JournalSpider:
         self.JournalObj = JournalObj
         self.volume_links = []
 
+    def generate_volume_links(self):
+        pass
+
     @EP_METHOD
     def _run(self,AllItemsPageParser,JournalArticle,use_tor=False,
              check_pdf_url=True,internal_thread_cot=8,just_init=False):
