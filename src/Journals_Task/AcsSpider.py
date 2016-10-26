@@ -58,7 +58,7 @@ class AcsSpider(JournalSpider):
             JournalArticle=AcsArticle,
             internal_thread_cot=internal_thread_cot,
             just_init=just_init,
-            debug=True
+            debug = False
         )
 
 if __name__=="__main__":
