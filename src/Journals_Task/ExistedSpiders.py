@@ -26,8 +26,14 @@ from Journals_Task.SageSpider import SageSpider
 from Journals_Task.BiomedSpider import BioMedSpider
 from Journals_Task.WileySpider import WileySpider
 from Journals_Task.AcsSpider import AcsSpider
+from Journals_Task.EmeraldSpider import EmeraldSpider
 
 EXISTED_SPIDERS = [
+    {
+       'publisherSpiderClass': EmeraldSpider,
+       'publisherKeywords':    ['emeraldgroup'],
+       'need_webdriver':       False
+    },
     {
        'publisherSpiderClass': AcsSpider,
        'publisherKeywords':    ['pubs.acs'],
