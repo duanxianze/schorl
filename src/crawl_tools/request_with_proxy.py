@@ -91,9 +91,9 @@ def request_with_random_ua(url,timeout=3):
         try:
             return requests.get(
                 url = url,
+                timeout = timeout,
                 headers = {'User-Agent': get_one_random_ua()}
             )
         except Exception as e:
             print('[Error]request_with_random_ua :%s'%str(e))
-            time.sleep(timeout)
     return None
