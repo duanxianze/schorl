@@ -193,6 +193,7 @@ class JournalSpider:
     def create_new_volumes(self):
         print('Init volume_links of {}...'.format(self.JournalObj.name))
         if self.volume_links==[]:
+            #抓取volume_links失败时，避免对journal volume_links_got置1
             return
         for volume_link in self.volume_links:
             self.create_volume(volume_link)
