@@ -33,7 +33,6 @@ class EmeraldParser:
                 html_source = f.read()
         self.soup = BeautifulSoup(html_source, 'lxml')
 
-
     @property
     def sections(self):
         return self.soup.find_all(class_ = 'articleEntry')

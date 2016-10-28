@@ -40,8 +40,10 @@ class AcsParser:
 
     @property
     def volume_year(self):
-        return int(self.soup.select_one('#date').text.split(' ')[-1].strip())
-
+        try:
+            return int(self.soup.select_one('#date').text.split(' ')[-1].strip())
+        except:
+            return int(self.soup.select_one('#date').text.split(' ')[-1].strip().split(',')[-1])
 
 class AcsArticle(JournalArticle):
     def __init__(self, sec, JournalObj,volume_db_id,year):
