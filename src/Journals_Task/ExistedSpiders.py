@@ -27,8 +27,14 @@ from Journals_Task.BiomedSpider import BioMedSpider
 from Journals_Task.WileySpider import WileySpider
 from Journals_Task.AcsSpider import AcsSpider
 from Journals_Task.EmeraldSpider import EmeraldSpider
+from Journals_Task.LwwSpider import LwwSpider
 
 EXISTED_SPIDERS = [
+    {
+       'publisherSpiderClass': LwwSpider,
+       'publisherKeywords':    ['lww.com'],
+       'need_webdriver':       False
+    },
     {
        'publisherSpiderClass': EmeraldSpider,
        'publisherKeywords':    ['emeraldgroup'],
