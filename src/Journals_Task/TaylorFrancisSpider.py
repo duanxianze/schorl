@@ -70,12 +70,14 @@ class TaylorFrancisSpider(JournalSpider):
             html_source=request_with_random_ua(self.url).text
         ).volume_links
 
-    def run(self,internal_thread_cot=8):
+    def run(self,internal_thread_cot=8,just_init=False):
         self._run(
             AllItemsPageParser = TaylorFrancisParser,
             JournalArticle = TaylorFrancisArticle,
             internal_thread_cot=internal_thread_cot,
-            use_tor = True
+            use_tor = True,
+            just_init = just_init,
+            debug = False
         )
 
 
