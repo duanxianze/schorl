@@ -29,7 +29,7 @@ class EmeraldParser:
     '''
     def __init__(self,html_source=None,from_web=True):
         if not from_web:
-            with open('./pages/Emerald.html','rb') as f:
+            with open('./emerald.html','rb') as f:
                 html_source = f.read()
         self.soup = BeautifulSoup(html_source, 'lxml')
 
@@ -37,6 +37,10 @@ class EmeraldParser:
     def sections(self):
         return self.soup.find_all(class_ = 'articleEntry')
 
+    @property
+    def volume_year(self):
+        year_str = self.soup.find('span',text=re.compile('Published')).text.strip()
+        return int(re.split(',| ',year_str)[1])
 
 class EmeraldArticle(JournalArticle):
     def __init__(self,sec,JournalObj,volume_db_id):
@@ -70,6 +74,9 @@ class EmeraldArticle(JournalArticle):
 if __name__=="__main__":
     from Journals_Task.JournalClass import Journal
     journal = Journal()
-    for sec in EmeraldParser(from_web=False).sections:
+    parser = EmeraldParser(from_web=False)
+    year = parser.volume_year
+    for sec in parser.sections:
         article = EmeraldArticle(sec,journal,2)
         article.show_in_cmd()
+    print(year)
