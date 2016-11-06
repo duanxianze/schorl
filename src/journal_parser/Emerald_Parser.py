@@ -60,8 +60,13 @@ class EmeraldArticle(JournalArticle):
 
     @EP_METHOD
     def generate_id_by_journal(self):
-        self.generate_link()
-        self.id_by_journal = self.link.strip(self.domain+'/doi/full')
+        try:
+            self.generate_link()
+            self.id_by_journal = self.link.strip(self.domain+'/doi/full')
+        except:
+            self.generate_pdf_temp_url()
+            self.id_by_journal = self.pdf_temp_url.strip(self.domain+'/pdfplus')
+
 
     @EP_METHOD
     def generate_link(self):
