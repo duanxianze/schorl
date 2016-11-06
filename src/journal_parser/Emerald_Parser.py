@@ -48,6 +48,7 @@ class EmeraldArticle(JournalArticle):
         self.domain = 'http://www.emeraldinsight.com'
         JournalArticle.__init__(self,JournalObj,volume_db_id)
         self.generate_all_method()
+        self.year = year
 
     @EP_METHOD
     def generate_title(self):
@@ -77,6 +78,6 @@ if __name__=="__main__":
     parser = EmeraldParser(from_web=False)
     year = parser.volume_year
     for sec in parser.sections:
-        article = EmeraldArticle(sec,journal,2)
+        article = EmeraldArticle(sec,journal,2,2013)
         article.show_in_cmd()
     print(year)
