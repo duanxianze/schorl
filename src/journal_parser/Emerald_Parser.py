@@ -43,7 +43,7 @@ class EmeraldParser:
         return int(re.split(',| ',year_str)[1])
 
 class EmeraldArticle(JournalArticle):
-    def __init__(self,sec,JournalObj,volume_db_id):
+    def __init__(self,sec,JournalObj,volume_db_id,year):
         self.sec = sec
         self.domain = 'http://www.emeraldinsight.com'
         JournalArticle.__init__(self,JournalObj,volume_db_id)
