@@ -70,13 +70,7 @@ class JournalSpider:
 
     @ERN_METHOD
     def crawl_vp(self,params_dict):
-        return self.crawl_volume_page(
-            volume_item = params_dict['volume_item'],
-            AllItemsPageParser = params_dict['AllItemsPageParser'],
-            JournalArticle = params_dict['JournalArticle'],
-            use_tor = params_dict['use_tor'],
-            check_pdf_url = params_dict['check_pdf_url'],
-        )
+        return self.crawl_volume_page(**params_dict)
 
     def handle_volume_link_for_multi_results(self,volume_link):
         #对多页的支持，根据不同出版社各自情况，可能需要加一些ajax参数
@@ -128,7 +122,8 @@ class JournalSpider:
                       .format(str(e)))
                 continue
             if check_pdf_url:
-                if article.pdf_url==None and article.pdf_temp_url==None:
+                if article.pdf_url==None \
+                        and article.pdf_temp_url==None:
                     pdf_url_null_cot += 1
                 else:
                     pdf_url_null_cot = 0

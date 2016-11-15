@@ -49,7 +49,8 @@ class EmeraldSpider(JournalSpider):
             JournalArticle = EmeraldArticle,
             internal_thread_cot = internal_thread_cot,
             just_init = just_init,
-            debug=True
+            debug = True,
+            use_tor = True
         )
 
 if __name__=="__main__":
